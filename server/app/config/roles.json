@@ -1,0 +1,51 @@
+{
+    "roles": [
+        {
+            "name": "super_admin",
+            "permissions": [
+                "view_platform_metrics",
+                "manage_institutions",
+                "manage_all_users",
+                "view_all_tests",
+                "view_all_results",
+                "reset_attempt"
+            ]
+        },
+        {
+            "name": "owner",
+            "permissions": [
+                "manage_students",
+                "manage_instructors",
+                "view_institution_metrics",
+                "create_test",
+                "read_test",
+                "update_test",
+                "delete_test",
+                "publish_test",
+                "view_results",
+                "reset_attempt"
+            ]
+        },
+        {
+            "name": "instructor",
+            "permissions": [
+                "create_test",
+                "read_test",
+                "update_test",
+                "delete_test",
+                "view_results",
+                "manage_questions",
+                "publish_test",
+                "reset_attempt"
+            ]
+        },
+        {
+            "name": "student",
+            "permissions": [
+                "read_test",
+                "take_test",
+                "view_own_results"
+            ]
+        }
+    ]
+}

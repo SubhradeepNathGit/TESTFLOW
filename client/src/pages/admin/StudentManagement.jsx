@@ -1,0 +1,262 @@
+import React, { useState, useContext } from 'react';
+import { Users, UserPlus, Mail, Search, X, Eye, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import AuthContext from '../../context/AuthContext';
+import { toast } from 'react-toastify';
+import api from '../../api/axiosInstance';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+const StudentManagement = () => {
+    const { user } = useContext(AuthContext);
+    const queryClient = useQueryClient();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [newStudent, setNewStudent] = useState({ name: '', email: '' });
+
+    const { data: students = [], isLoading: loading } = useQuery({
+        queryKey: ['students', searchTerm],
+        queryFn: () => api.get(`/users/students?search=${searchTerm}`).then(r => r.data.data || []),
+        keepPreviousData: true,
+    });
+
+    const handleAddStudent = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            const { data } = await api.post('/users/students', newStudent);
+            toast.success(data.message || 'Student added! Credentials sent via email.');
+            setShowAddModal(false);
+            setNewStudent({ name: '', email: '' });
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to add student');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleToggleStatus = async (studentId, currentStatus) => {
+        try {
+            await api.patch(`/users/students/${studentId}/toggle`);
+            queryClient.setQueryData(['students', searchTerm], (old = []) =>
+                old.map(s => s._id === studentId ? { ...s, isActive: !currentStatus } : s)
+            );
+            toast.success(`Student ${currentStatus ? 'deactivated' : 'activated'}`);
+        } catch {
+            toast.error('Failed to update status');
+        }
+    };
+
+    const handleDelete = async (studentId) => {
+        if (!window.confirm('Permanently delete this student? This cannot be undone.')) return;
+        try {
+            await api.delete(`/users/students/${studentId}`);
+            toast.success('Student removed');
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+        } catch {
+            toast.error('Failed to delete student');
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-50 p-6 lg:p-12 font-sans">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                    <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Management</p>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                            Student <span className="text-slate-400 font-light">Management</span>
+                        </h1>
+                        <p className="text-slate-500 font-medium mt-1">Add and manage examinees for your institution</p>
+                    </div>
+                    {(user?.role === 'owner' || user?.role === 'instructor') && (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            className="flex items-center gap-2 px-6 py-3.5 bg-slate-900 text-white rounded-2xl hover:bg-black transition-all font-bold shadow-lg shadow-slate-900/20 active:scale-95"
+                        >
+                            <UserPlus size={18} />
+                            Add Student
+                        </button>
+                    )}
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    {[
+                        { label: 'Total Students', value: students.length },
+                        { label: 'Active', value: students.filter(s => s.isActive).length },
+                        { label: 'Inactive', value: students.filter(s => !s.isActive).length },
+                    ].map((stat, i) => (
+                        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{stat.label}</p>
+                            <p className="text-3xl font-black text-slate-900">{stat.value}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Search */}
+                <div className="relative mb-6">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                        type="text"
+                        placeholder="Search by name, email or student ID..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 placeholder-slate-400 transition-all"
+                    />
+                </div>
+
+                {/* Table */}
+                <div className="bg-white rounded-[28px] border border-slate-100 shadow-sm overflow-hidden">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24 gap-4">
+                            <div className="w-10 h-10 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin" />
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loading Students...</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-100">
+                                        {['Student', 'Roll / ID', 'Status', 'Joined', 'Actions'].map(h => (
+                                            <th key={h} className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                {h}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {students.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="py-20 text-center">
+                                                <Users className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                                                <p className="text-slate-400 font-medium">No students found</p>
+                                            </td>
+                                        </tr>
+                                    ) : students.map(student => (
+                                        <tr key={student._id} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-black text-sm">
+                                                        {student.name?.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-slate-800 text-sm">{student.name}</p>
+                                                        <p className="text-xs text-slate-400">{student.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-xs font-black text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                                    {student.studentId || 'Not assigned'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <button
+                                                    onClick={() => handleToggleStatus(student._id, student.isActive)}
+                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase transition-all ${
+                                                        student.isActive
+                                                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                                            : 'bg-red-50 text-red-600 hover:bg-red-100'
+                                                    }`}
+                                                >
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${student.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                                                    {student.isActive ? 'Active' : 'Inactive'}
+                                                </button>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-slate-500 font-medium">
+                                                {student.joinedAt
+                                                    ? new Date(student.joinedAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })
+                                                    : <span className="text-slate-300 italic">Not yet</span>
+                                                }
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    {!student.isActive && user?.role === 'owner' && (
+                                                        <button
+                                                            onClick={() => handleDelete(student._id)}
+                                                            className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-xl transition-colors"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Add Student Modal */}
+            {showAddModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-[32px] shadow-2xl max-w-md w-full p-8">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-2xl font-black text-slate-900">Add Student</h2>
+                                <p className="text-sm text-slate-400 mt-1">Credentials auto-generated and emailed</p>
+                            </div>
+                            <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleAddStudent} className="space-y-5">
+                            <div>
+                                <label className="block text-xs font-black text-slate-600 uppercase tracking-widest mb-2">Full Name</label>
+                                <input
+                                    type="text" required
+                                    value={newStudent.name}
+                                    onChange={e => setNewStudent({ ...newStudent, name: e.target.value })}
+                                    placeholder="e.g. John Doe"
+                                    className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-black text-slate-600 uppercase tracking-widest mb-2">Email Address</label>
+                                <div className="relative">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <input
+                                        type="email" required
+                                        value={newStudent.email}
+                                        onChange={e => setNewStudent({ ...newStudent, email: e.target.value })}
+                                        placeholder="student@email.com"
+                                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100/50 flex gap-3.5 items-start shadow-sm">
+                                <div className="mt-0.5 w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-indigo-100 shadow-inner text-indigo-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </div>
+                                <p className="text-[13px] text-indigo-700 font-medium leading-relaxed">
+                                    <strong className="block text-indigo-900 font-bold mb-0.5 tracking-tight">Automated Provisioning</strong>
+                                    A secure temporary password and unique Student ID will be automatically generated and privately dispatched to the candidate's email address.
+                                </p>
+                            </div>
+
+                            <div className="flex gap-3 pt-2">
+                                <button type="button" onClick={() => setShowAddModal(false)}
+                                    className="flex-1 py-3.5 border border-slate-200 text-slate-700 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all">
+                                    Cancel
+                                </button>
+                                <button type="submit" disabled={submitting}
+                                    className="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all disabled:opacity-50 active:scale-95">
+                                    {submitting ? 'Adding...' : 'Add Student'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default StudentManagement;
