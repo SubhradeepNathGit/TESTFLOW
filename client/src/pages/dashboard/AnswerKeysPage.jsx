@@ -5,9 +5,7 @@ import { toast } from 'react-toastify';
 import AuthContext from '../../context/AuthContext';
 import { getAnswerKeys, uploadAnswerKey, deleteAnswerKey } from '../../api/answerKeyApi';
 
-/* ─────────────────────────────────────────
-   Upload Modal (Instructors Only)
-───────────────────────────────────────── */
+// Upload Modal
 const UploadModal = ({ isOpen, onClose, onUploaded }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -128,9 +126,7 @@ const UploadModal = ({ isOpen, onClose, onUploaded }) => {
     );
 };
 
-/* ─────────────────────────────────────────
-   Main Component
-───────────────────────────────────────── */
+// Main Component
 const AnswerKeysPage = () => {
     const { user } = useContext(AuthContext);
     const [answerKeys, setAnswerKeys] = useState([]);
@@ -170,7 +166,7 @@ const AnswerKeysPage = () => {
         <div className="min-h-screen bg-[#F8F9FD] p-6 lg:p-10">
             <div className="max-w-7xl mx-auto">
                 
-                {/* ── Header ── */}
+                {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
@@ -193,7 +189,7 @@ const AnswerKeysPage = () => {
                     )}
                 </div>
 
-                {/* ── List ── */}
+                {/* List */}
                 {loading ? (
                     <div className="flex justify-center p-20">
                         <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     FiBook, FiClock, FiStar, FiAward, FiTrendingUp,
-    FiLogIn, FiCheckCircle, FiLock, FiZap
+    FiLogIn, FiCheckCircle, FiLock
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { getTests } from '../../api/testApi';
@@ -17,7 +17,7 @@ const cardVariants = {
     show: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.4, ease: 'easeOut' } }),
 };
 
-/* Tiny score bar component */
+// Score bar component
 const ScoreBar = ({ score, total }) => {
     const pct = total > 0 ? Math.min((score / total) * 100, 100) : 0;
     const color = pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-indigo-500' : pct >= 40 ? 'bg-amber-400' : 'bg-red-400';
@@ -161,7 +161,7 @@ const StudentDashboard = () => {
                     </div>
                 </motion.div>
 
-                {/* ── KPI Row ── */}
+                {/* KPIs */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     {kpis.map((kpi, i) => (
                         <motion.div
@@ -184,7 +184,7 @@ const StudentDashboard = () => {
                     ))}
                 </div>
 
-                {/* ── Main Grid ── */}
+                {/* Management Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     {/* Available Tests (2/3 wide) */}
@@ -276,7 +276,7 @@ const StudentDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Results Sidebar (1/3 wide) */}
+                    {/* My Results */}
                     <div>
                         <div className="flex items-center gap-3 mb-5">
                             <span className="w-1 h-6 bg-emerald-500 rounded-full" />

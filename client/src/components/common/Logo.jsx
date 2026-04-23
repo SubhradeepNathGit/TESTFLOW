@@ -1,4 +1,4 @@
-import { Store } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 const Logo = ({
     className = "",
@@ -10,7 +10,7 @@ const Logo = ({
     return (
         <div className={`flex items-center gap-3 ${className}`}>
 
-            <Store size={size} className={iconClassName} />
+            <BookOpen size={size} className={iconClassName} />
             {!hideText && (
                 <span className={`text-2xl font-bold tracking-tight ${textClassName || "text-slate-900"} drop-shadow-sm`}>
                     TESTFLOW

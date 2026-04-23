@@ -4,9 +4,7 @@ const { parseMCQFromPDF } = require("../utils/pdfParser");
 const fs = require("fs");
 const ErrorResponse = require("../utils/errorResponse");
 
-/**
- * Create a new test and its questions from PDF
- */
+// Create test from PDF
 exports.createTestFromPDF = async (testData, pdfPath, userId) => {
     try {
         const buffer = fs.readFileSync(pdfPath);
@@ -46,9 +44,7 @@ exports.createTestFromPDF = async (testData, pdfPath, userId) => {
     }
 };
 
-/**
- * Create a new test manually
- */
+// Create test manually
 exports.createTest = async (testData, userId) => {
     return await Test.create({
         ...testData,
@@ -57,9 +53,7 @@ exports.createTest = async (testData, userId) => {
     });
 };
 
-/**
- * Manually add a question to a test
- */
+// Add question to test
 exports.addQuestion = async (testId, questionData) => {
     const test = await Test.findById(testId);
     if (!test) throw new ErrorResponse("Test not found", 404);
@@ -77,9 +71,7 @@ exports.addQuestion = async (testId, questionData) => {
     return question;
 };
 
-/**
- * Get tests for an institution
- */
+// Get tests by institution
 exports.getTestsByInstitution = async (institutionId, userRole) => {
     const query = { institutionId, isDeleted: false };
     if (userRole === "student") {
@@ -88,9 +80,7 @@ exports.getTestsByInstitution = async (institutionId, userRole) => {
     return await Test.find(query).sort({ createdAt: -1 });
 };
 
-/**
- * Get full test details with questions
- */
+// Get test details
 exports.getTestDetails = async (testId, institutionId) => {
     const test = await Test.findOne({ _id: testId, institutionId, isDeleted: false });
     if (!test) throw new ErrorResponse("Test not found", 404);
@@ -107,9 +97,7 @@ exports.getTestDetails = async (testId, institutionId) => {
     return { test, questions };
 };
 
-/**
- * Publish a test
- */
+// Publish test
 exports.publishTest = async (testId, institutionId) => {
     const test = await Test.findOne({ _id: testId, institutionId });
     if (!test) throw new ErrorResponse("Test not found", 404);
@@ -119,9 +107,7 @@ exports.publishTest = async (testId, institutionId) => {
     return test;
 };
 
-/**
- * Get comprehensive stats for a test (Instructor Only) using Aggregation Pipelines
- */
+// Get test analytics
 exports.getTestStats = async (testId, institutionId) => {
     const mongoose = require("mongoose");
     const Attempt = require("../models/Attempt");
@@ -329,9 +315,7 @@ exports.getTestStats = async (testId, institutionId) => {
 };
 
 
-/**
- * Get the global leaderboard for an institution
- */
+// Get leaderboard
 exports.getGlobalLeaderboard = async (institutionId) => {
     const Attempt = require("../models/Attempt");
     const mongoose = require("mongoose");
@@ -390,9 +374,7 @@ exports.getGlobalLeaderboard = async (institutionId) => {
     return leaderboard;
 };
 
-/**
- * Archive a test (soft delete)
- */
+// Archive test
 exports.archiveTest = async (testId, institutionId) => {
     const test = await Test.findOne({ _id: testId, institutionId });
     if (!test) throw new ErrorResponse("Test not found", 404);
@@ -402,9 +384,7 @@ exports.archiveTest = async (testId, institutionId) => {
     return test;
 };
 
-/**
- * Restore an archived test
- */
+// Restore test
 exports.restoreTest = async (testId, institutionId) => {
     const test = await Test.findOne({ _id: testId, institutionId });
     if (!test) throw new ErrorResponse("Test not found", 404);
@@ -414,9 +394,7 @@ exports.restoreTest = async (testId, institutionId) => {
     return test;
 };
 
-/**
- * Permanently delete a test and its questions
- */
+// Permanent delete
 exports.permanentDeleteTest = async (testId, institutionId) => {
     const test = await Test.findOne({ _id: testId, institutionId });
     if (!test) throw new ErrorResponse("Test not found", 404);

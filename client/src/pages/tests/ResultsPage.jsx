@@ -7,7 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getMyAttempts } from '../../api/attemptApi';
 
-/* ── Animated circular progress ── */
+// Score ring component
 const ScoreRing = ({ score, total, size = 160, stroke = 10 }) => {
     const pct = total > 0 ? Math.min(score / total, 1) : 0;
     const r = (size - stroke * 2) / 2;
@@ -127,7 +127,7 @@ const ResultsPage = () => {
         <div className="min-h-screen bg-[#F8F9FD] flex items-center justify-center p-5 lg:p-10">
             <div className="w-full max-w-lg">
 
-                {/* ── Card ── */}
+                {/* Form Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 24, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -135,16 +135,16 @@ const ResultsPage = () => {
                     className="bg-white rounded-[40px] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden"
                 >
                     {/* Top gradient header */}
-                    <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-8 pb-12 text-center relative overflow-hidden">
+                    <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-8 pb-24 text-center relative overflow-hidden">
                         <div className="absolute -right-8 -top-8 w-48 h-48 bg-white/5 rounded-full pointer-events-none" />
                         <div className="absolute -left-4 -bottom-4 w-28 h-28 bg-white/5 rounded-full pointer-events-none" />
                         <div className="relative z-10">
                             <p className="text-indigo-200 font-semibold text-sm mb-1 uppercase tracking-widest">Assessment Complete</p>
-                            <h1 className="text-2xl font-black text-white mb-1 truncate px-4">{testTitle}</h1>
+                            <h1 className="text-3xl font-black text-white mb-1 px-4 drop-shadow-md">{testTitle}</h1>
                         </div>
                     </div>
 
-                    {/* Score ring — overlapping the header */}
+                    {/* Score Ring */}
                     <div className="flex justify-center -mt-[80px] relative z-10 mb-2">
                         <motion.div
                             initial={{ scale: 0, opacity: 0 }}
@@ -156,7 +156,7 @@ const ResultsPage = () => {
                         </motion.div>
                     </div>
 
-                    {/* Grade badge */}
+                    {/* Grade Badge */}
                     <div className="flex justify-center mb-7">
                         <motion.span
                             initial={{ opacity: 0, y: 8 }}
@@ -169,7 +169,7 @@ const ResultsPage = () => {
                         </motion.span>
                     </div>
 
-                    {/* Stat cards */}
+                    {/* Metrics */}
                     <div className="grid grid-cols-3 gap-3 px-7 mb-7">
                         {stats.map((s, i) => (
                             <motion.div
@@ -190,7 +190,7 @@ const ResultsPage = () => {
                         ))}
                     </div>
 
-                    {/* CTA section */}
+                    {/* Actions */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

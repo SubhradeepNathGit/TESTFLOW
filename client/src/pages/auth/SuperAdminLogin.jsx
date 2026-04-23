@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
-import { ShieldCheck, Eye, EyeOff, Store } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, BookOpen } from "lucide-react";
 import Logo from "../../components/common/Logo";
 
 const SuperAdminLogin = () => {
@@ -74,7 +74,7 @@ const SuperAdminLogin = () => {
                     <div className="mb-10 text-center lg:text-left">
                         <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3 justify-center lg:justify-start">
                             <div className="p-1.5 bg-indigo-600 rounded-lg shadow-sm">
-                                <ShieldCheck className="w-5 h-5 text-white" />
+                                <BookOpen className="w-5 h-5 text-white" />
                             </div>
                             <span>TESTFLOW</span>
                             <span className="text-slate-900">Admin</span>

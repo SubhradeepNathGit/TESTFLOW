@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Plus, Menu, X } from 'lucide-react';
+import { BookOpen, Plus, Menu, X } from 'lucide-react';
 import SearchBar from '../components/common/SearchBar';
 
 const Navbar = ({ searchTerm, setSearchTerm }) => {
@@ -8,7 +8,7 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleAddProduct = () => {
-    navigate('/add-product');
+    navigate('/instructor-dashboard');
     setIsMobileMenuOpen(false);
   };
 
@@ -16,24 +16,24 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
     <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {}
+          {/* Logo Section */}
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-xl font-bold text-gray-800 hover:text-blue-600 transition-colors"
+            className="flex items-center gap-2 text-xl font-bold text-gray-800 hover:text-indigo-600 transition-colors"
           >
-            <ShoppingBag className="w-6 h-6 text-blue-600" />
-            <span className="hidden sm:inline">My Store</span>
-            <span className="sm:hidden">CRUD</span>
+            <BookOpen className="w-6 h-6 text-indigo-600" />
+            <span className="hidden sm:inline">TestFlow</span>
+            <span className="sm:hidden">TF</span>
           </Link>
 
-          {}
+          {/* New Test Button */}
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={handleAddProduct}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
             >
               <Plus className="w-4 h-4" />
-              Add Product
+              New Test
             </button>
           </div>
 
@@ -58,14 +58,14 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
               <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             </div>
 
-            {}
+            {/* Mobile Actions */}
             <div className="space-y-2">
               <button
                 onClick={handleAddProduct}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
               >
                 <Plus className="w-4 h-4" />
-                Add Product
+                New Test
               </button>
             </div>
           </div>

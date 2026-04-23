@@ -21,7 +21,7 @@ const SearchBar = ({ searchTerm, setSearchTerm }) => {
         {}
         <input
           type="text"
-          placeholder="Search products by name..."
+          placeholder="Search assessments..."
           value={searchTerm}
           onChange={handleChange}
           className="w-full pl-11 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 transition-all outline-none text-slate-900 text-sm font-medium placeholder-slate-400 bg-white shadow-sm"

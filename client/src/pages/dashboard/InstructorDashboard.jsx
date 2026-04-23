@@ -233,7 +233,7 @@ const InstructorDashboard = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    {/* === Left Panel === */}
+                    {/* Left Panel */}
                     <div className="lg:col-span-1 space-y-8">
                         {/* Test Creation Card */}
                         <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40">
@@ -361,7 +361,7 @@ const InstructorDashboard = () => {
                         </div>
                     </div>
 
-                    {/* === Right Panel: Stats === */}
+                    {/* Right Panel: Stats */}
                     <div className="lg:col-span-2">
                         {selectedTestId ? (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">

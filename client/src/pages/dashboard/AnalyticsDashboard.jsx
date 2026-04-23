@@ -11,9 +11,10 @@ import { getTests, getTestStats } from '../../api/testApi';
 import { useSocket } from '../../context/SocketContext';
 import {
     FiBarChart2, FiUsers, FiAward, FiTrendingUp,
-    FiPieChart, FiTarget, FiZap, FiActivity, FiCheckCircle,
+    FiPieChart, FiTarget, FiActivity, FiCheckCircle,
     FiAlertTriangle, FiClock, FiStar
 } from 'react-icons/fi';
+import { Medal, Trophy, Award } from 'lucide-react';
 import CustomSelect from '../../components/common/CustomSelect';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -23,7 +24,7 @@ ChartJS.register(
     PointElement, LineElement, Filler
 );
 
-/* ── Shared chart defaults ──────────────────────────────────── */
+// Chart defaults
 const chartFont = { family: "'Inter', system-ui, sans-serif", weight: '700' };
 const gridColor = 'rgba(148,163,184,0.08)';
 const baseLineOptions = {
@@ -38,7 +39,7 @@ const baseLineOptions = {
     }
 };
 
-/* ── animation variants ──────────────────────────────────────── */
+// Animation variants
 const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     show: (i = 0) => ({
@@ -47,7 +48,7 @@ const fadeUp = {
     })
 };
 
-/* ── Stat card ───────────────────────────────────────────────── */
+// Stat card component
 const StatCard = ({ label, value, sub, icon: Icon, gradient, index }) => (
     <motion.div
         custom={index} variants={fadeUp} initial="hidden" animate="show"
@@ -70,7 +71,7 @@ const StatCard = ({ label, value, sub, icon: Icon, gradient, index }) => (
     </motion.div>
 );
 
-/* ── Empty state ─────────────────────────────────────────────── */
+// Empty state component
 const Empty = ({ icon: Icon, title, desc }) => (
     <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4">
@@ -81,14 +82,14 @@ const Empty = ({ icon: Icon, title, desc }) => (
     </div>
 );
 
-/* ── Difficulty badge ────────────────────────────────────────── */
+// Difficulty badge component
 const DiffBadge = ({ pct }) => {
     if (pct >= 70) return <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-black rounded-full uppercase">Easy</span>;
     if (pct >= 40) return <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[9px] font-black rounded-full uppercase">Medium</span>;
     return <span className="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] font-black rounded-full uppercase">Hard</span>;
 };
 
-/* ── Main Component ──────────────────────────────────────────── */
+// Main analytics component
 const AnalyticsDashboard = () => {
     const socket = useSocket();
     const queryClient = useQueryClient();
@@ -154,7 +155,7 @@ const AnalyticsDashboard = () => {
         </div>
     );
 
-    /* ── chart data builders ── */
+    // Chart data builders
     const distributionChart = stats ? {
         labels: ['Below 40%', '40–60%', '60–80%', '80–100%'],
         datasets: [{
@@ -212,7 +213,7 @@ const AnalyticsDashboard = () => {
 
             <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-8">
 
-                {/* ── HEADER ─────────────────────────────────────── */}
+                {/* Header */}
                 <motion.div variants={fadeUp} initial="hidden" animate="show"
                     className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
@@ -238,14 +239,14 @@ const AnalyticsDashboard = () => {
                     </div>
                 </motion.div>
 
-                {/* ── NO STATS YET ─────────────────────────────── */}
+                {/* No stats available */}
                 {!stats && !statsLoading && (
                     <div className="bg-white rounded-[2rem] border border-slate-100 p-20 text-center">
                         <Empty icon={FiBarChart2} title="No data available" desc="Select a test to see detailed analytics." />
                     </div>
                 )}
 
-                {/* ── LOADING OVERLAY ──────────────────────────── */}
+                {/* Loading state */}
                 {statsLoading && (
                     <div className="bg-white rounded-[2rem] border border-slate-100 p-16 flex items-center justify-center">
                         <div className="flex flex-col items-center gap-4">
@@ -262,14 +263,14 @@ const AnalyticsDashboard = () => {
                     <AnimatePresence mode="wait">
                         <motion.div key={selectedTest} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8">
 
-                            {/* ── KPI GRID ─────────────────────────────────── */}
+                            {/* KPI Grid */}
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                 {kpis.map((kpi, i) => (
                                     <StatCard key={i} index={i} label={kpi.label} value={kpi.value} sub={kpi.sub} icon={kpi.icon} gradient={kpi.gradient} />
                                 ))}
                             </div>
 
-                            {/* ── TAB NAVIGATION ───────────────────────────── */}
+                            {/* Tab navigation */}
                             <div className="flex bg-white border border-slate-100 rounded-2xl p-1.5 w-fit shadow-sm gap-1">
                                 {[
                                     { id: 'overview', label: 'Overview', icon: FiBarChart2 },
@@ -284,7 +285,7 @@ const AnalyticsDashboard = () => {
                                 ))}
                             </div>
 
-                            {/* ── OVERVIEW TAB ─────────────────────────────── */}
+                            {/* Overview tab */}
                             {activeTab === 'overview' && (
                                 <motion.div variants={fadeUp} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -351,7 +352,7 @@ const AnalyticsDashboard = () => {
                                     {/* Summary stats */}
                                     <div className="lg:col-span-3 bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
                                         <div className="flex items-center gap-2 mb-6">
-                                            <FiZap className="text-amber-500" size={16} />
+                                            <FiActivity className="text-amber-500" size={16} />
                                             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Assessment Summary</h3>
                                         </div>
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
@@ -377,7 +378,7 @@ const AnalyticsDashboard = () => {
                                 </motion.div>
                             )}
 
-                            {/* ── STUDENTS TAB ──────────────────────────────── */}
+                            {/* Students tab */}
                             {activeTab === 'students' && (
                                 <motion.div variants={fadeUp} initial="hidden" animate="show"
                                     className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
@@ -405,7 +406,7 @@ const AnalyticsDashboard = () => {
                                                         const passed = pct >= 50;
                                                         const color = pct >= 80 ? '#10b981' : pct >= 60 ? '#6366f1' : pct >= 40 ? '#f59e0b' : '#f43f5e';
                                                         const timeMins = p.timeTaken ? Math.round(p.timeTaken / 60000) : null;
-                                                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null;
+                                                        const medal = i === 0 ? <Medal className="text-yellow-500" size={18} /> : i === 1 ? <Medal className="text-slate-400" size={18} /> : i === 2 ? <Medal className="text-amber-600" size={18} /> : null;
 
                                                         return (
                                                             <tr key={i} className="hover:bg-slate-50/40 transition-colors">
@@ -459,7 +460,7 @@ const AnalyticsDashboard = () => {
                                 </motion.div>
                             )}
 
-                            {/* ── QUESTIONS TAB ─────────────────────────────── */}
+                            {/* Questions tab */}
                             {activeTab === 'questions' && (
                                 <motion.div variants={fadeUp} initial="hidden" animate="show" className="space-y-6">
 

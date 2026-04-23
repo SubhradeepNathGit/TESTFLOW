@@ -13,7 +13,7 @@ import { Line } from 'react-chartjs-2';
 import {
     Users, TrendingUp, Search, ArrowUpRight, ArrowDownRight, Trash2,
     CheckCircle2, XCircle, Activity, Layers, Database, ShieldCheck,
-    Briefcase, GraduationCap, Globe, Zap
+    Briefcase, GraduationCap, Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../utils/cn";
@@ -22,7 +22,7 @@ ChartJS.register(
     CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, Filler
 );
 
-/* ── Generic Components ────────────────────────────────────────── */
+// Components
 
 const StatCard = ({ icon: Icon, label, value, subValue, trend, index }) => (
     <motion.div
@@ -78,7 +78,7 @@ const TableAction = ({ onClick, color, icon: Icon, title }) => (
     </button>
 );
 
-/* ── Main Component ───────────────────────────────────────────── */
+// SuperAdmin Dashboard
 
 const SuperAdminDashboard = () => {
     const { user, loading: authLoading } = useContext(AuthContext);
@@ -269,7 +269,7 @@ const SuperAdminDashboard = () => {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                         <StatCard index={0} icon={Database} label="Institutions" value={metrics.totalInstitutions} subValue={metrics.activeInstitutions} trend={12} />
                                         <StatCard index={1} icon={Users} label="Global Users" value={metrics.totalUsers} trend={18} />
-                                        <StatCard index={2} icon={Zap} label="Activities" value={metrics.totalAttempts} subValue={metrics.totalTests} trend={24} />
+                                        <StatCard index={2} icon={Activity} label="Activities" value={metrics.totalAttempts} subValue={metrics.totalTests} trend={24} />
                                         <StatCard index={3} icon={TrendingUp} label="Platform Score" value={metrics.avgPlatformScore} subValue="100%" />
                                     </div>
 

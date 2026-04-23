@@ -9,9 +9,7 @@ import { toast } from 'react-toastify';
 import { startAttempt, saveAnswer, submitAttempt } from '../../api/attemptApi';
 import { getTest } from '../../api/testApi';
 
-/* ─────────────────────────────────────────────
-   Submit Confirmation Modal
-───────────────────────────────────────────── */
+// Submit confirmation modal
 const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total }) => {
     if (!isOpen) return null;
     const unanswered = total - answered;
@@ -96,9 +94,7 @@ const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total
     );
 };
 
-/* ─────────────────────────────────────────────
-   Main TestPlayer Component
-───────────────────────────────────────────── */
+// Main test player component
 const TestPlayer = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -116,26 +112,26 @@ const TestPlayer = () => {
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    /* ── Load test ── */
+    // Fetch test data on mount
     useEffect(() => {
         fetchTestData();
         const handleVisibilityChange = () => {
             if (document.hidden) {
-                toast.warning('⚠️ Warning: Do not switch tabs during the exam.', { toastId: 'tab-switch' });
+                toast.warning('Warning: Do not switch tabs during the exam.', { toastId: 'tab-switch' });
             }
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [id]);
 
-    /* ── Mark current question as visited whenever the index changes ── */
+    // Mark current question as visited
     useEffect(() => {
         if (!questions.length) return;
         const q = questions[currentIdx];
         if (q) setVisited(prev => ({ ...prev, [q._id]: true }));
     }, [currentIdx, questions]);
 
-    /* ── Countdown ── */
+    // Timer countdown
     useEffect(() => {
         if (timeLeft <= 0) {
             if (!loading && attemptId) handleAutoSubmit();
@@ -190,7 +186,7 @@ const TestPlayer = () => {
         setIsSubmitting(true);
         try {
             await submitAttempt(attemptId);
-            toast.success('Assessment submitted successfully! 🎉');
+            toast.success('Assessment submitted successfully!');
             navigate('/results');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Submission failed. Please try again.');
@@ -200,7 +196,7 @@ const TestPlayer = () => {
     };
 
     const handleAutoSubmit = useCallback(async () => {
-        toast.info('⏰ Time expired! Submitting your assessment…');
+        toast.info('Time expired! Submitting your assessment...');
         try {
             if (attemptId) await submitAttempt(attemptId);
         } catch { /* silent */ }
@@ -214,7 +210,7 @@ const TestPlayer = () => {
         return `${h > 0 ? h + ':' : ''}${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
     };
 
-    /* ── Loading State ── */
+    // Loading state
     if (loading) return (
         <div className="flex items-center justify-center h-screen bg-[#FDFDFD]">
             <div className="flex flex-col items-center gap-4">
@@ -229,7 +225,7 @@ const TestPlayer = () => {
     const isTimeCritical = timeLeft < 300;
     const isTimeWarning = timeLeft < 60;
 
-    /* ── Question Palette Button Status ── */
+    // Get status for palette buttons
     const getQStatus = (q, idx) => {
         const isAnswered = !!answers[q._id];
         const isMarkedQ = !!marked[q._id];
@@ -262,7 +258,7 @@ const TestPlayer = () => {
 
             <div className="flex h-screen bg-[#F8F9FD] overflow-hidden font-sans select-none">
 
-                {/* ── Main Content ── */}
+                {/* Main Content */}
                 <div className="flex-1 flex flex-col min-w-0">
 
                     {/* Header */}
@@ -275,9 +271,6 @@ const TestPlayer = () => {
                                 <FiMenu size={20} />
                             </button>
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-                                    <FiZap size={15} className="text-white" />
-                                </div>
                                 <h1 className="text-sm font-bold text-slate-800 truncate">{test.title}</h1>
                             </div>
                         </div>
@@ -307,8 +300,8 @@ const TestPlayer = () => {
                     </div>
 
                     {/* Question Area */}
-                    <main className="flex-1 overflow-y-auto p-6 lg:p-10">
-                        <div className="max-w-3xl mx-auto">
+                    <main className="flex-1 overflow-y-auto p-6 lg:p-10 flex flex-col">
+                        <div className="max-w-3xl w-full mx-auto my-auto">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={currentIdx}
@@ -316,7 +309,7 @@ const TestPlayer = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -24 }}
                                     transition={{ duration: 0.18, ease: 'easeOut' }}
-                                    className="bg-white rounded-3xl p-8 lg:p-10 shadow-sm border border-slate-100"
+                                    className="bg-white rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100"
                                 >
                                     {/* Question header */}
                                     <div className="flex items-center justify-between mb-7">
@@ -434,7 +427,7 @@ const TestPlayer = () => {
                     </footer>
                 </div>
 
-                {/* ── Question Palette Sidebar ── */}
+                {/* Question Palette Sidebar */}
                 <AnimatePresence>
                     {isSidebarOpen && (
                         <motion.aside
@@ -443,10 +436,10 @@ const TestPlayer = () => {
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: 320, opacity: 0 }}
                             transition={{ duration: 0.22, ease: 'easeOut' }}
-                            className="w-72 xl:w-80 bg-white border-l border-slate-100 flex flex-col shrink-0 shadow-[-4px_0_16px_rgba(0,0,0,0.03)]"
+                            className="w-72 xl:w-80 bg-white border-l border-slate-100 flex flex-col shrink-0"
                         >
                             {/* Palette Header */}
-                            <div className="px-6 pt-16 pb-6 border-b border-slate-100">
+                            <div className="px-5 pt-6 pb-4 border-b border-slate-100">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em]">Question Palette</h3>
                                     <button
@@ -472,7 +465,7 @@ const TestPlayer = () => {
                                 </div>
 
                                 {/* Grid */}
-                                <div className="grid grid-cols-5 gap-2 max-h-[48vh] overflow-y-auto no-scrollbar">
+                                <div className="grid grid-cols-5 gap-2 max-h-[48vh] overflow-y-auto no-scrollbar p-1.5">
                                     {questions.map((q, idx) => {
                                         const status = getQStatus(q, idx);
                                         const isCurrent = currentIdx === idx;
@@ -494,7 +487,7 @@ const TestPlayer = () => {
                             </div>
 
                             {/* Legend */}
-                            <div className="px-6 py-6 flex-1">
+                            <div className="px-6 py-4 flex-1">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Legend</p>
                                 <div className="space-y-2.5">
                                     {[

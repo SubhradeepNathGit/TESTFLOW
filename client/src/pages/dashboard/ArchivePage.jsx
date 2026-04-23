@@ -63,7 +63,7 @@ const ArchivePage = () => {
         <div className="min-h-screen bg-[#FDFDFD] p-6 lg:p-10">
             <div className="max-w-7xl mx-auto">
 
-                {/* ── Page Header ── */}
+                {/* Header */}
                 <div className="mb-10">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-11 h-11 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-100">
@@ -83,7 +83,7 @@ const ArchivePage = () => {
                     </p>
                 </div>
 
-                {/* ── Content ── */}
+                {/* Content */}
                 {loading ? (
                     <div className="flex items-center justify-center h-64">
                         <div className="flex flex-col items-center gap-4">

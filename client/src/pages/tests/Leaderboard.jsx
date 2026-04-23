@@ -2,20 +2,19 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     FiTrendingUp, FiAward, FiUser, FiBarChart2,
-    FiZap, FiStar, FiChevronRight
+    FiStar, FiChevronRight
 } from 'react-icons/fi';
+import { Medal, Trophy, BarChart2 } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { toast } from 'react-toastify';
 import { useSocket } from '../../context/SocketContext';
 import { useQuery } from '@tanstack/react-query';
 
-/* ─────────────────────────────────────────
-   Medal color helpers
-───────────────────────────────────────── */
+// Medal styles for top ranks
 const medalStyles = [
-    { bg: 'bg-amber-400', text: 'text-white', label: '🥇', shadow: 'shadow-amber-200' },
-    { bg: 'bg-slate-400', text: 'text-white', label: '🥈', shadow: 'shadow-slate-200' },
-    { bg: 'bg-orange-400', text: 'text-white', label: '🥉', shadow: 'shadow-orange-200' },
+    { bg: 'bg-amber-400', text: 'text-white', shadow: 'shadow-amber-200' },
+    { bg: 'bg-slate-400', text: 'text-white', shadow: 'shadow-slate-200' },
+    { bg: 'bg-orange-400', text: 'text-white', shadow: 'shadow-orange-200' },
 ];
 
 const cardVariants = {
@@ -30,9 +29,7 @@ const getProfileUrl = (img) => {
     return `${baseUrl}/${img}`;
 };
 
-/* ─────────────────────────────────────────
-   Podium Card
-───────────────────────────────────────── */
+// Podium card for top 3 students
 const PodiumCard = ({ student, rank, delay }) => {
     const heights = [220, 170, 140];        // 1st, 2nd, 3rd column heights
     const reorderedRank = rank;             // 0=centre(1st), 1=left(2nd), 2=right(3rd)
@@ -54,7 +51,9 @@ const PodiumCard = ({ student, rank, delay }) => {
                 ) : (
                     <FiUser size={isFirst ? 34 : 24} className="text-slate-400" />
                 )}
-                <span className={`absolute -bottom-1 -right-1 text-lg leading-none`}>{medal.label}</span>
+                <span className={`absolute -bottom-1 -right-1`}>
+                    <Medal size={isFirst ? 24 : 18} className="text-amber-500 fill-amber-500 shadow-sm" />
+                </span>
             </div>
 
             {/* Info */}
@@ -77,9 +76,7 @@ const PodiumCard = ({ student, rank, delay }) => {
     );
 };
 
-/* ─────────────────────────────────────────
-   Main Component
-───────────────────────────────────────── */
+// Main leaderboard component
 const Leaderboard = () => {
     const socket = useSocket();
 
@@ -120,7 +117,7 @@ const Leaderboard = () => {
         <div className="min-h-screen bg-[#F8F9FD] p-6 lg:p-10">
             <div className="max-w-7xl mx-auto">
 
-                {/* ── Page header ── */}
+                {/* Page header */}
                 <motion.div
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -144,7 +141,7 @@ const Leaderboard = () => {
                         animate={{ opacity: 1 }}
                         className="bg-white rounded-[36px] border-2 border-dashed border-slate-100 p-20 text-center"
                     >
-                        <FiBarChart2 size={48} className="mx-auto text-slate-200 mb-6" />
+                        <BarChart2 size={48} className="mx-auto text-slate-200 mb-6" />
                         <h3 className="text-xl font-bold text-slate-800 mb-2">No Rankings Yet</h3>
                         <p className="text-slate-400 font-medium max-w-xs mx-auto text-sm leading-relaxed">
                             Students need to complete assessments before rankings appear here.
@@ -152,7 +149,7 @@ const Leaderboard = () => {
                     </motion.div>
                 ) : (
                     <>
-                        {/* ── Podium ── */}
+                        {/* Podium Section */}
                         {top3.length >= 2 && (
                             <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-8 lg:p-10 mb-8">
                                 <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-10 flex items-center gap-2">
@@ -173,7 +170,7 @@ const Leaderboard = () => {
                             </div>
                         )}
 
-                        {/* ── Rank table ── */}
+                        {/* Rankings Table */}
                         <motion.div
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -215,7 +212,7 @@ const Leaderboard = () => {
                                                         ? `${medal.bg} ${medal.text} shadow-md ${medal.shadow}`
                                                         : 'bg-slate-100 text-slate-400'
                                                 }`}>
-                                                    {idx < 3 ? ['🥇', '🥈', '🥉'][idx] : `#${idx + 1}`}
+                                                    {idx < 3 ? <Medal size={14} className="fill-white" /> : `#${idx + 1}`}
                                                 </span>
                                                 {/* Avatar circle */}
                                                 <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors overflow-hidden">
@@ -244,16 +241,13 @@ const Leaderboard = () => {
                             </div>
                         </motion.div>
 
-                        {/* ── Footer CTA ── */}
+                        {/* Footer Section */}
                         <motion.div
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
                             className="bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 p-8 rounded-[32px] flex items-center gap-6 shadow-xl shadow-indigo-100"
                         >
-                            <div className="w-14 h-14 bg-white/15 backdrop-blur rounded-2xl flex items-center justify-center text-white shrink-0">
-                                <FiZap size={24} />
-                            </div>
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-bold text-white text-lg">Keep Competing!</h4>
                                 <p className="text-sm text-indigo-100 font-medium mt-1">
