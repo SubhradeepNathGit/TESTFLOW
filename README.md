@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="https://via.placeholder.com/200x200/0f172a/ffffff?text=TESTFLOW" alt="TestFlow Logo" />
 
-  # TESTFLOW Engine
+
+  # TESTFLOW
   
   **Enterprise-Grade Online Assessment & Examination Platform**
 
