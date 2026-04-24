@@ -7,6 +7,13 @@ const setupMiddleware = require("./app/middleware");
 const routes = require("./app/routes");
 const errorHandler = require("./app/middleware/error");
 
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const path = require("path");
+
+// Load swagger.yaml from the parent directory
+const swaggerDocument = YAML.load(path.join(__dirname, "../swagger.yaml"));
+
 // Connect to Database
 connectDB().then(() => {
   // Sync Super Admin with .env
@@ -16,6 +23,9 @@ connectDB().then(() => {
 
 // Setup global middleware (CORS, Helmet, Rate Limit, etc.)
 setupMiddleware(app);
+
+// API Documentation Route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // API Routes
 app.use("/", routes);

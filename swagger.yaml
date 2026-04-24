@@ -1,0 +1,268 @@
+openapi: 3.0.0
+info:
+  title: TESTFLOW API
+  description: Production-ready API documentation for the TestFlow Online Assessment Platform. Features Role-Based Access Control (RBAC), WebSocket integrations, and Redis Queue processing.
+  version: 1.0.0
+  contact:
+    name: Subhradeep Nath
+    email: subhradeepnath2.o@gmail.com
+servers:
+  - url: http://localhost:3006/api
+    description: Local Development Server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+    description: Authentication, OTP, and Password Management
+  - name: User
+    description: User Profile and Institution Members Management
+  - name: Test
+    description: Test CRUD, PDF Upload, and Question Management
+  - name: Attempt
+    description: Exam Taking, Answer Saving, and Submissions
+  - name: Admin
+    description: Super Admin Platform Metrics and Management
+  - name: AnswerKey
+    description: PDF Answer Keys Management
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, role, institutionName]
+              properties:
+                name: { type: string }
+                email: { type: string }
+                password: { type: string }
+                role: { type: string, enum: [owner, instructor, student] }
+                institutionName: { type: string }
+      responses:
+        '200':
+          description: User registered, OTP sent to email
+  /auth/login:
+    post:
+      summary: Login to the platform
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Successful login
+  /auth/verify-email:
+    post:
+      summary: Verify email using OTP
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                otp: { type: string }
+      responses:
+        '200': { description: Email verified successfully }
+  /auth/resend-otp:
+    post:
+      summary: Resend OTP
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+      responses:
+        '200': { description: OTP resent }
+  /auth/me:
+    get:
+      summary: Get current logged-in user profile
+      tags: [Auth]
+      responses:
+        '200': { description: Current user data }
+  /auth/refresh:
+    post:
+      summary: Refresh JWT access token
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200': { description: New tokens generated }
+  /auth/logout:
+    get:
+      summary: Logout current user
+      tags: [Auth]
+      responses:
+        '200': { description: Logged out }
+
+  /tests:
+    get:
+      summary: Get all tests for institution
+      tags: [Test]
+      responses:
+        '200': { description: List of tests }
+    post:
+      summary: Create a test manually
+      tags: [Test]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                duration: { type: integer }
+      responses:
+        '201': { description: Test created }
+  /tests/upload-pdf:
+    post:
+      summary: Create test by parsing PDF
+      tags: [Test]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pdfFile: { type: string, format: binary }
+                title: { type: string }
+                duration: { type: integer }
+      responses:
+        '201': { description: Test created from PDF }
+  /tests/{id}:
+    get:
+      summary: Get specific test details with questions
+      tags: [Test]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Test details }
+    delete:
+      summary: Archive a test
+      tags: [Test]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Test archived }
+  /tests/{id}/publish:
+    patch:
+      summary: Publish a draft test
+      tags: [Test]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Test published }
+  /tests/{id}/stats:
+    get:
+      summary: Get analytics for a specific test (Instructors only)
+      tags: [Test]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Test analytics data }
+
+  /attempts/start:
+    post:
+      summary: Start a new test attempt
+      tags: [Attempt]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                testId: { type: string }
+      responses:
+        '200': { description: Attempt started, Redis job queued }
+  /attempts/save-answer:
+    post:
+      summary: Save an answer during a test
+      tags: [Attempt]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attemptId: { type: string }
+                questionId: { type: string }
+                selectedOption: { type: string }
+      responses:
+        '200': { description: Answer saved }
+  /attempts/submit:
+    post:
+      summary: Submit a completed test
+      tags: [Attempt]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attemptId: { type: string }
+      responses:
+        '200': { description: Test submitted, auto-submit cancelled }
+
+  /admin/metrics:
+    get:
+      summary: Get platform wide metrics (Super Admin only)
+      tags: [Admin]
+      responses:
+        '200': { description: Platform analytics }
+  /admin/institutions:
+    get:
+      summary: Get all institutions
+      tags: [Admin]
+      responses:
+        '200': { description: List of institutions }
