@@ -27,8 +27,9 @@ exports.createLog = async (data) => {
             logData.userAgent = data.req.headers['user-agent'];
         }
 
-        await AuditLog.create(logData);
+        // Create log in background without awaiting to improve response time
+        AuditLog.create(logData).catch(err => console.error("Audit log error:", err));
     } catch (err) {
-        console.error("Audit log error:", err);
+        console.error("Audit log creation helper error:", err);
     }
 };

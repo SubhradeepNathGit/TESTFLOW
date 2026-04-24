@@ -4,18 +4,157 @@ import {
     FiTrendingUp, FiAward, FiUser, FiBarChart2,
     FiStar, FiChevronRight
 } from 'react-icons/fi';
-import { Medal, Trophy, BarChart2 } from 'lucide-react';
+import { BarChart2 } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { toast } from 'react-toastify';
 import { useSocket } from '../../context/SocketContext';
 import { useQuery } from '@tanstack/react-query';
 
-// Medal styles for top ranks
-const medalStyles = [
-    { bg: 'bg-amber-400', text: 'text-white', shadow: 'shadow-amber-200' },
-    { bg: 'bg-slate-400', text: 'text-white', shadow: 'shadow-slate-200' },
-    { bg: 'bg-orange-400', text: 'text-white', shadow: 'shadow-orange-200' },
-];
+// Premium SVG trophy for rank 1
+const GoldTrophy = ({ size = 28 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="gold-cup" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#FDE68A" />
+                <stop offset="40%" stopColor="#F59E0B" />
+                <stop offset="100%" stopColor="#B45309" />
+            </linearGradient>
+            <linearGradient id="gold-stem" x1="14" y1="18" x2="18" y2="26" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#F59E0B" />
+                <stop offset="100%" stopColor="#92400E" />
+            </linearGradient>
+            <filter id="gold-glow">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+        </defs>
+        {/* Handles */}
+        <path d="M6 9 Q2 9 2 13 Q2 17 6 17" stroke="url(#gold-cup)" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M26 9 Q30 9 30 13 Q30 17 26 17" stroke="url(#gold-cup)" strokeWidth="2" strokeLinecap="round" fill="none" />
+        {/* Cup body */}
+        <path d="M6 5 L6 17 Q6 23 16 23 Q26 23 26 17 L26 5 Z" fill="url(#gold-cup)" filter="url(#gold-glow)" />
+        {/* Shine */}
+        <path d="M10 7 Q11 9 10 12" stroke="#FEF3C7" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+        {/* Stem */}
+        <rect x="14" y="23" width="4" height="4" fill="url(#gold-stem)" rx="0.5" />
+        {/* Base */}
+        <path d="M10 27 Q10 29 16 29 Q22 29 22 27 L21 27 Q21 28 16 28 Q11 28 11 27 Z" fill="url(#gold-cup)" />
+        <line x1="10" y1="27" x2="22" y2="27" stroke="url(#gold-cup)" strokeWidth="2.5" strokeLinecap="round" />
+        {/* Star on cup */}
+        <path d="M16 9 L16.8 11.5 L19.4 11.5 L17.3 13 L18.1 15.5 L16 14 L13.9 15.5 L14.7 13 L12.6 11.5 L15.2 11.5 Z" fill="#FEF3C7" opacity="0.9" />
+    </svg>
+);
+
+// Premium SVG silver medal for rank 2
+const SilverMedal = ({ size = 26 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="silver-ribbon-l" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#94A3B8" />
+                <stop offset="100%" stopColor="#475569" />
+            </linearGradient>
+            <linearGradient id="silver-ribbon-r" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#CBD5E1" />
+                <stop offset="100%" stopColor="#64748B" />
+            </linearGradient>
+            <linearGradient id="silver-disc" x1="8" y1="10" x2="24" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#F1F5F9" />
+                <stop offset="35%" stopColor="#CBD5E1" />
+                <stop offset="100%" stopColor="#64748B" />
+            </linearGradient>
+            <filter id="silver-shadow">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#94A3B8" floodOpacity="0.5" />
+            </filter>
+        </defs>
+        {/* Ribbon left */}
+        <path d="M12 2 L16 8 L10 14 L6 8 Z" fill="url(#silver-ribbon-l)" />
+        {/* Ribbon right */}
+        <path d="M20 2 L24 8 L18 14 L16 8 Z" fill="url(#silver-ribbon-r)" />
+        {/* Disc */}
+        <circle cx="16" cy="21" r="10" fill="url(#silver-disc)" filter="url(#silver-shadow)" />
+        {/* Shine arc */}
+        <path d="M11 16 Q13 14 17 15" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+        {/* Number */}
+        <text x="16" y="25" textAnchor="middle" fontSize="9" fontWeight="900" fill="white" fontFamily="system-ui" letterSpacing="-0.5">2</text>
+    </svg>
+);
+
+// Premium SVG bronze medal for rank 3
+const BronzeMedal = ({ size = 26 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="bronze-ribbon-l" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#C2763B" />
+                <stop offset="100%" stopColor="#7C3B1A" />
+            </linearGradient>
+            <linearGradient id="bronze-ribbon-r" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#E8996A" />
+                <stop offset="100%" stopColor="#A0522D" />
+            </linearGradient>
+            <linearGradient id="bronze-disc" x1="8" y1="10" x2="24" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#FCD9B0" />
+                <stop offset="35%" stopColor="#D97706" />
+                <stop offset="100%" stopColor="#92400E" />
+            </linearGradient>
+            <filter id="bronze-shadow">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#B45309" floodOpacity="0.5" />
+            </filter>
+        </defs>
+        {/* Ribbon left */}
+        <path d="M12 2 L16 8 L10 14 L6 8 Z" fill="url(#bronze-ribbon-l)" />
+        {/* Ribbon right */}
+        <path d="M20 2 L24 8 L18 14 L16 8 Z" fill="url(#bronze-ribbon-r)" />
+        {/* Disc */}
+        <circle cx="16" cy="21" r="10" fill="url(#bronze-disc)" filter="url(#bronze-shadow)" />
+        {/* Shine arc */}
+        <path d="M11 16 Q13 14 17 15" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+        {/* Number */}
+        <text x="16" y="25" textAnchor="middle" fontSize="9" fontWeight="900" fill="white" fontFamily="system-ui" letterSpacing="-0.5">3</text>
+    </svg>
+);
+
+// Rank badge icon for the table
+const RankBadge = ({ rank }) => {
+    if (rank === 1) return (
+        <span className="w-10 h-10 flex items-center justify-center shrink-0">
+            <GoldTrophy size={28} />
+        </span>
+    );
+    if (rank === 2) return (
+        <span className="w-10 h-10 flex items-center justify-center shrink-0">
+            <SilverMedal size={28} />
+        </span>
+    );
+    if (rank === 3) return (
+        <span className="w-10 h-10 flex items-center justify-center shrink-0">
+            <BronzeMedal size={28} />
+        </span>
+    );
+    return (
+        <span className="w-10 h-10 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 font-black text-xs shrink-0">
+            #{rank}
+        </span>
+    );
+};
+
+// Podium avatar medal pin
+const PodiumMedalPin = ({ rank }) => {
+    if (rank === 1) return (
+        <span className="absolute -bottom-2 -right-2 flex items-center justify-center">
+            <GoldTrophy size={22} />
+        </span>
+    );
+    if (rank === 2) return (
+        <span className="absolute -bottom-2 -right-2 flex items-center justify-center">
+            <SilverMedal size={20} />
+        </span>
+    );
+    return (
+        <span className="absolute -bottom-2 -right-2 flex items-center justify-center">
+            <BronzeMedal size={20} />
+        </span>
+    );
+};
 
 const cardVariants = {
     hidden: { opacity: 0, y: 14 },
@@ -31,11 +170,20 @@ const getProfileUrl = (img) => {
 
 // Podium card for top 3 students
 const PodiumCard = ({ student, rank, delay }) => {
-    const heights = [220, 170, 140];        // 1st, 2nd, 3rd column heights
-    const reorderedRank = rank;             // 0=centre(1st), 1=left(2nd), 2=right(3rd)
+    const heights = [220, 170, 140];
     const displayRank = [1, 2, 3][rank];
-    const medal = medalStyles[displayRank - 1];
     const isFirst = displayRank === 1;
+
+    const podiumGradients = [
+        'linear-gradient(160deg, #6366f1 0%, #4f46e5 60%, #3730a3 100%)',
+        'linear-gradient(160deg, #94A3B8 0%, #64748B 100%)',
+        'linear-gradient(160deg, #D97706 0%, #92400E 100%)',
+    ];
+    const podiumShadows = [
+        '0 8px 32px rgba(99,102,241,0.35)',
+        '0 6px 20px rgba(100,116,139,0.25)',
+        '0 6px 20px rgba(180,83,9,0.25)',
+    ];
 
     return (
         <motion.div
@@ -45,19 +193,26 @@ const PodiumCard = ({ student, rank, delay }) => {
             className="flex flex-col items-center gap-2 flex-1 min-w-0"
         >
             {/* Avatar */}
-            <div className={`relative w-14 h-14 ${isFirst ? 'w-20 h-20' : ''} rounded-full flex items-center justify-center bg-slate-100 border-4 border-white shadow-xl`}>
+            <div
+                className={`relative rounded-full flex items-center justify-center bg-slate-100 border-4 border-white`}
+                style={{
+                    width: isFirst ? 80 : 56,
+                    height: isFirst ? 80 : 56,
+                    boxShadow: isFirst
+                        ? '0 0 0 4px rgba(99,102,241,0.15), 0 8px 24px rgba(99,102,241,0.25)'
+                        : '0 4px 12px rgba(0,0,0,0.12)',
+                }}
+            >
                 {getProfileUrl(student.profileImage) ? (
                     <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" />
                 ) : (
                     <FiUser size={isFirst ? 34 : 24} className="text-slate-400" />
                 )}
-                <span className={`absolute -bottom-1 -right-1`}>
-                    <Medal size={isFirst ? 24 : 18} className="text-amber-500 fill-amber-500 shadow-sm" />
-                </span>
+                <PodiumMedalPin rank={displayRank} />
             </div>
 
             {/* Info */}
-            <div className="text-center min-w-0 w-full px-1">
+            <div className="text-center min-w-0 w-full px-1 mt-2">
                 <p className={`font-black truncate ${isFirst ? 'text-slate-900 text-base' : 'text-slate-700 text-sm'}`}>{student.name}</p>
                 <p className={`font-black ${isFirst ? 'text-2xl text-indigo-600' : 'text-lg text-indigo-500'}`}>{student.totalScore}</p>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -67,10 +222,14 @@ const PodiumCard = ({ student, rank, delay }) => {
 
             {/* Podium bar */}
             <div
-                className={`w-full rounded-t-2xl flex items-end justify-center pb-2 ${isFirst ? 'bg-indigo-600' : 'bg-slate-100 border border-slate-200'} shrink-0`}
-                style={{ height: heights[displayRank - 1] }}
+                className="w-full rounded-t-2xl flex items-end justify-center pb-3 shrink-0"
+                style={{
+                    height: heights[displayRank - 1],
+                    background: podiumGradients[displayRank - 1],
+                    boxShadow: podiumShadows[displayRank - 1],
+                }}
             >
-                <span className={`text-5xl font-black mb-2 ${isFirst ? 'text-white/20' : 'text-slate-200/80'}`}>#{displayRank}</span>
+                <span className={`text-5xl font-black mb-2 text-white/20`}>#{displayRank}</span>
             </div>
         </motion.div>
     );
@@ -110,7 +269,7 @@ const Leaderboard = () => {
     const top3 = leaderboard.slice(0, 3);
     // Podium visual order: 2nd (left), 1st (centre), 3rd (right)
     const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
-    const podiumRanks = [1, 0, 2];   // indices into medalStyles / heights
+    const podiumRanks = [1, 0, 2];
     const rest = leaderboard.slice(3);
 
     return (
@@ -194,50 +353,41 @@ const Leaderboard = () => {
                             </div>
 
                             <div className="divide-y divide-slate-50">
-                                {leaderboard.map((student, idx) => {
-                                    const medal = medalStyles[idx];
-                                    return (
-                                        <motion.div
-                                            key={idx}
-                                            custom={idx}
-                                            variants={cardVariants}
-                                            initial="hidden"
-                                            animate="show"
-                                            className="flex items-center justify-between px-7 py-4 hover:bg-slate-50/70 transition-colors group"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                {/* Rank badge */}
-                                                <span className={`w-8 h-8 flex items-center justify-center rounded-xl font-black text-xs shrink-0 ${
-                                                    medal
-                                                        ? `${medal.bg} ${medal.text} shadow-md ${medal.shadow}`
-                                                        : 'bg-slate-100 text-slate-400'
-                                                }`}>
-                                                    {idx < 3 ? <Medal size={14} className="fill-white" /> : `#${idx + 1}`}
-                                                </span>
-                                                {/* Avatar circle */}
-                                                <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors overflow-hidden">
-                                                    {getProfileUrl(student.profileImage) ? (
-                                                        <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" />
-                                                    ) : (
-                                                        <FiUser size={16} />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-slate-800 text-sm">{student.name}</h4>
-                                                    <p className="text-[11px] font-medium text-slate-400 mt-0.5">
-                                                        {student.testsTaken} {student.testsTaken === 1 ? 'test' : 'tests'} completed
-                                                    </p>
-                                                </div>
+                                {leaderboard.map((student, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        custom={idx}
+                                        variants={cardVariants}
+                                        initial="hidden"
+                                        animate="show"
+                                        className="flex items-center justify-between px-7 py-4 hover:bg-slate-50/70 transition-colors group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            {/* Rank badge */}
+                                            <RankBadge rank={idx + 1} />
+                                            {/* Avatar circle */}
+                                            <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors overflow-hidden">
+                                                {getProfileUrl(student.profileImage) ? (
+                                                    <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" />
+                                                ) : (
+                                                    <FiUser size={16} />
+                                                )}
                                             </div>
-                                            <div className="text-right">
-                                                <p className="font-black text-slate-900 text-lg tabular-nums">{student.totalScore}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                                    avg {student.avgScore} pts
+                                            <div>
+                                                <h4 className="font-bold text-slate-800 text-sm">{student.name}</h4>
+                                                <p className="text-[11px] font-medium text-slate-400 mt-0.5">
+                                                    {student.testsTaken} {student.testsTaken === 1 ? 'test' : 'tests'} completed
                                                 </p>
                                             </div>
-                                        </motion.div>
-                                    );
-                                })}
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-black text-slate-900 text-lg tabular-nums">{student.totalScore}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                avg {student.avgScore} pts
+                                            </p>
+                                        </div>
+                                    </motion.div>
+                                ))}
                             </div>
                         </motion.div>
 
@@ -251,7 +401,7 @@ const Leaderboard = () => {
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-bold text-white text-lg">Keep Competing!</h4>
                                 <p className="text-sm text-indigo-100 font-medium mt-1">
-                                    Rankings update based on cumulative score. Take move tests to climb higher.
+                                    Rankings update based on cumulative score. Take more tests to climb higher.
                                 </p>
                             </div>
                             <FiChevronRight size={24} className="text-white/40 shrink-0" />

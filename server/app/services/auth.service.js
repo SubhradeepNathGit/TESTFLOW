@@ -32,8 +32,8 @@ exports.register = async (userData) => {
         });
         emitToSuperAdmin('institutionCreated', institution);
     } else {
-        
-        institution = await Institution.findOne({ name: institutionName });
+        // Find existing institution (Lean query for speed)
+        institution = await Institution.findOne({ name: institutionName }).lean();
         if (!institution) {
             throw new ErrorResponse("Institution not found. Instructors must join an existing institution.", 404);
         }
@@ -106,7 +106,7 @@ exports.login = async (email, password) => {
 
     
     if (user.role !== "super_admin") {
-        const institution = await Institution.findById(user.institutionId);
+        const institution = await Institution.findById(user.institutionId).lean();
         if (!institution) {
             throw new ErrorResponse("Your associated institution no longer exists. Please contact support.", 401);
         }
@@ -121,17 +121,16 @@ exports.login = async (email, password) => {
     }
 
     
+    // Reset login attempts and set joinedAt timestamp in memory
+    // We will perform a single consolidated save in the Controller to avoid extra DB round-trips
     if (user.loginAttempts > 0 || user.lockUntil) {
         user.loginAttempts = 0;
         user.lockUntil = undefined;
     }
 
-    
     if (!user.joinedAt) {
         user.joinedAt = new Date();
     }
-
-    await user.save();
 
     return user;
 };

@@ -11,7 +11,9 @@ class AuthController {
         const accessToken = user.getSignedJwtToken();
         const refreshToken = user.getRefreshToken();
 
-        await authService.updateRefreshToken(user._id, refreshToken);
+        // Consolidated update: save refresh token, joinedAt, and reset loginAttempts in one go
+        user.refreshToken = refreshToken;
+        await user.save();
 
         
         if (user.institutionId && !user.institutionId.name) {
@@ -293,7 +295,9 @@ class AuthController {
 
             const newAccessToken = user.getSignedJwtToken();
             const newRefreshToken = user.getRefreshToken();
-            await authService.updateRefreshToken(user._id, newRefreshToken);
+            
+            user.refreshToken = newRefreshToken;
+            await user.save();
 
             res.status(statusCodes.OK).json({
                 status: true,
