@@ -1,220 +1,284 @@
 <div align="center">
-  <img src="https://via.placeholder.com/150/000000/FFFFFF/?text=TESTFLOW" alt="TestFlow Logo" width="150" height="150">
-  
-  # 🚀 TESTFLOW: Enterprise-Grade Online Assessment Platform
-  
-  **The ultimate, production-ready, highly scalable test portal engine engineered for the modern web.**
-  
-  [![React](https://img.shields.io/badge/React-19.2.0-blue.svg?style=flat-square&logo=react)](https://reactjs.org/)
-  [![Node.js](https://img.shields.io/badge/Node.js-Express-green.svg?style=flat-square&logo=nodedotjs)](https://nodejs.org/)
-  [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248.svg?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
-  [![Redis](https://img.shields.io/badge/Redis-BullMQ-DC382D.svg?style=flat-square&logo=redis)](https://redis.io/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1.17-38B2AC.svg?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-  [![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-010101.svg?style=flat-square&logo=socketdotio)](https://socket.io/)
+  <img src="https://via.placeholder.com/200x200/0f172a/ffffff?text=TESTFLOW" alt="TestFlow Logo" />
 
-  *Built with ❤️ by an aspiring Full-Stack Engineer ready to make an impact.*
+  # TESTFLOW Engine
+  
+  **Enterprise-Grade Online Assessment & Examination Platform**
+
+  [![React](https://img.shields.io/badge/React-19.2.0-blue.svg?style=flat&logo=react)](https://reactjs.org/)
+  [![Node.js](https://img.shields.io/badge/Node.js-Express-green.svg?style=flat&logo=nodedotjs)](https://nodejs.org/)
+  [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248.svg?style=flat&logo=mongodb)](https://www.mongodb.com/)
+  [![Redis](https://img.shields.io/badge/Redis-BullMQ-DC382D.svg?style=flat&logo=redis)](https://redis.io/)
+  [![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D.svg?style=flat&logo=swagger)](http://localhost:3006/api-docs)
 </div>
 
----
+<br />
 
-## 🌟 Project Overview
+## 📖 Overview
 
-**TESTFLOW** is a robust, multi-tenant B2B online assessment platform designed to handle thousands of concurrent users with zero latency. It empowers educational institutions to create, manage, and evaluate online tests seamlessly while offering students an immersive, real-time testing environment.
+**TESTFLOW** is a highly scalable, multi-tenant assessment platform engineered to handle massive concurrent traffic for educational institutions and corporate environments. It transcends traditional CRUD applications by implementing complex distributed systems patterns, real-time bidirectional communication, and automated background processing.
 
-From **automated PDF test generation** using OCR/Parsing to **real-time WebSocket leaderboards**, distributed **Redis queues** for test auto-submission, and deep **TanStack Query** frontend caching, this platform is engineered following the highest industry standards.
-
----
-
-## 🔥 Key Features & Optimizations
-
-### 🛡️ Enterprise Architecture & Security
-- **Multi-Tenant System:** Segregated data models using `institutionId` for complete data isolation.
-- **Hierarchical RBAC (Role-Based Access Control):** 4 distinct roles (Super Admin, Owner/Institution Admin, Instructor, Student) with strict middleware enforcement.
-- **Advanced Authentication:** JWT-based stateless auth, Refresh Tokens (rotated & securely handled), OTP email verification, and cryptographic password resets.
-- **Rate Limiting & Security Headers:** Express-rate-limit and Helmet to prevent DDoS, Brute-force attacks, and XSS.
-
-### ⚡ Performance & Scalability Optimizations
-- **Redis & BullMQ:** Offloaded heavy tasks (auto-submission of expired tests) to background workers using Redis queues, preventing Node.js event-loop blocking.
-- **Socket.io Real-Time Engine:** Live institution-scoped events for attempt tracking, live leaderboards, and instant dashboard updates without HTTP polling.
-- **TanStack Query (React Query):** Implemented on the frontend for aggressive caching, request deduplication, background data synchronization, and optimistic UI updates.
-- **Optimized MongoDB Queries:** Extensive use of MongoDB Aggregation Pipelines (e.g., `getTestStats`, `getGlobalLeaderboard`) to compute complex analytics at the database level rather than application level. Indexed fields (`studentId`, `testId`, `institutionId`) for rapid lookups.
-- **Lazy Loading & Code Splitting:** React components are dynamically imported to reduce the initial JS bundle size.
-
-### 🧠 Innovative Features
-- **AI/Automated Test Creation:** Upload a PDF and the server parses it (`pdf-parse`, regex patterns) to automatically generate MCQs, options, and answers, accurately calculating total marks.
-- **Automated Timers & Submission:** Real-time synchronized timers. If a student disconnects or time runs out, the Redis worker automatically submits the test accurately.
-- **Analytics Dashboard:** Deep instructor insights showing standard deviation, pass rates, score bands (buckets), and per-question difficulty (accuracy rate) to analyze student performance.
-- **Audit Logging:** Non-blocking tracking of critical user actions (logins, creates, deletes) for compliance and tracking.
+Whether it's parsing unstructured PDFs into structured MCQs using AI/Regex or managing asynchronous test auto-submissions via distributed Redis queues, this platform is built to production-grade standards.
 
 ---
 
-## 🏗️ System Design & Architecture
+## 🏗️ System Architecture
 
-### Backend (Node.js/Express)
-The backend follows a strict **Controller-Service-Model** architecture:
-- **Routes Layer:** Maps HTTP endpoints to controllers. Applies Auth and RBAC middleware.
-- **Controller Layer:** Handles HTTP request/response formatting, status codes, and input validation.
-- **Service Layer:** Contains the core business logic, database queries, and external integrations (Redis, Email).
-- **Model Layer:** Mongoose schemas with strict validation, pre-save hooks (password hashing), and instance methods.
+```mermaid
+flowchart TB
+    classDef client fill:#1e293b,stroke:#38bdf8,color:#e2e8f0,stroke-width:2px
+    classDef gateway fill:#0f172a,stroke:#818cf8,color:#e2e8f0,stroke-width:2px
+    classDef middleware fill:#1e1b4b,stroke:#a78bfa,color:#e2e8f0,stroke-width:1px
+    classDef controller fill:#172554,stroke:#60a5fa,color:#e2e8f0,stroke-width:1px
+    classDef service fill:#0c4a6e,stroke:#38bdf8,color:#e2e8f0,stroke-width:1px
+    classDef database fill:#14532d,stroke:#4ade80,color:#e2e8f0,stroke-width:2px
+    classDef queue fill:#7c2d12,stroke:#fb923c,color:#e2e8f0,stroke-width:2px
+    classDef infra fill:#1c1917,stroke:#a8a29e,color:#e2e8f0,stroke-width:1px
 
-### Frontend (React/Vite)
-- **State Management:** `Zustand` for lightweight global UI state (Sidebar), `React Query` for server state, `Context API` for Auth/Socket state.
-- **Component Architecture:** Reusable, accessible UI components (Modals, Custom Selects, Data Tables) using `Lucide-React` icons and `Tailwind CSS`.
-- **Routing:** Protected routing logic intercepting unauthorized access and redirecting based on user roles natively via `react-router-dom`.
+    subgraph BROWSER["🌐  Browser  (React 19 + Vite + Tailwind CSS)"]
+        direction TB
+        TQ["TanStack Query\nServer-State Cache"]:::client
+        ZS["Zustand\nUI State Store"]:::client
+        SC["Socket.io Client\nWSS Live Events"]:::client
+        PAGES["Pages & Components\nStudent · Instructor · Admin"]:::client
+        AX["Axios Interceptor\nJWT Auto-Refresh"]:::client
+        PAGES --> TQ & ZS & SC
+        TQ --> AX
+    end
 
----
+    subgraph SERVER["⚙️  Express API Server  (Node.js 18 + Express 5)"]
+        direction TB
 
-## 📂 Detailed Codebase Breakdown
+        subgraph MIDDLEWARES["Security Layer"]
+            direction LR
+            CORS["CORS\nOrigin Guard"]:::middleware
+            HELMET["Helmet\nHTTP Headers"]:::middleware
+            RL["Rate Limiter\n1000 req / 15 min"]:::middleware
+            COMP["Compression\ngzip"]:::middleware
+            AUTH["JWT Auth\nprotect()"]:::middleware
+            RBAC["RBAC\ncheckPermission()"]:::middleware
+        end
 
-### 🖥️ Client (Frontend) Directory Structure
-\`\`\`text
-client/
-├── public/                 # Static assets
-├── src/
-│   ├── api/                # Axios instance & API wrapper functions
-│   │   ├── axiosInstance.js  # Configures base URL, headers, and JWT interceptors (auto-refresh logic)
-│   │   ├── attemptApi.js     # Endpoints for starting, saving, submitting tests
-│   │   ├── testApi.js        # Endpoints for test CRUD and analytics
-│   │   └── answerKeyApi.js   # Endpoints for handling PDF answer keys
-│   ├── components/         # Reusable UI building blocks
-│   │   ├── auth/             # ProtectedRoute wrapper
-│   │   ├── common/           # ErrorBoundary, Logo, Pagination, SearchBar, Skeleton loaders
-│   │   └── modals/           # ConfirmationModal, ProfileModal, QuestionModal, TaskModal
-│   ├── context/            # Global Contexts
-│   │   ├── AuthContext.jsx   # Manages JWT token lifecycle, login/logout, and RBAC helper functions
-│   │   └── SocketContext.jsx # Initializes and provides the Socket.io client instance
-│   ├── layouts/            # Page layouts (e.g., DashboardLayout with Sidebar & Header)
-│   ├── pages/              # Route-level components
-│   │   ├── admin/            # SuperAdminDashboard, Institution Management
-│   │   ├── auth/             # Login, Register, Forgot Password, OTP Verification flows
-│   │   ├── dashboard/        # Instructor/Student dashboards, Analytics, Archive
-│   │   ├── profile/          # User profile settings
-│   │   └── tests/            # TestPlayer (actual exam UI), ResultsPage, Leaderboard
-│   ├── routes/             # App routing logic (Routing.jsx with Role-based redirects)
-│   ├── store/              # Zustand stores (useSidebarStore.js)
-│   ├── App.jsx             # Root component wrapping providers (Query, Socket, Auth, Toast)
-│   ├── main.jsx            # React entry point, initializes TanStack QueryClient
-│   └── index.css           # Tailwind base styles and custom CSS variables
-\`\`\`
+        subgraph CONTROLLERS["Controller Layer"]
+            direction LR
+            AUTHC["AuthController\nRegister · Login · OTP"]:::controller
+            TESTC["TestController\nCRUD · Publish · Stats"]:::controller
+            ATTEMPTC["AttemptController\nStart · Save · Submit"]:::controller
+            USERC["UserController\nProfile · Members"]:::controller
+            ADMINC["AdminController\nMetrics · Institutions"]:::controller
+            AKC["AnswerKeyController\nPDF Upload"]:::controller
+        end
 
-### ⚙️ Server (Backend) Directory Structure
-\`\`\`text
-server/
-├── app.js                  # Entry point: Express setup, DB connection, Middlewares, Socket.io attachment
-├── app/
-│   ├── config/             # Database and service configurations
-│   │   ├── db.js             # MongoDB connection logic
-│   │   ├── redis.js          # Redis client and BullMQ Queue instantiation
-│   │   ├── worker.js         # BullMQ Worker processing auto-submissions asynchronously
-│   │   └── roles.json        # Centralized Role & Permission configuration matrix
-│   ├── controllers/        # Request handlers
-│   │   ├── AdminController.js    # Super Admin metrics, institution & global user management
-│   │   ├── AttemptController.js  # Handles test taking, answer saving, and manual/auto submissions
-│   │   ├── AuthController.js     # JWT auth, registration, OTP, password recovery
-│   │   ├── TestController.js     # Test CRUD, PDF uploads, Publishing, Analytics
-│   │   ├── UserController.js     # Profile management, Institution specific user management
-│   │   └── AnswerKeyController.js# Answer key PDF uploads using Cloudinary
-│   ├── middleware/         # Express middlewares
-│   │   ├── auth.js           # Validates JWT and attaches user to request
-│   │   ├── rbac.js           # Enforces role/permission checks using roles.json
-│   │   ├── error.js          # Global error handler returning standardized JSON
-│   │   ├── upload.js & pdfUpload.js # Multer configurations for images and PDFs
-│   │   └── index.js          # Bootstraps security middlewares (Helmet, CORS, Rate Limit, Compression)
-│   ├── models/             # Mongoose Schemas
-│   │   ├── User.js           # Users (Super Admin, Owner, Instructor, Student)
-│   │   ├── Institution.js    # Multi-tenant isolation entity
-│   │   ├── Test.js           # Test metadata
-│   │   ├── Question.js       # MCQs linked to Tests
-│   │   ├── Attempt.js        # Tracks student progress, answers, scores, and expiration times
-│   │   ├── AnswerKey.js      # Stores uploaded PDF answer keys
-│   │   └── AuditLog.js       # Non-blocking tracking of platform actions
-│   ├── routes/             # Express Routers linking to Controllers
-│   ├── services/           # Core Business Logic (Separation of Concerns)
-│   │   ├── auth.service.js   # DB interactions for authentication
-│   │   ├── test.service.js   # Heavy lifting for Test Analytics aggregation and PDF parsing
-│   │   ├── attempt.service.js# Test submission logic, score calculation, Redis auto-submit queuing
-│   │   └── user.service.js   # Profile and user management
-│   └── utils/              # Utility functions
-│       ├── socket.js         # Socket.io server configuration, namespacing by institutionId
-│       ├── pdfParser.js      # Custom PDF text extraction and Regex-based Question mapping
-│       ├── auditLogger.js    # Asynchronous DB logging helper
-│       ├── emailService.js & sendEmail.js # Nodemailer integration for OTPs and notifications
-│       └── scheduler.js      # Node-cron for daily recurring tasks (e.g., reminders)
-\`\`\`
+        subgraph SERVICES["Service Layer (Business Logic)"]
+            direction LR
+            AUTHS["auth.service\nBcrypt · OTP · Tokens"]:::service
+            TESTS["test.service\nPDF Parse · Aggregations"]:::service
+            ATTEMPTS["attempt.service\nScore Calc · Auto-Submit"]:::service
+            USERS["user.service\nRole Management"]:::service
+        end
 
----
+        subgraph UTILS["Utilities"]
+            direction LR
+            SOCKETS["Socket.io\nemitToInstitution()"]:::service
+            PDFP["PDF Parser\nRegex MCQ Extractor"]:::service
+            AUDIT["Audit Logger\nNon-blocking Writes"]:::service
+            EMAIL["Nodemailer\nOTP · Reset · Welcome"]:::service
+        end
 
-## 🔄 Detailed API Workflow Example: Taking a Test
+        MIDDLEWARES --> CONTROLLERS
+        CONTROLLERS --> SERVICES
+        SERVICES --> UTILS
+    end
 
-1. **Start Attempt (`POST /api/attempts/start`)**
-   - **Frontend:** Student clicks "Start Test".
-   - **Backend:** `AttemptController` validates the test exists and is Published. Checks if an attempt already exists.
-   - **Service:** Creates a new `Attempt` document with `status: IN_PROGRESS` and sets `expiresAt` based on test duration.
-   - **Redis Integration:** Dispatches a delayed job to BullMQ (`submissionQueue.add`) scheduled to execute precisely when `expiresAt` occurs.
-   - **Socket:** Emits `test:attempt_started` to the institution room so instructors see live activity.
+    subgraph DATAPLANE["🗄️  Data & Infrastructure Plane"]
+        direction TB
 
-2. **Save Answer (`POST /api/attempts/save-answer`)**
-   - **Frontend:** Student clicks an option. TanStack Query `useMutation` sends the request in the background.
-   - **Backend:** Updates the specific answer array in the `Attempt` document. Verifies time hasn't expired.
+        subgraph MONGODB["MongoDB Atlas  (7 Collections)"]
+            direction LR
+            U[("users")]:::database
+            I[("institutions")]:::database
+            T[("tests")]:::database
+            Q[("questions")]:::database
+            ATT[("attempts")]:::database
+            AK[("answerkeys")]:::database
+            AL[("auditlogs")]:::database
+        end
 
-3. **Submit Attempt (`POST /api/attempts/submit`)**
-   - **Frontend:** Student clicks "Submit Test".
-   - **Backend:** Fetches all questions, compares answers, calculates the `score`. Updates status to `SUBMITTED`.
-   - **Redis Integration:** Cancels the scheduled BullMQ auto-submit job to prevent duplicate processing.
-   - **Socket:** Emits `test:attempt_submitted` to update live dashboards and leaderboards instantly.
+        subgraph REDISP["Redis Cloud  (Message Broker)"]
+            direction LR
+            BQ["BullMQ Queue\ntest-submission"]:::queue
+            WORKER["BullMQ Worker\nAuto-Submit Processor"]:::queue
+            BQ --> WORKER
+        end
 
-*If the student closes the browser, the **BullMQ Worker** deployed in `worker.js` automatically processes the test at the `expiresAt` timestamp, calculates the score, and marks it as `AUTO_SUBMITTED`.*
+        subgraph EXTERNAL["External Services"]
+            direction LR
+            CDN["Cloudinary CDN\nProfile Images · PDF Keys"]:::infra
+            SMTP2["Gmail SMTP\nTransactional Email"]:::infra
+        end
+    end
+
+    AX -->|"REST  /api/*"| MIDDLEWARES
+    SC <-->|"WSS  wss://*"| SOCKETS
+    SERVICES <-->|"Mongoose ODM"| MONGODB
+    ATTEMPTS -->|"scheduleAutoSubmit()"| BQ
+    WORKER -->|"calculateScore() + save()"| ATT
+    AKC -->|"multer-cloudinary"| CDN
+    EMAIL --> SMTP2
+    AUDIT --> AL
+```
 
 ---
 
-## 🔮 Future Scope & Roadmap
+## ⚙️ Core Workflows & Engineering Optimizations
 
-1. **AI Proctoring:** Integration of WebRTC and AI vision models (like TensorFlow.js) for head-movement tracking, multiple-face detection, and tab-switch monitoring to prevent cheating.
-2. **Microservices Migration:** As the platform scales, breaking out the `Analytics Engine` and `Notification Service` into independent microservices using gRPC or RabbitMQ.
-3. **Advanced Question Types:** Expanding beyond MCQs to include Coding challenges (via isolated Docker containers) and subjective answers (graded via LLMs).
-4. **Offline Mode capabilities:** Utilizing PWA Service Workers to cache questions, allowing students in low-bandwidth areas to take the test and sync answers upon reconnection.
+### 1. Resilient Test Auto-Submission (Distributed Queues)
+**The Problem:** If a student's internet drops or they close their browser, their test timer expires, but the server never receives a "submit" request, leaving the test in a hanging state.
+**The TESTFLOW Solution:**
+- When a student starts an attempt, the `AttemptService` calculates the exact expiry timestamp.
+- It pushes a delayed job to a **Redis Queue** using `BullMQ`.
+- A standalone `worker.js` listens to this queue. If the time expires and the test isn't manually submitted, the worker independently calculates the score based on saved answers and marks it as `AUTO_SUBMITTED` directly in MongoDB.
+- If the student submits manually *before* the time runs out, the API securely cancels the pending Redis job.
+
+### 2. Automated Test Generation via PDF Parsing
+**Workflow:**
+- Instructors upload a standard question paper PDF.
+- The `PDFParser` utility utilizes `pdf-parse` (with `tesseract.js` fallback hooks) to extract raw text.
+- Complex Regular Expressions isolate the Question Text, Options (A-E), and the Correct Answer Key.
+- The backend automatically calculates total marks, bundles the questions, and constructs a relational test entity in MongoDB.
+
+### 3. Real-Time Dashboard Synchronization
+**Workflow:**
+- `Socket.io` is implemented with strict authentication and namespacing by `institutionId`.
+- When an event occurs (e.g., a student starts a test, or an instructor publishes an answer key), the backend emits localized events.
+- The React frontend captures these events and forcefully invalidates specific `TanStack Query` caches, triggering silent, instant background refetches. Result: Zero-reload, live-updating dashboards.
+
+---
+
+## 🛡️ Security & RBAC Implementation
+
+Security is handled at both the gateway and controller levels.
+
+1.  **Stateless Authentication:** Short-lived JWT Access Tokens combined with long-lived, securely stored Refresh Tokens prevent session hijacking.
+2.  **Hierarchical RBAC Matrix:** 
+    - `Super Admin`: Platform-wide metrics and institution suspension.
+    - `Owner`: Institution-level control (add/remove students/instructors).
+    - `Instructor`: Test creation, PDF uploading, analytics viewing.
+    - `Student`: Read-only access to published tests and personal results.
+3.  **Audit Logging:** Every critical action (Login, Delete, Update) triggers a non-blocking asynchronous database write to the `AuditLog` collection, tracking IP, User Agent, and Target IDs.
+
+---
+
+## 📂 Detailed Codebase Topography
+
+<details>
+<summary><b>Frontend Structure (React/Vite)</b></summary>
+
+```text
+client/src/
+├── api/                # Axios interceptors (auto token refresh) & modular API hooks
+├── components/         # Atomic UI components
+│   ├── auth/           # RBAC Protected Route wrappers
+│   ├── common/         # SearchBars, Pagination, ErrorBoundaries, Skeletons
+│   └── modals/         # Confirmation & Profile Modals
+├── context/            # Socket.io connection & Auth lifecycle providers
+├── layouts/            # Dashboard layouts with responsive sidebars
+├── pages/              
+│   ├── admin/          # Super Admin & Institution Owner management panels
+│   ├── dashboard/      # Instructor Analytics & Archival pages
+│   └── tests/          # The core TestPlayer engine & Live Leaderboards
+├── routes/             # Centralized routing logic
+└── store/              # Zustand global state (Sidebar toggle, etc.)
+```
+</details>
+
+<details>
+<summary><b>Backend Structure (Node/Express)</b></summary>
+
+```text
+server/app/
+├── config/             # DB, Redis, BullMQ Worker initialization, and Roles JSON
+├── controllers/        # Request parsing and response formatting
+├── middleware/         # Security (Helmet, Rate Limiter), Auth (JWT), Multer (File uploads)
+├── models/             # Mongoose schemas with pre-save hooks (bcrypt)
+├── routes/             # Express API route definitions
+├── services/           # Heavy lifting (Analytics aggregation, Auto-submit logic)
+└── utils/              # PDF Parsing, Socket.io emitters, Nodemailer, Cron Jobs
+```
+</details>
+
+---
+
+## 💻 Technical Stack
+
+| Domain | Technology | Justification |
+| :--- | :--- | :--- |
+| **Frontend Framework** | React 19 + Vite | High-performance virtual DOM rendering with instant HMR dev experience. |
+| **State & Caching** | Zustand + TanStack Query | Eliminates prop-drilling; Query handles race conditions and stale data automatically. |
+| **Styling** | Tailwind CSS v4 | Utility-first, highly maintainable design system without CSS bloat. |
+| **Backend Framework** | Node.js + Express 5 | Event-driven I/O model perfect for concurrent test-taking connections. |
+| **Primary Database** | MongoDB Atlas | Flexible document model; crucial for complex nested aggregation pipelines (Analytics). |
+| **Queue / Cache** | Redis + BullMQ | Highly reliable job scheduling for asynchronous tasks preventing event-loop blocks. |
+| **Real-Time Comm.** | Socket.io | Reliable WebSocket fallbacks with built-in broadcasting/room capabilities. |
 
 ---
 
 ## 🚀 Getting Started
 
+Follow these instructions to spin up the entire architecture locally.
+
 ### Prerequisites
 - Node.js (v18+)
-- MongoDB Atlas cluster
-- Redis Server (Local or Cloud like Upstash/RedisLabs)
-- Cloudinary Account (for image/PDF storage)
+- Local or Cloud MongoDB Instance
+- Local or Cloud Redis Server
+
+### Environment Configuration
+Create `.env` files in both `client` and `server` based on their respective `.env.example` templates.
+
+**Crucial Server Variables:**
+```env
+MONGODB_URL=mongodb://localhost:27017/testflow
+REDIS_URL=redis://localhost:6379
+JWT_ACCESS_SECRET=your_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+```
 
 ### Installation
-1. **Clone the repository:**
-   \`\`\`bash
+1. **Clone the repository**
+   ```bash
    git clone https://github.com/SubhradeepNathGit/TESTFLOW.git
    cd TESTFLOW
-   \`\`\`
+   ```
 
-2. **Setup Server:**
-   \`\`\`bash
+2. **Boot the Backend**
+   ```bash
    cd server
    npm install
-   # Configure .env file using variables from .env.example
    npm run dev
-   \`\`\`
+   ```
 
-3. **Setup Client:**
-   \`\`\`bash
-   cd client
+3. **Boot the Frontend**
+   ```bash
+   cd ../client
    npm install
-   # Configure .env file
    npm run dev
-   \`\`\`
+   ```
 
 ---
 
-## 📞 Contact & Hiring
+## 📖 API Documentation (Swagger)
 
-**Subhradeep Nath**  
-Full-Stack Developer | System Design Enthusiast
-- **Email:** subhradeepnath2.o@gmail.com
-- **LinkedIn:** [Available upon request]
-- **GitHub:** [SubhradeepNathGit](https://github.com/SubhradeepNathGit)
+The backend exposes an interactive **Swagger UI** containing schemas, endpoints, and authentication flows.
+With the server running, access the docs at:  
+👉 **[http://localhost:3006/api-docs](http://localhost:3006/api-docs)**
 
-> *"I don't just write code; I architect solutions. I am actively seeking Full-Stack Engineering roles where I can bring my expertise in React, Node.js, distributed systems, and performance optimization to a forward-thinking team. Let's build something amazing together."*
+---
+
+## 📄 License & Contact
+
+This project is licensed under the ISC License.
+
+<div align="center">
+  <b>Architected & Developed by <a href="https://github.com/SubhradeepNathGit">Subhradeep Nath</a></b><br/>
+  <i>Open to Full-Stack Software Engineering Opportunities</i>
+</div>
