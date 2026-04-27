@@ -6,6 +6,12 @@ html, body {
   min-height: 100vh;           
   overflow-x: hidden;          
   scroll-behavior: smooth;
+  background-color: #f8fafc; /* slate-50 */
+  overscroll-behavior-y: none;
+}
+
+html.dark body {
+  background-color: #000000;
 }
 
 #root {

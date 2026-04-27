@@ -15,9 +15,9 @@ const PrivateRoute = ({ children }) => {
     }
 
     return (
-        <div className="flex min-h-screen bg-slate-50 overflow-x-hidden">
+        <div className="flex min-h-screen bg-slate-50 dark:bg-black overflow-x-hidden">
             <Sidebar />
-            <main className={`flex-1 transition-all duration-300 w-full ${isOpen ? 'lg:ml-72' : 'lg:ml-20'} pt-16 lg:pt-0`}>
+            <main className={`flex-1 transition-all duration-300 w-full ${isOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-0`}>
                 {children}
             </main>
         </div>

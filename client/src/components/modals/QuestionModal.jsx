@@ -83,7 +83,7 @@ const QuestionModal = ({ isOpen, onClose, testId, onSuccess, initialData }) => {
                     {/* Header */}
                     <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200">
+                            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg dark:shadow-none">
                                 <HelpCircle className="w-6 h-6 text-white" />
                             </div>
                             <div>
@@ -178,7 +178,7 @@ const QuestionModal = ({ isOpen, onClose, testId, onSuccess, initialData }) => {
                                 <button 
                                     type="submit"
                                     disabled={isSaving}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-xl shadow-indigo-100 flex items-center gap-2 transition-all disabled:opacity-70"
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-xl dark:shadow-none flex items-center gap-2 transition-all disabled:opacity-70"
                                 >
                                     {isSaving ? 'Saving...' : (
                                         <>

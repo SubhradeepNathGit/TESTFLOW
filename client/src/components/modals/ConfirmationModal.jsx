@@ -28,8 +28,8 @@ const ConfirmationModal = ({
 
     if (!isOpen && !isAnimating) return null;
 
-    const iconColor = type === 'danger' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600';
-    const confirmButtonColor = type === 'danger' ? 'bg-red-600 hover:bg-red-700 shadow-red-100' : 'bg-slate-900 hover:bg-slate-800 shadow-slate-100';
+    const iconColor = type === 'danger' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400';
+    const confirmButtonColor = type === 'danger' ? 'bg-red-600 hover:bg-red-700 shadow-red-100 dark:shadow-none' : 'bg-slate-900 dark:bg-white/10 dark:hover:bg-white/20';
 
     return (
         <div
@@ -43,12 +43,12 @@ const ConfirmationModal = ({
 
             {}
             <div
-                className={`relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transition-all duration-300 transform ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}
+                className={`relative w-full max-w-md bg-white dark:bg-white/5 dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/10 shadow-none overflow-hidden transition-all duration-500 transform ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}
             >
                 {}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all"
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -61,8 +61,8 @@ const ConfirmationModal = ({
 
                     {}
                     <div className="mb-8">
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">{title}</h3>
-                        <p className="text-slate-500 font-medium leading-relaxed">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{title}</h3>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
                             {message}
                         </p>
                     </div>
@@ -72,14 +72,14 @@ const ConfirmationModal = ({
                         <button
                             onClick={onClose}
                             disabled={isLoading}
-                            className="flex-1 px-6 py-3.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 px-6 py-3.5 bg-white dark:bg-white/5 dark:backdrop-blur-xl border-white/10 shadow-none"
                         >
                             {cancelText}
                         </button>
                         <button
                             onClick={onConfirm}
                             disabled={isLoading}
-                            className={`flex-1 px-6 py-3.5 ${confirmButtonColor} text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70`}
+                            className={`flex-1 px-6 py-3.5 ${confirmButtonColor} rounded-xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70`}
                         >
                             {isLoading ? (
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

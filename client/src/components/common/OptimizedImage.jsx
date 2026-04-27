@@ -37,7 +37,7 @@ const OptimizedImage = ({
         >
             {}
             <div
-                className={`absolute inset-0 bg-slate-100 transition-opacity duration-500 flex items-center justify-center ${isLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                className={`absolute inset-0 bg-slate-100 flex items-center justify-center ${isLoaded ? 'hidden' : 'block'
                     }`}
             >
                 <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin" />
@@ -55,10 +55,10 @@ const OptimizedImage = ({
                 <img
                     src={src || placeholderUrl}
                     alt={alt}
-                    className={`w-full h-full transition-all duration-700 ease-out ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                        } ${className}`}
+                    className={`w-full h-full ${className} ${isLoaded ? 'opacity-100 block' : 'opacity-0 hidden'}`}
                     style={{ objectFit }}
-                    loading="lazy"
+                    loading="eager"
+                    fetchpriority="high"
                 />
             )}
         </div>

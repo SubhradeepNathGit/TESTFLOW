@@ -9,6 +9,7 @@ import {
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 import { getTests, getTestStats } from '../../api/testApi';
 import { useSocket } from '../../context/SocketContext';
+import { useTheme } from '../../context/ThemeContext';
 import {
     FiBarChart2, FiUsers, FiAward, FiTrendingUp,
     FiPieChart, FiTarget, FiActivity, FiCheckCircle,
@@ -17,6 +18,7 @@ import {
 import { Medal, Trophy, Award } from 'lucide-react';
 import CustomSelect from '../../components/common/CustomSelect';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Skeleton, { CardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 
 ChartJS.register(
     ArcElement, ChartTooltip, ChartLegend,
@@ -27,17 +29,19 @@ ChartJS.register(
 // Chart defaults
 const chartFont = { family: "'Inter', system-ui, sans-serif", weight: '700' };
 const gridColor = 'rgba(148,163,184,0.08)';
-const baseLineOptions = {
+const baseLineOptions = (isDark) => ({
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: {
-        backgroundColor: '#0f172a', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+        backgroundColor: isDark ? '#1e293b' : '#0f172a', 
+        titleColor: isDark ? '#f8fafc' : '#e2e8f0', 
+        bodyColor: isDark ? '#94a3b8' : '#94a3b8',
         padding: 12, cornerRadius: 12, titleFont: chartFont,
     }},
     scales: {
-        x: { grid: { color: gridColor }, ticks: { color: '#94a3b8', font: chartFont } },
-        y: { grid: { color: gridColor }, ticks: { color: '#94a3b8', font: chartFont } },
+        x: { grid: { color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(148,163,184,0.08)' }, ticks: { color: '#94a3b8', font: chartFont } },
+        y: { grid: { color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(148,163,184,0.08)' }, ticks: { color: '#94a3b8', font: chartFont } },
     }
-};
+});
 
 // Animation variants
 const fadeUp = {
@@ -74,24 +78,26 @@ const StatCard = ({ label, value, sub, icon: Icon, gradient, index }) => (
 // Empty state component
 const Empty = ({ icon: Icon, title, desc }) => (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4">
-            <Icon size={28} className="text-slate-300" />
+        <div className="w-16 h-16 bg-slate-50 dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-2xl flex items-center justify-center mb-4">
+            <Icon size={28} className="text-slate-300 dark:text-slate-600" />
         </div>
-        <p className="font-bold text-slate-500">{title}</p>
-        <p className="text-xs text-slate-400 mt-1">{desc}</p>
+        <p className="font-bold text-slate-500 dark:text-slate-400">{title}</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{desc}</p>
     </div>
 );
 
 // Difficulty badge component
 const DiffBadge = ({ pct }) => {
-    if (pct >= 70) return <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-black rounded-full uppercase">Easy</span>;
-    if (pct >= 40) return <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[9px] font-black rounded-full uppercase">Medium</span>;
-    return <span className="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] font-black rounded-full uppercase">Hard</span>;
+    if (pct >= 70) return <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] font-black rounded-full uppercase">Easy</span>;
+    if (pct >= 40) return <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[9px] font-black rounded-full uppercase">Medium</span>;
+    return <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[9px] font-black rounded-full uppercase">Hard</span>;
 };
 
 // Main analytics component
 const AnalyticsDashboard = () => {
     const socket = useSocket();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const queryClient = useQueryClient();
     const [selectedTest, setSelectedTest] = useState(null);
     const [stats, setStats] = useState(null);
@@ -144,13 +150,16 @@ const AnalyticsDashboard = () => {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center min-h-screen bg-[#F6F7FB]">
-            <div className="flex flex-col items-center gap-4">
-                <div className="relative w-14 h-14">
-                    <div className="absolute inset-0 rounded-full border-4 border-indigo-100" />
-                    <div className="absolute inset-0 rounded-full border-4 border-t-indigo-600 animate-spin" />
+        <div className="min-h-screen bg-[#F6F7FB] dark:bg-black font-sans">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12 space-y-8">
+                <div className="flex justify-between mb-8">
+                    <Skeleton className="w-1/3 h-12" />
+                    <Skeleton className="w-48 h-12 rounded-2xl" />
                 </div>
-                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Loading Analytics</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton />
+                </div>
+                <CardSkeleton />
             </div>
         </div>
     );
@@ -199,33 +208,26 @@ const AnalyticsDashboard = () => {
     } : null;
 
     const kpis = stats ? [
-        { label: 'Avg Score', value: `${stats.averageScore}`, sub: `/ ${stats.totalMarks} pts`, icon: FiTrendingUp, gradient: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)', shadow: 'shadow-indigo-200' },
-        { label: 'Pass Rate', value: `${stats.passRate}%`, sub: `${stats.totalAttempts} attempts`, icon: FiCheckCircle, gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', shadow: 'shadow-emerald-200' },
-        { label: 'Completion', value: `${stats.completionRate}%`, sub: `${stats.enrolledStudents} enrolled`, icon: FiUsers, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'shadow-amber-200' },
-        { label: 'Top Score', value: stats.maxScore, sub: `Std Dev: ${stats.stdDev}`, icon: FiAward, gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)', shadow: 'shadow-pink-200' },
+        { label: 'Avg Score', value: `${stats.averageScore}`, sub: `/ ${stats.totalMarks} pts`, icon: FiTrendingUp, gradient: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)', shadow: 'dark:shadow-none' },
+        { label: 'Pass Rate', value: `${stats.passRate}%`, sub: `${stats.totalAttempts} attempts`, icon: FiCheckCircle, gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', shadow: 'dark:shadow-none' },
+        { label: 'Completion', value: `${stats.completionRate}%`, sub: `${stats.enrolledStudents} enrolled`, icon: FiUsers, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'dark:shadow-none' },
+        { label: 'Top Score', value: stats.maxScore, sub: `Std Dev: ${stats.stdDev}`, icon: FiAward, gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)', shadow: 'dark:shadow-none' },
     ] : [];
 
     return (
-        <div className="min-h-screen bg-[#F6F7FB] font-sans">
-            {/* Ambient glows */}
-            <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[100px] opacity-70 pointer-events-none -translate-y-1/2 translate-x-1/3" />
-            <div className="fixed bottom-0 left-0 w-[300px] h-[300px] bg-purple-50 rounded-full blur-[80px] opacity-50 pointer-events-none translate-y-1/2 -translate-x-1/3" />
-
-            <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-8 lg:py-12 space-y-8">
-
-                {/* Header */}
-                <motion.div variants={fadeUp} initial="hidden" animate="show"
-                    className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">
+            <div className="max-w-7xl mx-auto">
+                <motion.div 
+                    variants={fadeUp} 
+                    initial="hidden" 
+                    animate="show"
+                    className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10"
+                >
                     <div>
-                        <div className="flex items-center gap-3 mb-1">
-                            <div className="p-2.5 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-2xl shadow-lg shadow-indigo-200">
-                                <FiPieChart size={20} />
-                            </div>
-                            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Analytics</h1>
-                        </div>
-                        <p className="text-slate-500 font-medium pl-1 text-sm">
-                            Deep insights powered by MongoDB Aggregation Pipelines
-                        </p>
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mb-2">
+                            Intelligence <span className="text-slate-400 dark:text-slate-500 font-light">Suite</span>
+                        </h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Deep assessment analytics and performance trends.</p>
                     </div>
 
                     <div className="min-w-[280px]">
@@ -239,304 +241,205 @@ const AnalyticsDashboard = () => {
                     </div>
                 </motion.div>
 
-                {/* No stats available */}
-                {!stats && !statsLoading && (
-                    <div className="bg-white rounded-[2rem] border border-slate-100 p-20 text-center">
-                        <Empty icon={FiBarChart2} title="No data available" desc="Select a test to see detailed analytics." />
-                    </div>
-                )}
-
-                {/* Loading state */}
-                {statsLoading && (
-                    <div className="bg-white rounded-[2rem] border border-slate-100 p-16 flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-4">
-                            <div className="relative w-12 h-12">
-                                <div className="absolute inset-0 rounded-full border-4 border-indigo-100" />
-                                <div className="absolute inset-0 rounded-full border-4 border-t-indigo-600 animate-spin" />
-                            </div>
-                            <p className="text-sm font-bold text-slate-400">Running aggregation pipeline…</p>
-                        </div>
-                    </div>
-                )}
-
-                {stats && !statsLoading && (
-                    <AnimatePresence mode="wait">
-                        <motion.div key={selectedTest} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8">
-
-                            {/* KPI Grid */}
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                {kpis.map((kpi, i) => (
-                                    <StatCard key={i} index={i} label={kpi.label} value={kpi.value} sub={kpi.sub} icon={kpi.icon} gradient={kpi.gradient} />
-                                ))}
-                            </div>
-
+                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none min-h-[500px] relative overflow-hidden group">
+                    {tests.length === 0 ? (
+                        <Empty icon={FiActivity} title="No Assessments" desc="Launch your first test to see analytics." />
+                    ) : (
+                        <div className="space-y-10">
                             {/* Tab navigation */}
-                            <div className="flex bg-white border border-slate-100 rounded-2xl p-1.5 w-fit shadow-sm gap-1">
+                            <div className="flex flex-wrap bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-1.5 rounded-[22px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none w-fit gap-1">
                                 {[
-                                    { id: 'overview', label: 'Overview', icon: FiBarChart2 },
-                                    { id: 'students', label: 'Students', icon: FiUsers },
-                                    { id: 'questions', label: 'Questions', icon: FiTarget },
+                                    { id: 'overview', icon: FiPieChart, label: 'Overview' },
+                                    { id: 'participants', icon: FiUsers, label: 'Participants' },
+                                    { id: 'questions', icon: FiTarget, label: 'Questions' },
                                 ].map(tab => (
-                                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-none dark:shadow-none' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                                    >
                                         <tab.icon size={14} />
                                         {tab.label}
                                     </button>
                                 ))}
                             </div>
 
-                            {/* Overview tab */}
-                            {activeTab === 'overview' && (
-                                <motion.div variants={fadeUp} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                                    {/* Score Distribution Donut */}
-                                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
-                                        <div className="flex items-center gap-2 mb-6">
-                                            <FiPieChart className="text-indigo-500" size={16} />
-                                            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Score Bands</h3>
-                                        </div>
-                                        {distributionChart ? (
-                                            <>
-                                                <div className="h-44 flex items-center justify-center">
-                                                    <Doughnut data={distributionChart} options={{
-                                                        responsive: true, maintainAspectRatio: false, cutout: '72%',
-                                                        plugins: { legend: { display: false }, tooltip: {
-                                                            backgroundColor: '#0f172a', titleColor: '#e2e8f0',
-                                                            bodyColor: '#94a3b8', padding: 12, cornerRadius: 12,
-                                                        }}
-                                                    }} />
+                            {!stats && !statsLoading ? (
+                                <Empty icon={FiBarChart2} title="No data available" desc="Select a test to see detailed analytics." />
+                            ) : statsLoading ? (
+                                <div className="space-y-8">
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <CardSkeleton /><CardSkeleton /><CardSkeleton /><CardSkeleton />
+                                    </div>
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                        <CardSkeleton />
+                                        <div className="lg:col-span-2"><CardSkeleton /></div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <AnimatePresence mode="wait">
+                                    <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                                        {/* Overview Tab Content */}
+                                        {activeTab === 'overview' && (
+                                            <div className="space-y-10">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                    <StatCard index={0} label="Success Rate" value={`${stats?.completionRate || 0}%`} icon={FiAward} gradient="linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)" />
+                                                    <StatCard index={1} label="Participants" value={stats?.completedStudentCount || 0} sub={stats?.enrolledStudents} icon={FiUsers} gradient="linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)" />
+                                                    <StatCard index={2} label="Average Score" value={stats?.averageScore || 0} icon={FiTrendingUp} gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)" />
+                                                    <StatCard index={3} label="Total Items" value={stats?.totalQuestions || 0} icon={FiTarget} gradient="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" />
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-2 mt-4">
-                                                    {[
-                                                        { label: 'Below 40%', color: '#f43f5e', idx: 0 },
-                                                        { label: '40–60%', color: '#f59e0b', idx: 1 },
-                                                        { label: '60–80%', color: '#6366f1', idx: 2 },
-                                                        { label: '80–100%', color: '#10b981', idx: 3 },
-                                                    ].map(band => (
-                                                        <div key={band.idx} className="flex items-center gap-2">
-                                                            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: band.color }} />
-                                                            <span className="text-[10px] font-bold text-slate-500">{band.label}</span>
-                                                            <span className="ml-auto text-[10px] font-black text-slate-800">
-                                                                {distributionChart.datasets[0].data[band.idx]}
-                                                            </span>
+
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                                    <div className="lg:col-span-2 space-y-6">
+                                                        <div>
+                                                            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">Score Distribution</h3>
+                                                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">Student Performance Spread</p>
+                                                        </div>
+                                                        <div className="h-[320px]">
+                                                            {stats?.performance?.length > 0 ? (
+                                                                <Bar 
+                                                                    data={{
+                                                                        labels: stats.performance.map(p => p.studentName.split(' ')[0]),
+                                                                        datasets: [{
+                                                                            data: stats.performance.map(p => p.score),
+                                                                            backgroundColor: '#6366f1',
+                                                                            borderRadius: 8,
+                                                                            barThickness: 32,
+                                                                        }]
+                                                                    }} 
+                                                                    options={baseLineOptions(isDark)} 
+                                                                />
+                                                            ) : <Empty icon={FiActivity} title="Insufficient Data" desc="Scores will appear here once students submit." />}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-6">
+                                                        <div>
+                                                            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">Completion Status</h3>
+                                                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">Submission Tracking</p>
+                                                        </div>
+                                                        <div className="h-[320px] flex items-center justify-center">
+                                                            {stats ? (
+                                                                <Doughnut 
+                                                                    data={{
+                                                                        labels: ['Completed', 'Pending'],
+                                                                        datasets: [{
+                                                                            data: [stats.completedStudentCount, stats.enrolledStudents - stats.completedStudentCount],
+                                                                            backgroundColor: ['#6366f1', isDark ? '#334155' : '#e2e8f0'],
+                                                                            borderWidth: 0,
+                                                                            cutout: '80%',
+                                                                        }]
+                                                                    }}
+                                                                    options={{
+                                                                        plugins: { legend: { display: false } },
+                                                                        maintainAspectRatio: false
+                                                                    }}
+                                                                />
+                                                            ) : <Empty icon={FiActivity} title="Status Unknown" desc="Waiting for test data..." />}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Participants Tab Content */}
+                                        {activeTab === 'participants' && (
+                                            <div className="space-y-6">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">Exam Roster</h3>
+                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">Detailed Student Performance</p>
+                                                    </div>
+                                                </div>
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full text-left">
+                                                        <thead>
+                                                            <tr className="bg-slate-50 dark:bg-black/50">
+                                                                {['Student', 'Roll Number', 'Score', 'Status', 'Accuracy'].map(h => (
+                                                                    <th key={h} className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{h}</th>
+                                                                ))}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
+                                                            {stats?.performance?.map((p, i) => (
+                                                                <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
+                                                                    <td className="px-6 py-5">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="w-9 h-9 rounded-full overflow-hidden bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xs">
+                                                                                {p.profileImage 
+                                                                                    ? <img src={p.profileImage.startsWith('http') ? p.profileImage : `http://localhost:3006/${p.profileImage}`} alt="" className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
+                                                                                    : p.studentName?.charAt(0).toUpperCase()}
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="font-bold text-slate-700 dark:text-slate-300">{p.studentName}</p>
+                                                                                <p className="text-[10px] text-slate-400 dark:text-slate-500">{p.studentEmail}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="px-6 py-5 text-sm font-bold text-slate-500 dark:text-slate-400">{p.studentRoll || 'N/A'}</td>
+                                                                    <td className="px-6 py-5">
+                                                                        <span className="text-lg font-black text-slate-800 dark:text-slate-200">{p.score}</span>
+                                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1 font-bold">PTS</span>
+                                                                    </td>
+                                                                    <td className="px-6 py-5">
+                                                                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${p.status === 'SUBMITTED' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}`}>
+                                                                            {p.status}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-6 py-5">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden min-w-[60px]">
+                                                                                <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${(p.score / (stats.totalMarks || 1)) * 100}%` }} />
+                                                                            </div>
+                                                                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500">{Math.round((p.score / (stats.totalMarks || 1)) * 100)}%</span>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Questions Tab Content */}
+                                        {activeTab === 'questions' && (
+                                            <div className="space-y-8">
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">Item Analysis</h3>
+                                                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">Accuracy Per Question</p>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {stats?.questionDifficulty?.map((q, i) => (
+                                                        <div key={i} className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-6 rounded-2xl border border-slate-100 dark:border-white/5 shadow-none group hover:border-indigo-500/30 transition-all duration-300">
+                                                            <div className="flex items-center justify-between mb-4">
+                                                                 <span className="w-8 h-8 bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-xl flex items-center justify-center text-xs font-black text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/5">
+                                                                    {i + 1}
+                                                                </span>
+                                                                <DiffBadge pct={q.accuracyRate} />
+                                                            </div>
+                                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 line-clamp-2 mb-4 leading-relaxed">{q.questionText}</p>
+                                                            <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
+                                                                <div className="flex items-center gap-2">
+                                                                    <FiCheckCircle className="text-emerald-500" />
+                                                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Accuracy</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-3 shrink-0">
+                                                                    <DiffBadge pct={q.accuracyRate} />
+                                                                    <span className="text-sm font-black text-slate-900 dark:text-slate-100">{q.accuracyRate}%</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </>
-                                        ) : <Empty icon={FiPieChart} title="No data" desc="No submissions yet." />}
-                                    </div>
-
-                                    {/* Score Timeline Line Chart */}
-                                    <div className="lg:col-span-2 bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-2">
-                                                <FiActivity className="text-indigo-500" size={16} />
-                                                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Score Timeline</h3>
                                             </div>
-                                            <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full uppercase">
-                                                Avg per day
-                                            </span>
-                                        </div>
-                                        {timelineChart ? (
-                                            <div className="h-52">
-                                                <Line data={timelineChart} options={{
-                                                    ...baseLineOptions,
-                                                    plugins: { ...baseLineOptions.plugins, legend: { display: false } }
-                                                }} />
-                                            </div>
-                                        ) : (
-                                            <Empty icon={FiActivity} title="No timeline data" desc="Submissions will appear here over time." />
                                         )}
-                                    </div>
-
-                                    {/* Summary stats */}
-                                    <div className="lg:col-span-3 bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
-                                        <div className="flex items-center gap-2 mb-6">
-                                            <FiActivity className="text-amber-500" size={16} />
-                                            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Assessment Summary</h3>
-                                        </div>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                                            {[
-                                                { label: 'Total Marks', value: stats.totalMarks, icon: FiStar, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-                                                { label: 'Duration', value: `${stats.duration}m`, icon: FiClock, color: 'text-amber-600', bg: 'bg-amber-50' },
-                                                { label: 'Enrolled', value: stats.enrolledStudents, icon: FiUsers, color: 'text-blue-600', bg: 'bg-blue-50' },
-                                                { label: 'Attempts', value: stats.totalAttempts, icon: FiActivity, color: 'text-purple-600', bg: 'bg-purple-50' },
-                                                { label: 'Max Score', value: stats.maxScore, icon: FiAward, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                                                { label: 'Min Score', value: stats.minScore, icon: FiAlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50' },
-                                                { label: 'Std Deviation', value: stats.stdDev, icon: FiBarChart2, color: 'text-slate-600', bg: 'bg-slate-50' },
-                                            ].map((s, i) => (
-                                                <div key={i} className="flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
-                                                    <div className={`p-2 rounded-xl ${s.bg} ${s.color} mb-2`}>
-                                                        <s.icon size={16} />
-                                                    </div>
-                                                    <p className="text-xl font-black text-slate-900">{s.value}</p>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{s.label}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </motion.div>
+                                    </motion.div>
+                                </AnimatePresence>
                             )}
-
-                            {/* Students tab */}
-                            {activeTab === 'students' && (
-                                <motion.div variants={fadeUp} initial="hidden" animate="show"
-                                    className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-                                    <div className="px-7 py-5 border-b border-slate-50 flex items-center justify-between">
-                                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Student Performance</h3>
-                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full uppercase">
-                                            {stats.performance.length} Results
-                                        </span>
-                                    </div>
-                                    {stats.performance.length === 0 ? (
-                                        <Empty icon={FiUsers} title="No submissions yet" desc="Students will appear here after submitting." />
-                                    ) : (
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full">
-                                                <thead>
-                                                    <tr className="bg-slate-50/60 text-left">
-                                                        {['Rank', 'Student', 'Score', 'Progress', 'Status', 'Time', 'Date'].map(h => (
-                                                            <th key={h} className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">{h}</th>
-                                                        ))}
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-50">
-                                                    {stats.performance.map((p, i) => {
-                                                        const pct = stats.totalMarks > 0 ? Math.round((p.score / stats.totalMarks) * 100) : 0;
-                                                        const passed = pct >= 50;
-                                                        const color = pct >= 80 ? '#10b981' : pct >= 60 ? '#6366f1' : pct >= 40 ? '#f59e0b' : '#f43f5e';
-                                                        const timeMins = p.timeTaken ? Math.round(p.timeTaken / 60000) : null;
-                                                        const medal = i === 0 ? <Medal className="text-yellow-500" size={18} /> : i === 1 ? <Medal className="text-slate-400" size={18} /> : i === 2 ? <Medal className="text-amber-600" size={18} /> : null;
-
-                                                        return (
-                                                            <tr key={i} className="hover:bg-slate-50/40 transition-colors">
-                                                                <td className="px-6 py-4">
-                                                                    <span className="text-base">{medal || <span className="text-sm font-black text-slate-400">#{i + 1}</span>}</span>
-                                                                </td>
-                                                                <td className="px-6 py-5">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="w-9 h-9 rounded-full overflow-hidden bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-sm shrink-0">
-                                                                            {p.profileImage
-                                                                                ? <img src={p.profileImage.startsWith('http') ? p.profileImage : `http://localhost:3006/${p.profileImage}`} alt="" className="w-full h-full object-cover rounded-full" />
-                                                                                : p.studentName?.charAt(0).toUpperCase()
-                                                                            }
-                                                                        </div>
-                                                                        <div>
-                                                                            <p className="font-bold text-slate-700 text-sm">{p.studentName}</p>
-                                                                            <p className="text-[10px] text-slate-400">{p.studentRoll || p.studentEmail}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <span className="text-xl font-black" style={{ color }}>{p.score}</span>
-                                                                    <span className="text-xs text-slate-400 ml-1">/{stats.totalMarks}</span>
-                                                                </td>
-                                                                <td className="px-6 py-4 min-w-[120px]">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
-                                                                        </div>
-                                                                        <span className="text-[10px] font-black" style={{ color }}>{pct}%</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${passed ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
-                                                                        {passed ? 'Passed' : 'Failed'}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-6 py-4 text-xs text-slate-400 font-medium whitespace-nowrap">
-                                                                    {timeMins != null ? `${timeMins} min` : '—'}
-                                                                </td>
-                                                                <td className="px-6 py-4 text-xs text-slate-400 font-medium whitespace-nowrap">
-                                                                    {p.submittedAt ? new Date(p.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
-
-                            {/* Questions tab */}
-                            {activeTab === 'questions' && (
-                                <motion.div variants={fadeUp} initial="hidden" animate="show" className="space-y-6">
-
-                                    {/* Bar chart: accuracy per question */}
-                                    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-2">
-                                                <FiBarChart2 className="text-indigo-500" size={16} />
-                                                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Question Accuracy Rates</h3>
-                                            </div>
-                                            <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">Hardest → Easiest</span>
-                                        </div>
-                                        {difficultyChart ? (
-                                            <div className="h-56">
-                                                <Bar data={difficultyChart} options={{
-                                                    ...baseLineOptions,
-                                                    scales: {
-                                                        ...baseLineOptions.scales,
-                                                        y: { ...baseLineOptions.scales.y, min: 0, max: 100, ticks: { ...baseLineOptions.scales.y.ticks, callback: v => `${v}%` } }
-                                                    },
-                                                    plugins: {
-                                                        legend: { display: false },
-                                                        tooltip: { ...baseLineOptions.plugins.tooltip, callbacks: { label: c => ` Accuracy: ${c.raw}%` } }
-                                                    }
-                                                }} />
-                                            </div>
-                                        ) : <Empty icon={FiBarChart2} title="No question data" desc="Question difficulty data will appear after attempts." />}
-                                    </div>
-
-                                    {/* Question detail list */}
-                                    {stats.questionDifficulty?.length > 0 && (
-                                        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-                                            <div className="px-7 py-5 border-b border-slate-50">
-                                                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Question Breakdown</h3>
-                                            </div>
-                                            <div className="divide-y divide-slate-50">
-                                                {stats.questionDifficulty.map((q, i) => (
-                                                    <div key={i} className="px-7 py-5 flex items-center gap-5 hover:bg-slate-50/40 transition-colors">
-                                                        <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
-                                                            Q{i + 1}
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="font-bold text-slate-700 text-sm truncate">{q.questionText}</p>
-                                                            <div className="flex items-center gap-3 mt-1.5">
-                                                                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                                    <div
-                                                                        className="h-full rounded-full"
-                                                                        style={{
-                                                                            width: `${q.accuracyRate}%`,
-                                                                            background: q.accuracyRate >= 70 ? '#10b981' : q.accuracyRate >= 40 ? '#f59e0b' : '#f43f5e'
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                                <span className="text-xs font-black text-slate-500 whitespace-nowrap">{q.accuracyRate}%</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center gap-3 shrink-0">
-                                                            <DiffBadge pct={q.accuracyRate} />
-                                                            <span className="text-[10px] font-black text-slate-400 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-full">
-                                                                {q.correctAttempts}/{q.totalAttempts} correct
-                                                            </span>
-                                                            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
-                                                                {q.marks} {q.marks === 1 ? 'mark' : 'marks'}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
-
-                        </motion.div>
-                    </AnimatePresence>
-                )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

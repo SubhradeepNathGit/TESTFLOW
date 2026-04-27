@@ -12,6 +12,7 @@ import { Send, Trash2, Edit, Trash, Loader2 } from 'lucide-react';
 import QuestionModal from '../../components/modals/QuestionModal';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Skeleton, { CardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 
 const InstructorDashboard = () => {
     const socket = useSocket();
@@ -220,15 +221,31 @@ const InstructorDashboard = () => {
         });
     };
 
-    if (testsLoading) return <div className="p-8 font-sans flex items-center justify-center h-screen">Loading...</div>;
+    if (testsLoading) return (
+        <div className="min-h-screen bg-[#FDFDFD] dark:bg-black p-4 sm:p-6 lg:p-10 font-sans transition-colors duration-500">
+            <div className="max-w-7xl mx-auto space-y-10">
+                <Skeleton className="w-1/3 h-10 mb-2" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div className="lg:col-span-1 space-y-8">
+                        <CardSkeleton />
+                        <CardSkeleton />
+                    </div>
+                    <div className="lg:col-span-2 space-y-8">
+                        <CardSkeleton />
+                        <TableSkeleton rows={4} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="min-h-screen bg-[#FDFDFD] p-6 lg:p-10 font-sans">
+        <div className="min-h-screen bg-[#FDFDFD] dark:bg-black p-4 sm:p-6 lg:p-10 font-sans transition-colors duration-500">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Instructor Panel</h1>
-                        <p className="text-slate-500 font-medium mt-1">Design precision assessments and monitor academic integrity.</p>
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Instructor Panel</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Design precision assessments and monitor academic integrity.</p>
                     </div>
                 </div>
 
@@ -236,21 +253,22 @@ const InstructorDashboard = () => {
                     {/* Left Panel */}
                     <div className="lg:col-span-1 space-y-8">
                         {/* Test Creation Card */}
-                        <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40">
+                        <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none relative overflow-hidden group hover:border-slate-200 dark:hover:border-indigo-500/30 transition-all duration-500">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -translate-y-1/2 translate-x-1/4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                      Create Test 
                                 </h2>
-                                <div className="flex bg-slate-100 p-1 rounded-xl">
+                                <div className="flex bg-slate-100 dark:bg-white/[0.03] p-1 rounded-xl">
                                     <button 
                                         onClick={() => setCreationMode('pdf')}
-                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${creationMode === 'pdf' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}
+                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${creationMode === 'pdf' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
                                     >
                                         PDF
                                     </button>
                                     <button 
                                         onClick={() => setCreationMode('manual')}
-                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${creationMode === 'manual' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}
+                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${creationMode === 'manual' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
                                     >
                                         Manual
                                     </button>
@@ -261,7 +279,7 @@ const InstructorDashboard = () => {
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Test Identity</label>
                                     <input type="text" placeholder="e.g. Advanced Mathematics Final" required
-                                        className="w-full bg-slate-50 rounded-2xl p-4 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-100"
+                                        className="w-full bg-slate-50 dark:bg-white/[0.03] rounded-2xl p-4 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-100 dark:border-white/5 text-slate-900 dark:text-slate-100"
                                         value={newTest.title}
                                         onChange={e => setNewTest({ ...newTest, title: e.target.value })}
                                     />
@@ -272,7 +290,7 @@ const InstructorDashboard = () => {
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Duration</label>
                                         <div className="relative">
                                             <input type="number" placeholder="60" required
-                                                className="w-full bg-slate-50 rounded-2xl p-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-100"
+                                                className="w-full bg-slate-50 dark:bg-white/[0.03] rounded-2xl p-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-100 dark:border-white/5 text-slate-900 dark:text-slate-100"
                                                 value={newTest.duration}
                                                 onChange={e => setNewTest({ ...newTest, duration: e.target.value })}
                                             />
@@ -288,7 +306,7 @@ const InstructorDashboard = () => {
                                                     onChange={e => setNewTest({ ...newTest, pdfFile: e.target.files[0] })}
                                                 />
                                                 <label htmlFor="pdf-upload"
-                                                    className="w-full h-[54px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl px-4 text-xs font-bold text-slate-400 flex items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors truncate">
+                                                    className="w-full h-[54px] bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl px-4 text-xs font-bold text-slate-400 dark:text-slate-500 flex items-center justify-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors truncate">
                                                     {newTest.pdfFile ? newTest.pdfFile.name : 'MCQ PDF'}
                                                 </label>
                                             </div>
@@ -297,7 +315,7 @@ const InstructorDashboard = () => {
                                 </div>
 
                                 <button type="submit" disabled={isUploading}
-                                    className="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-slate-200 flex items-center justify-center gap-2 mt-2">
+                                    className="w-full bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-black font-black py-4 rounded-2xl transition-all shadow-none dark:shadow-none flex items-center justify-center gap-2 mt-2">
                                     {isUploading ? 'Processing...' : (
                                         creationMode === 'pdf' ? <><FiUploadCloud size={18} /> GENERATE FROM PDF</> : <><FiUploadCloud size={18}/> INITIALIZE TEST</>
                                     )}
@@ -306,8 +324,9 @@ const InstructorDashboard = () => {
                         </div>
 
                         {/* Tests List */}
-                        <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
-                            <h2 className="text-lg font-bold text-slate-800 mb-5">Assessments ({tests.length})</h2>
+                         <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-6 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none relative overflow-hidden group hover:border-slate-200 dark:hover:border-rose-500/30 transition-all duration-500">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 blur-[60px] -translate-y-1/2 translate-x-1/4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-5">Assessments ({tests.length})</h2>
                             <div className="space-y-3 max-h-96 overflow-y-auto">
                                 {tests.length === 0 ? (
                                     <div className="py-12 text-center">
@@ -315,13 +334,13 @@ const InstructorDashboard = () => {
                                         <p className="text-xs text-slate-300 mt-1">Upload a PDF or create manually.</p>
                                     </div>
                                 ) : tests.map(test => (
-                                    <div key={test._id}
-                                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedTestId === test._id ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50/70 border-transparent hover:bg-slate-100 hover:border-slate-200'}`}
+                                     <div key={test._id}
+                                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedTestId === test._id ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800' : 'bg-slate-50/70 dark:bg-black/70 border-transparent hover:bg-slate-100 dark:hover:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700'}`}
                                         onClick={() => fetchStats(test._id)}
                                     >
-                                        <div className="flex items-start justify-between gap-3">
+                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-bold text-slate-800 text-sm truncate leading-snug">{test.title}</p>
+                                                <p className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate leading-snug">{test.title}</p>
                                                 <p className="text-xs font-medium text-slate-400 mt-1">
                                                     {test.duration} min · <span className="font-bold text-slate-500">{test.totalMarks}</span> marks
                                                 </p>
@@ -332,9 +351,9 @@ const InstructorDashboard = () => {
                                                 </span>
                                             </div>
                                             <div className="flex flex-col items-center gap-2 shrink-0">
-                                                <button 
+                                                 <button 
                                                     onClick={(e) => { e.stopPropagation(); handleArchiveTest(test._id); }}
-                                                    className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all rounded-xl border border-transparent hover:border-rose-100"
+                                                    className="p-2 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all rounded-xl border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
                                                     title="Archive Test"
                                                 >
                                                     <Trash2 size={15} />
@@ -343,7 +362,7 @@ const InstructorDashboard = () => {
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); handlePublish(test._id); }}
                                                         disabled={publishingId === test._id}
-                                                        className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
                                                         title="Publish Test"
                                                     >
                                                         {publishingId === test._id ? (
@@ -366,17 +385,16 @@ const InstructorDashboard = () => {
                         {selectedTestId ? (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">{stats?.testTitle || "Test Details"}</h2>
-                                    <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit">
+                                    <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">{stats?.testTitle || "Test Details"}</h2>                                     <div className="flex bg-slate-100 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
                                         <button 
                                             onClick={() => setActiveTab('stats')}
-                                            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${activeTab === 'stats' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${activeTab === 'stats' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                                         >
                                             <FiTrendingUp className="w-4 h-4" /> Performance
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab('questions')}
-                                            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${activeTab === 'questions' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${activeTab === 'questions' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                                         >
                                             <FiList className="w-4 h-4" /> Questions ({selectedTestQuestions.length})
                                         </button>
@@ -387,19 +405,18 @@ const InstructorDashboard = () => {
                                     <div className="space-y-8">
                                         {/* KPI Cards */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                                            <div className="bg-white p-7 rounded-[28px] border border-slate-100 shadow-sm">
+                                            <div className="bg-white dark:bg-white/[0.03] p-7 rounded-[28px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none">
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Average Score</p>
-                                                <div className="flex items-end gap-2">
-                                                    <p className="text-3xl font-black text-slate-900">{stats?.averageScore || 0}</p>
+                                                <div className="flex items-end gap-2">                                                     <p className="text-3xl font-black text-slate-900 dark:text-slate-100">{stats?.averageScore || 0}</p>
                                                     <FiTrendingUp className="text-emerald-500 mb-1" />
                                                 </div>
                                             </div>
-                                            <div className="bg-white p-7 rounded-[28px] border border-slate-100 shadow-sm">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Participants</p>
-                                                <p className="text-3xl font-black text-slate-900">{stats?.completedStudentCount || 0}<span className="text-slate-400 text-lg font-bold"> / {stats?.enrolledStudents || 0}</span></p>
+                                            <div className="bg-white dark:bg-white/[0.03] p-7 rounded-[28px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none">
+                                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Participants</p>
+                                                <p className="text-3xl font-black text-slate-900 dark:text-slate-100">{stats?.completedStudentCount || 0}<span className="text-slate-400 dark:text-slate-500 text-lg font-bold"> / {stats?.enrolledStudents || 0}</span></p>
                                             </div>
-                                            <div className="bg-slate-900 p-7 rounded-[28px] text-white shadow-xl shadow-slate-200">
-                                                <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-2">Completion Rate</p>
+                                            <div className="bg-slate-900 dark:bg-slate-100 p-7 rounded-[28px] text-white dark:text-slate-900 shadow-xl dark:shadow-none">
+                                                <p className="text-[10px] font-black text-white/50 dark:text-slate-900/50 uppercase tracking-widest mb-2">Completion Rate</p>
                                                 <p className="text-3xl font-black">
                                                     {stats?.completionRate || 0}%
                                                 </p>
@@ -407,34 +424,34 @@ const InstructorDashboard = () => {
                                         </div>
 
                                         {/* Performance Table */}
-                                        <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
-                                            <div className="p-7 border-b border-slate-50 flex items-center justify-between">
-                                                <h3 className="text-lg font-bold text-slate-800">Student Attempts</h3>
+                                        <div className="bg-white dark:bg-white/[0.03] rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none overflow-hidden">
+                                            <div className="p-7 border-b border-slate-50 dark:border-white/5 flex items-center justify-between">
+                                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Student Attempts</h3>
                                             </div>
                                             <div className="overflow-x-auto">
                                                 <table className="w-full">
                                                     <thead>
-                                                        <tr className="bg-slate-50/60 text-left">
+                                                        <tr className="bg-slate-50/60 dark:bg-black/60 text-left">
                                                             {['Student', 'Score', 'Status', 'Submitted At', 'Actions'].map(h => (
                                                                 <th key={h} className="px-7 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{h}</th>
                                                             ))}
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="divide-y divide-slate-50">
+                                                    <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
                                                         {(!stats || stats.performance.length === 0) ? (
-                                                            <tr><td colSpan="5" className="py-20 text-center text-slate-400 font-medium italic">No attempts recorded for this assessment.</td></tr>
+                                                            <tr><td colSpan="5" className="py-20 text-center text-slate-400 dark:text-slate-600 font-medium italic">No attempts recorded for this assessment.</td></tr>
                                                         ) : stats.performance.map((p, i) => (
-                                                            <tr key={i} className="hover:bg-slate-50/30 transition-colors">
+                                                            <tr key={i} className="hover:bg-slate-50/30 dark:hover:bg-slate-900/30 transition-colors">
                                                                 <td className="px-7 py-5">
-                                                                    <p className="font-bold text-slate-700">{p.studentName}</p>
-                                                                    <p className="text-xs text-slate-400">{p.studentRoll || p.studentEmail}</p>
+                                                                    <p className="font-bold text-slate-700 dark:text-slate-300">{p.studentName}</p>
+                                                                    <p className="text-xs text-slate-400 dark:text-slate-500">{p.studentRoll || p.studentEmail}</p>
                                                                 </td>
                                                                 <td className="px-7 py-5">
-                                                                    <span className="font-black text-slate-900 text-xl">{p.score}</span>
-                                                                    <span className="text-xs text-slate-400 ml-1 font-bold">PTS</span>
+                                                                    <span className="font-black text-slate-900 dark:text-slate-100 text-xl">{p.score}</span>
+                                                                    <span className="text-xs text-slate-400 dark:text-slate-500 ml-1 font-bold">PTS</span>
                                                                 </td>
                                                                 <td className="px-7 py-5">
-                                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${p.status === 'SUBMITTED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-600'}`}>
+                                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${p.status === 'SUBMITTED' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}`}>
                                                                         {p.status}
                                                                     </span>
                                                                 </td>
@@ -443,7 +460,7 @@ const InstructorDashboard = () => {
                                                                 </td>
                                                                 <td className="px-7 py-5">
                                                                     <button onClick={() => handleResetAttempt(p.attemptId)}
-                                                                        className="p-2.5 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm">
+                                                                        className="p-2.5 bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400 hover:bg-rose-500 dark:hover:bg-rose-400 hover:text-white dark:hover:text-slate-900 transition-all shadow-none dark:shadow-none">
                                                                         <FiRefreshCw size={14} />
                                                                     </button>
                                                                 </td>
@@ -459,13 +476,13 @@ const InstructorDashboard = () => {
                                         {/* Question List Header */}
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h3 className="text-lg font-bold text-slate-800">Question Bank</h3>
-                                                <p className="text-xs text-slate-400 font-medium">Manage and refine individual assessment items.</p>
+                                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Question Bank</h3>
+                                                <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Manage and refine individual assessment items.</p>
                                             </div>
                                             {tests.find(t => t._id === selectedTestId)?.status !== 'Published' && (
                                                 <button 
                                                     onClick={() => { setEditingQuestion(null); setIsQuestionModalOpen(true); }}
-                                                    className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                                                    className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none"
                                                 >
                                                     <FiPlus /> ADD QUESTION
                                                 </button>
@@ -488,37 +505,37 @@ const InstructorDashboard = () => {
                                                 const correctLabel = correctIdx >= 0 ? String.fromCharCode(65 + correctIdx) : '?';
                                                 const correctText = correctIdx >= 0 ? q.options[correctIdx] : q.correctAnswer;
                                                 return (
-                                                <div key={idx} className="group bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm hover:border-indigo-100 hover:shadow-md transition-all">
+                                                <div key={idx} className="group bg-white dark:bg-white/[0.03] p-7 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300">
                                                     {/* Question header row */}
                                                     <div className="flex gap-4 items-start mb-5">
-                                                        <div className="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center font-black text-slate-400 text-sm shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                                                        <div className="w-10 h-10 bg-slate-50 dark:bg-black rounded-2xl flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-sm shrink-0 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">
                                                             {idx + 1}
                                                         </div>
                                                         <div className="flex-1">
-                                                            <p className="font-bold text-slate-800 leading-relaxed text-sm">{q.questionText}</p>
+                                                            <p className="font-bold text-slate-800 dark:text-slate-200 leading-relaxed text-sm">{q.questionText}</p>
                                                         </div>
                                                         {/* Actions — always visible unless published */}
                                                         <div className="flex items-center gap-2 shrink-0 ml-2">
-                                                            <span className="px-3 py-1 bg-slate-50 text-slate-400 text-[10px] font-black rounded-full uppercase mr-1">
+                                                            <span className="px-3 py-1 bg-slate-50 dark:bg-black text-slate-400 dark:text-slate-500 text-[10px] font-black rounded-full uppercase mr-1">
                                                                 {q.marks} {q.marks === 1 ? 'Mark' : 'Marks'}
                                                             </span>
                                                             {tests.find(t => t._id === selectedTestId)?.status !== 'Published' && (
-                                                                <>
+                                                                    <>
                                                                     <button 
                                                                         onClick={() => handleEditQuestionBtn(q)}
-                                                                        className="p-2 bg-indigo-50 text-indigo-500 hover:bg-indigo-600 hover:text-white rounded-xl transition-all"
+                                                                        className="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-600 dark:hover:bg-indigo-400 hover:text-white dark:hover:text-slate-900 rounded-xl transition-all"
                                                                         title="Edit Question"
                                                                     >
                                                                         <Edit size={14} />
                                                                     </button>
                                                                     <button 
                                                                         onClick={() => handleDeleteQuestion(q._id)}
-                                                                        className="p-2 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 rounded-xl transition-all"
+                                                                        className="p-2 bg-slate-50 dark:bg-black text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 dark:hover:text-rose-400 rounded-xl transition-all"
                                                                         title="Delete Question"
                                                                     >
                                                                         <Trash size={14} />
                                                                     </button>
-                                                                </>
+                                                                    </>
                                                             )}
                                                         </div>
                                                     </div>
@@ -530,11 +547,11 @@ const InstructorDashboard = () => {
                                                             return (
                                                             <div key={i} className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[11px] font-bold transition-colors ${
                                                                 isCorrectOpt
-                                                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                                                    : 'bg-slate-50 border-slate-100 text-slate-500'
+                                                                    ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
+                                                                    : 'bg-slate-50 dark:bg-black/50 border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400'
                                                             }`}>
                                                                 <span className={`w-5 h-5 flex items-center justify-center rounded-lg text-[9px] font-black shrink-0 ${
-                                                                    isCorrectOpt ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'
+                                                                    isCorrectOpt ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500'
                                                                 }`}>
                                                                     {String.fromCharCode(65 + i)}
                                                                 </span>
@@ -554,12 +571,12 @@ const InstructorDashboard = () => {
                                 )}
                             </motion.div>
                         ) : (
-                            <div className="h-full min-h-[500px] bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[40px] flex flex-col items-center justify-center p-20 text-center">
-                                <div className="w-24 h-24 bg-white rounded-3xl shadow-sm flex items-center justify-center text-slate-200 mb-8 border border-slate-100">
+                         <div className="h-full min-h-[500px] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border-2 border-dashed border-slate-200 dark:border-white/10 rounded-[40px] flex flex-col items-center justify-center p-20 text-center group hover:border-indigo-500/30 transition-all duration-700">
+                                <div className="w-24 h-24 bg-white dark:bg-white/5 rounded-3xl shadow-none dark:shadow-none flex items-center justify-center text-slate-200 dark:text-slate-700 mb-8 border border-slate-100 dark:border-white/5">
                                     <FiActivity size={48} />
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-800 mb-3 tracking-tight">Intelligence Dashboard</h3>
-                                <p className="text-slate-400 text-sm font-medium max-w-xs leading-relaxed">Select any assessment from the repository to view deep analytics and manage its structural components.</p>
+                                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-3 tracking-tight">Intelligence Dashboard</h3>
+                                <p className="text-slate-400 dark:text-slate-500 text-sm font-medium max-w-xs leading-relaxed">Select any assessment from the repository to view deep analytics and manage its structural components.</p>
                             </div>
                         )}
                     </div>

@@ -236,8 +236,7 @@ exports.getTestStats = async (testId, institutionId) => {
                             }
                         }
                     },
-                    { $sort: { accuracyRate: 1 } }, // hardest first
-                    { $limit: 10 }
+                    { $sort: { accuracyRate: 1 } } // hardest first
                 ],
                 // Student details with rank
                 "studentDetails": [
@@ -293,6 +292,25 @@ exports.getTestStats = async (testId, institutionId) => {
     });
     const passCount = passStudents.length;
 
+    // Per-question difficulty analysis - Merging with ALL questions to ensure none are missing
+    const allQuestions = await Question.find({ testId: testObjectId }).sort({ createdAt: 1 });
+    const questionDifficultyMap = new Map(
+        result.questionDifficulty.map(q => [q._id.toString(), q])
+    );
+
+    const fullQuestionDifficulty = allQuestions.map((q, index) => {
+        const stats = questionDifficultyMap.get(q._id.toString());
+        return {
+            _id: q._id,
+            questionText: q.questionText,
+            marks: q.marks,
+            totalAttempts: stats?.totalAttempts || 0,
+            correctAttempts: stats?.correctAttempts || 0,
+            accuracyRate: stats?.accuracyRate || 0,
+            order: index + 1
+        };
+    });
+
     return {
         testTitle: test.title,
         totalMarks: test.totalMarks,
@@ -309,7 +327,7 @@ exports.getTestStats = async (testId, institutionId) => {
         scoreDistribution: result.scoreDistribution,
         scoreTimeline: result.scoreTimeline,
         statusBreakdown: result.statusBreakdown,
-        questionDifficulty: result.questionDifficulty,
+        questionDifficulty: fullQuestionDifficulty, // Now contains all questions
         performance: result.studentDetails
     };
 };

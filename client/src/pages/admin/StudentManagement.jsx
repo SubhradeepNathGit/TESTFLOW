@@ -4,18 +4,21 @@ import AuthContext from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosInstance';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { TableSkeleton } from '../../components/common/Skeleton';
+import useDebounce from '../../hooks/useDebounce';
 
 const StudentManagement = () => {
     const { user } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const [showAddModal, setShowAddModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', email: '' });
 
     const { data: students = [], isLoading: loading } = useQuery({
-        queryKey: ['students', searchTerm],
-        queryFn: () => api.get(`/users/students?search=${searchTerm}`).then(r => r.data.data || []),
+        queryKey: ['students', debouncedSearchTerm],
+        queryFn: () => api.get(`/users/students?search=${debouncedSearchTerm}`).then(r => r.data.data || []),
         keepPreviousData: true,
     });
 
@@ -38,7 +41,7 @@ const StudentManagement = () => {
     const handleToggleStatus = async (studentId, currentStatus) => {
         try {
             await api.patch(`/users/students/${studentId}/toggle`);
-            queryClient.setQueryData(['students', searchTerm], (old = []) =>
+            queryClient.setQueryData(['students', debouncedSearchTerm], (old = []) =>
                 old.map(s => s._id === studentId ? { ...s, isActive: !currentStatus } : s)
             );
             toast.success(`Student ${currentStatus ? 'deactivated' : 'activated'}`);
@@ -59,13 +62,13 @@ const StudentManagement = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 lg:p-12 font-sans">
+        <div className="min-h-screen bg-slate-50 dark:bg-black p-4 sm:p-6 lg:p-12 font-sans">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                     <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Management</p>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                             Student <span className="text-slate-400 font-light">Management</span>
                         </h1>
                         <p className="text-slate-500 font-medium mt-1">Add and manage examinees for your institution</p>
@@ -82,15 +85,15 @@ const StudentManagement = () => {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     {[
                         { label: 'Total Students', value: students.length },
                         { label: 'Active', value: students.filter(s => s.isActive).length },
                         { label: 'Inactive', value: students.filter(s => !s.isActive).length },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <div key={i} className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{stat.label}</p>
-                            <p className="text-3xl font-black text-slate-900">{stat.value}</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-slate-100">{stat.value}</p>
                         </div>
                     ))}
                 </div>
@@ -103,22 +106,20 @@ const StudentManagement = () => {
                         placeholder="Search by name, email or student ID..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 placeholder-slate-400 transition-all"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all"
                     />
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-[28px] border border-slate-100 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700" />
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-24 gap-4">
-                            <div className="w-10 h-10 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin" />
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loading Students...</p>
-                        </div>
+                        <TableSkeleton rows={5} />
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-100">
+                                    <tr className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-600">
                                         {['Student', 'Roll / ID', 'Status', 'Joined', 'Actions'].map(h => (
                                             <th key={h} className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                 {h}
@@ -126,7 +127,7 @@ const StudentManagement = () => {
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-50">
+                                <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
                                     {students.length === 0 ? (
                                         <tr>
                                             <td colSpan="5" className="py-20 text-center">
@@ -135,20 +136,20 @@ const StudentManagement = () => {
                                             </td>
                                         </tr>
                                     ) : students.map(student => (
-                                        <tr key={student._id} className="hover:bg-slate-50/50 transition-colors">
+                                        <tr key={student._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-black text-sm">
                                                         {student.name?.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-slate-800 text-sm">{student.name}</p>
+                                                        <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">{student.name}</p>
                                                         <p className="text-xs text-slate-400">{student.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-xs font-black text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                                <span className="text-xs font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full">
                                                     {student.studentId || 'Not assigned'}
                                                 </span>
                                             </td>
@@ -195,10 +196,10 @@ const StudentManagement = () => {
             {/* Add Student Modal */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-[32px] shadow-2xl max-w-md w-full p-8">
+                    <div className="bg-white dark:bg-white/5 border-white/10 shadow-none">
                         <div className="flex items-center justify-between mb-8">
                             <div>
-                                <h2 className="text-2xl font-black text-slate-900">Add Student</h2>
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Add Student</h2>
                                 <p className="text-sm text-slate-400 mt-1">Credentials auto-generated and emailed</p>
                             </div>
                             <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400">
@@ -214,7 +215,7 @@ const StudentManagement = () => {
                                     value={newStudent.name}
                                     onChange={e => setNewStudent({ ...newStudent, name: e.target.value })}
                                     placeholder="e.g. John Doe"
-                                    className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 transition-all"
+                                    className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 transition-all"
                                 />
                             </div>
                             <div>
@@ -226,7 +227,7 @@ const StudentManagement = () => {
                                         value={newStudent.email}
                                         onChange={e => setNewStudent({ ...newStudent, email: e.target.value })}
                                         placeholder="student@email.com"
-                                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 transition-all"
+                                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 transition-all"
                                     />
                                 </div>
                             </div>

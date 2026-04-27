@@ -137,15 +137,15 @@ const ProfileModal = ({ isOpen, onClose }) => {
             />
 
             {}
-            <div className="relative w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[85vh] min-h-[500px]">
+            <div className="relative w-full max-w-5xl bg-white dark:bg-black rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[85vh] min-h-[500px]">
                 {}
-                <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-xl shadow-slate-200">
                             <User className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">My Profile</h2>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">My Profile</h2>
                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                                 Manage account configuration
                             </p>
@@ -155,7 +155,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                         {activeTab === "info" && !isEditing && (
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="p-3 bg-white border border-slate-100 text-slate-400 hover:text-slate-900 rounded-2xl shadow-sm hover:shadow-md transition-all group"
+                                className="p-3 bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none border border-slate-100 dark:border-white/5 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
                                 title="Edit Profile"
                             >
                                 <Pencil className="w-4 h-4 group-hover:rotate-12 transition-transform" />
@@ -163,21 +163,21 @@ const ProfileModal = ({ isOpen, onClose }) => {
                         )}
                         <button
                             onClick={onClose}
-                            className="p-3 hover:bg-white rounded-2xl transition-all group shadow-sm hover:shadow-md border border-transparent hover:border-slate-100"
+                            className="p-3 hover:bg-white dark:hover:bg-slate-800 rounded-2xl transition-all group shadow-sm hover:shadow-md border border-transparent hover:border-slate-100 dark:hover:border-slate-700"
                         >
-                            <X className="w-5 h-5 text-slate-400 group-hover:text-slate-900 group-hover:rotate-90 transition-all" />
+                            <X className="w-5 h-5 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:rotate-90 transition-all" />
                         </button>
                     </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
                     {}
-                    <div className="w-full md:w-72 bg-slate-50/30 border-r border-slate-100 p-6 space-y-2 shrink-0">
+                    <div className="w-full md:w-72 bg-slate-50/30 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/30 border-r border-slate-100 dark:border-white/5 p-6 space-y-2 shrink-0">
                         <button
                             onClick={() => setActiveTab("info")}
                             className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === "info"
-                                ? "bg-slate-900 text-white shadow-xl shadow-slate-200"
-                                : "text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm"
+                                ? "bg-slate-900 text-white shadow-xl shadow-slate-200 dark:shadow-none"
+                                : "text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm"
                                 }`}
                         >
                             <User className="w-4 h-4" />
@@ -192,8 +192,8 @@ const ProfileModal = ({ isOpen, onClose }) => {
                             <button
                                 onClick={() => setActiveTab("security")}
                                 className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === "security"
-                                    ? "bg-slate-900 text-white shadow-xl shadow-slate-200"
-                                    : "text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm"
+                                    ? "bg-slate-900 text-white shadow-xl shadow-slate-200 dark:shadow-none"
+                                    : "text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm"
                                     }`}
                             >
                                 <Lock className="w-4 h-4" />
@@ -207,14 +207,14 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
 
                     {}
-                    <div className="flex-1 overflow-y-auto bg-white/50">
+                    <div className="flex-1 overflow-y-auto bg-white/50 dark:bg-black/50">
                         {}
                         {activeTab === "info" && (
                             <div className="p-8 md:p-12">
                                 <div className="max-w-2xl mx-auto space-y-10">
                                     <div className="flex flex-col items-center text-center pb-10">
                                         <div className="relative group mb-8">
-                                            <div className="w-40 h-40 rounded-full overflow-hidden border-8 border-white ring-1 ring-slate-100 shadow-2xl shadow-slate-200">
+                                            <div className="w-40 h-40 rounded-full overflow-hidden border-8 border-white dark:border-white/5 ring-1 ring-slate-100 dark:ring-white/10 shadow-none dark:shadow-none">
                                                 <img
                                                     src={profileImageUrl}
                                                     alt={user?.name}
@@ -242,7 +242,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
                                         {!isEditing ? (
                                             <>
-                                                <h3 className="text-4xl font-bold text-slate-900 mb-1 tracking-tight">
+                                                <h3 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1 tracking-tight">
                                                     {user?.name}
                                                 </h3>
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
@@ -257,13 +257,13 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                 </p>
                                             </>
                                         ) : (
-                                            <div className="w-full space-y-6 bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100">
+                                            <div className="w-full space-y-6 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50 p-8 rounded-[2rem] border border-slate-100 dark:border-white/5">
                                                 <div className="space-y-2 text-left">
                                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                                                     <input
                                                         value={editName}
                                                         onChange={(e) => setEditName(e.target.value)}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none bg-white font-medium transition-all"
+                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-white dark:bg-white/10 text-slate-900 dark:text-slate-100 font-medium transition-all"
                                                         placeholder="Enter your name"
                                                     />
                                                 </div>
@@ -276,7 +276,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                             setSelectedFile(null);
                                                             setPreviewUrl(null);
                                                         }}
-                                                        className="flex-1 py-4 border border-slate-200 text-slate-600 rounded-2xl hover:bg-white hover:border-slate-300 font-bold text-xs uppercase tracking-wider transition-all"
+                                                        className="flex-1 py-4 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-2xl hover:bg-white dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-500 font-bold text-xs uppercase tracking-wider transition-all"
                                                     >
                                                         Cancel
                                                     </button>
@@ -284,7 +284,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                     <button
                                                         onClick={handleSaveProfile}
                                                         disabled={isSaving}
-                                                        className="flex-1 py-4 bg-slate-800 text-white rounded-2xl flex items-center justify-center gap-3 font-bold text-xs uppercase tracking-wider hover:bg-slate-900 disabled:opacity-70 shadow-lg shadow-slate-200 transition-all"
+                                                        className="flex-1 py-4 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl flex items-center justify-center gap-3 font-bold text-xs uppercase tracking-wider hover:bg-slate-900 dark:hover:bg-white disabled:opacity-70 shadow-lg shadow-slate-200 dark:shadow-none transition-all"
                                                     >
                                                         {isSaving ? (
                                                             <Loader className="animate-spin w-5 h-5" />
@@ -305,13 +305,13 @@ const ProfileModal = ({ isOpen, onClose }) => {
                         {activeTab === "security" && (
                             <div className="p-8 md:p-12">
                                 <div className="max-w-md mx-auto">
-                                    <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
+                                    <div className="bg-white dark:bg-white/5 dark:backdrop-blur-xl border-white/10 shadow-none">
                                         <div className="flex items-center gap-4 mb-10">
                                             <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
                                                 <Lock className="w-6 h-6 text-slate-900" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-bold text-slate-900">Security</h3>
+                                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Security</h3>
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update credentials</p>
                                             </div>
                                         </div>
@@ -327,7 +327,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                         required
                                                         value={passwordData.current}
                                                         onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none bg-slate-50/30 font-medium transition-all pr-12"
+                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-slate-50/30 dark:bg-white/10/50 text-slate-900 dark:text-slate-100 font-medium transition-all pr-12"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
@@ -350,7 +350,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                         required
                                                         value={passwordData.new}
                                                         onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none bg-slate-50/30 font-medium transition-all pr-12"
+                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-slate-50/30 dark:bg-white/10/50 text-slate-900 dark:text-slate-100 font-medium transition-all pr-12"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
@@ -376,7 +376,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                         required
                                                         value={passwordData.confirm}
                                                         onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 outline-none bg-slate-50/30 font-medium transition-all pr-12"
+                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-slate-50/30 dark:bg-white/10/50 text-slate-900 dark:text-slate-100 font-medium transition-all pr-12"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
@@ -393,7 +393,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                 <button
                                                     type="submit"
                                                     disabled={isUpdatingPassword}
-                                                    className="w-full py-5 bg-slate-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-900 flex items-center justify-center gap-3 disabled:opacity-70 shadow-xl shadow-slate-200 transition-all"
+                                                    className="w-full py-5 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white flex items-center justify-center gap-3 disabled:opacity-70 shadow-xl shadow-slate-200 dark:shadow-none transition-all"
                                                 >
                                                     {isUpdatingPassword ? (
                                                         <>

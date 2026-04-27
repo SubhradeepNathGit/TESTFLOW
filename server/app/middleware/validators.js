@@ -11,17 +11,75 @@ const validate = (req, res, next) => {
 };
 
 exports.registerValidation = [
-    body("name").trim().notEmpty().withMessage("Full name is required"),
-    body("institutionName").trim().notEmpty().withMessage("Institution name is required"),
-    body("email").isEmail().withMessage("Please provide a valid email"),
+    body("name")
+        .isString().withMessage("Name must be a string")
+        .trim()
+        .notEmpty().withMessage("Full name is required")
+        .isLength({ max: 100 }).withMessage("Name cannot exceed 100 characters")
+        .escape(),
+    body("institutionName")
+        .isString().withMessage("Institution name must be a string")
+        .trim()
+        .notEmpty().withMessage("Institution name is required")
+        .isLength({ max: 200 }).withMessage("Institution name cannot exceed 200 characters")
+        .escape(),
+    body("role")
+        .isString().withMessage("Role must be a string")
+        .trim()
+        .notEmpty().withMessage("Role is required")
+        .isIn(["owner", "instructor"]).withMessage("Invalid role selected"),
+    body("email")
+        .isString().withMessage("Email must be a string")
+        .trim()
+        .isEmail().withMessage("Please provide a valid email")
+        .normalizeEmail(),
     body("password")
-        .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters long"),
+        .isString().withMessage("Password must be a string")
+        .notEmpty().withMessage("Password is required")
+        .isLength({ min: 6, max: 128 }).withMessage("Password must be between 6 and 128 characters long"),
     validate,
 ];
 
 exports.loginValidation = [
-    body("email").trim().notEmpty().withMessage("Email is required"),
-    body("password").notEmpty().withMessage("Password is required"),
+    body("email")
+        .isString().withMessage("Email must be a string")
+        .trim()
+        .notEmpty().withMessage("Email is required")
+        .isEmail().withMessage("Please provide a valid email")
+        .normalizeEmail(),
+    body("password")
+        .isString().withMessage("Password must be a string")
+        .notEmpty().withMessage("Password is required")
+        .isLength({ max: 128 }).withMessage("Password exceeds maximum allowed length"),
+    validate,
+];
+
+exports.emailValidation = [
+    body("email")
+        .isString().withMessage("Email must be a string")
+        .trim()
+        .notEmpty().withMessage("Email is required")
+        .isEmail().withMessage("Please provide a valid email")
+        .normalizeEmail(),
+    validate,
+];
+
+exports.resetPasswordValidation = [
+    body("password")
+        .isString().withMessage("Password must be a string")
+        .notEmpty().withMessage("Password is required")
+        .isLength({ min: 6, max: 128 }).withMessage("Password must be between 6 and 128 characters long"),
+    validate,
+];
+
+exports.updatePasswordValidation = [
+    body("currentPassword")
+        .isString().withMessage("Current password must be a string")
+        .notEmpty().withMessage("Current password is required")
+        .isLength({ max: 128 }).withMessage("Current password exceeds maximum allowed length"),
+    body("newPassword")
+        .isString().withMessage("New password must be a string")
+        .notEmpty().withMessage("New password is required")
+        .isLength({ min: 6, max: 128 }).withMessage("New password must be between 6 and 128 characters long"),
     validate,
 ];

@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { getMyAttempts } from '../../api/attemptApi';
+import Skeleton, { CardSkeleton } from '../../components/common/Skeleton';
 
 // Score ring component
 const ScoreRing = ({ score, total, size = 160, stroke = 10 }) => {
@@ -19,7 +20,7 @@ const ScoreRing = ({ score, total, size = 160, stroke = 10 }) => {
     return (
         <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
             <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f1f5f9" strokeWidth={stroke} />
+                <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeWidth={stroke} className="text-slate-100 dark:text-white/10" />
                 <motion.circle
                     cx={size / 2} cy={size / 2} r={r}
                     fill="none"
@@ -80,10 +81,19 @@ const ResultsPage = () => {
     }, []);
 
     if (loading) return (
-        <div className="flex items-center justify-center h-screen bg-[#FDFDFD]">
-            <div className="flex flex-col items-center gap-4">
-                <div className="w-10 h-10 border-2 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
-                <p className="text-sm font-bold text-slate-400">Calculating your results…</p>
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black flex items-center justify-center p-4 sm:p-5 lg:p-10">
+            <div className="w-full max-w-lg">
+                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
+                    <Skeleton className="h-48 w-full rounded-none" />
+                    <div className="flex justify-center -mt-20 relative z-10 mb-8">
+                        <Skeleton className="w-[160px] h-[160px] rounded-full border-4 border-white dark:border-white/5" />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 sm:px-7 mb-7">
+                        <Skeleton className="h-32 rounded-2xl" />
+                        <Skeleton className="h-32 rounded-2xl" />
+                        <Skeleton className="h-32 rounded-2xl" />
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -124,7 +134,7 @@ const ResultsPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F8F9FD] flex items-center justify-center p-5 lg:p-10">
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black flex items-center justify-center p-4 sm:p-5 lg:p-10">
             <div className="w-full max-w-lg">
 
                 {/* Form Card */}
@@ -132,7 +142,7 @@ const ResultsPage = () => {
                     initial={{ opacity: 0, y: 24, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.5, ease: 'easeOut' }}
-                    className="bg-white rounded-[40px] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden"
+                    className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.08] rounded-[28px] overflow-hidden shadow-xl dark:shadow-none"
                 >
                     {/* Top gradient header */}
                     <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-8 pb-24 text-center relative overflow-hidden">
@@ -150,7 +160,7 @@ const ResultsPage = () => {
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ delay: 0.15, duration: 0.4, type: 'spring', stiffness: 250 }}
-                            className="w-[160px] h-[160px] bg-white rounded-full shadow-2xl shadow-slate-200/80 border-4 border-white flex items-center justify-center"
+                            className="w-[160px] h-[160px] bg-white dark:bg-black/60 rounded-full border-4 border-white dark:border-white/[0.08] flex items-center justify-center shadow-xl dark:shadow-none"
                         >
                             <ScoreRing score={score} total={total} size={148} stroke={9} />
                         </motion.div>
@@ -170,7 +180,7 @@ const ResultsPage = () => {
                     </div>
 
                     {/* Metrics */}
-                    <div className="grid grid-cols-3 gap-3 px-7 mb-7">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 sm:px-7 mb-7">
                         {stats.map((s, i) => (
                             <motion.div
                                 key={i}
@@ -178,7 +188,7 @@ const ResultsPage = () => {
                                 variants={cardVariants}
                                 initial="hidden"
                                 animate="show"
-                                className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-center"
+                                className="bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.06] rounded-2xl p-4 text-center"
                             >
                                 <div className={`w-9 h-9 ${s.bg} ${s.color} rounded-xl flex items-center justify-center mx-auto mb-2`}>
                                     <s.icon size={16} />
@@ -206,7 +216,7 @@ const ResultsPage = () => {
                         </button>
                         <button
                             onClick={() => navigate('/leaderboard')}
-                            className="w-full bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold py-3.5 rounded-2xl hover:bg-indigo-100 transition-all flex items-center justify-center gap-3 text-sm active:scale-95"
+                            className="w-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 font-bold py-3.5 rounded-2xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all flex items-center justify-center gap-3 text-sm active:scale-95"
                         >
                             <FiTrendingUp size={16} />
                             View Leaderboard

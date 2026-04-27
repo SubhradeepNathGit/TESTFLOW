@@ -9,6 +9,7 @@ import api from '../../api/axiosInstance';
 import { toast } from 'react-toastify';
 import { useSocket } from '../../context/SocketContext';
 import { useQuery } from '@tanstack/react-query';
+import Skeleton, { CardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 
 // Premium SVG trophy for rank 1
 const GoldTrophy = ({ size = 28 }) => (
@@ -131,7 +132,7 @@ const RankBadge = ({ rank }) => {
         </span>
     );
     return (
-        <span className="w-10 h-10 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 font-black text-xs shrink-0">
+        <span className="w-10 h-10 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-400 font-black text-xs shrink-0">
             #{rank}
         </span>
     );
@@ -194,7 +195,7 @@ const PodiumCard = ({ student, rank, delay }) => {
         >
             {/* Avatar */}
             <div
-                className={`relative rounded-full flex items-center justify-center bg-slate-100 border-4 border-white`}
+                className={`relative rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-700 border-4 border-white dark:border-slate-800`}
                 style={{
                     width: isFirst ? 80 : 56,
                     height: isFirst ? 80 : 56,
@@ -204,7 +205,7 @@ const PodiumCard = ({ student, rank, delay }) => {
                 }}
             >
                 {getProfileUrl(student.profileImage) ? (
-                    <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" />
+                    <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                 ) : (
                     <FiUser size={isFirst ? 34 : 24} className="text-slate-400" />
                 )}
@@ -213,9 +214,9 @@ const PodiumCard = ({ student, rank, delay }) => {
 
             {/* Info */}
             <div className="text-center min-w-0 w-full px-1 mt-2">
-                <p className={`font-black truncate ${isFirst ? 'text-slate-900 text-base' : 'text-slate-700 text-sm'}`}>{student.name}</p>
+                <p className={`font-black truncate ${isFirst ? 'text-slate-900 dark:text-slate-100 text-base' : 'text-slate-700 dark:text-slate-300 text-sm'}`}>{student.name}</p>
                 <p className={`font-black ${isFirst ? 'text-2xl text-indigo-600' : 'text-lg text-indigo-500'}`}>{student.totalScore}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     {student.testsTaken} tests · avg {student.avgScore}
                 </p>
             </div>
@@ -258,10 +259,19 @@ const Leaderboard = () => {
     }, [socket, refetch]);
 
     if (loading) return (
-        <div className="flex items-center justify-center h-[80vh]">
-            <div className="flex flex-col items-center gap-4">
-                <div className="w-10 h-10 border-2 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
-                <p className="text-sm font-bold text-slate-400">Loading Leaderboard…</p>
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">
+            <div className="max-w-7xl mx-auto space-y-8">
+                <Skeleton className="w-1/3 h-10 mb-8" />
+                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
+                    <div className="flex items-end justify-center gap-6 lg:gap-10">
+                        <Skeleton className="w-32 h-40 rounded-t-2xl" />
+                        <Skeleton className="w-40 h-56 rounded-t-2xl" />
+                        <Skeleton className="w-32 h-32 rounded-t-2xl" />
+                    </div>
+                </div>
+                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none overflow-hidden p-6">
+                    <TableSkeleton rows={5} />
+                </div>
             </div>
         </div>
     );
@@ -273,7 +283,7 @@ const Leaderboard = () => {
     const rest = leaderboard.slice(3);
 
     return (
-        <div className="min-h-screen bg-[#F8F9FD] p-6 lg:p-10">
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">
             <div className="max-w-7xl mx-auto">
 
                 {/* Page header */}
@@ -284,12 +294,12 @@ const Leaderboard = () => {
                     className="mb-12"
                 >
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
+                        <div className="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-none dark:shadow-none">
                             <FiAward size={20} />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Global Leaderboard</h1>
-                            <p className="text-sm font-medium text-slate-400">Top performers ranked by cumulative score</p>
+                            <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Global Leaderboard</h1>
+                            <p className="text-sm font-medium text-slate-400 dark:text-slate-500">Top performers ranked by cumulative score</p>
                         </div>
                     </div>
                 </motion.div>
@@ -298,10 +308,10 @@ const Leaderboard = () => {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-white rounded-[36px] border-2 border-dashed border-slate-100 p-20 text-center"
+                        className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none"
                     >
-                        <BarChart2 size={48} className="mx-auto text-slate-200 mb-6" />
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">No Rankings Yet</h3>
+                        <BarChart2 size={48} className="mx-auto text-slate-200 dark:text-slate-600 mb-6" />
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">No Rankings Yet</h3>
                         <p className="text-slate-400 font-medium max-w-xs mx-auto text-sm leading-relaxed">
                             Students need to complete assessments before rankings appear here.
                         </p>
@@ -310,11 +320,12 @@ const Leaderboard = () => {
                     <>
                         {/* Podium Section */}
                         {top3.length >= 2 && (
-                            <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-8 lg:p-10 mb-8">
+                            <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none p-8 lg:p-10 mb-8 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700" />
                                 <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-10 flex items-center gap-2">
                                     <FiStar size={12} className="text-amber-400" /> Top Performers
                                 </p>
-                                <div className="flex items-end justify-center gap-6 lg:gap-10">
+                                <div className="flex items-end justify-center gap-2 sm:gap-6 lg:gap-10">
                                     {podiumOrder.map((student, i) => (
                                         student && (
                                             <PodiumCard
@@ -334,25 +345,25 @@ const Leaderboard = () => {
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.45 }}
-                            className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden mb-8"
+                            className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none overflow-hidden mb-8"
                         >
-                            <div className="px-7 py-6 border-b border-slate-50 flex items-center justify-between">
-                                <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <div className="px-7 py-6 border-b border-slate-50 dark:border-white/5/50 flex items-center justify-between">
+                                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                     <FiTrendingUp size={18} className="text-emerald-500" />
                                     Full Rankings
                                 </h3>
-                                <span className="text-[10px] font-black text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                                <span className="text-[10px] font-black text-slate-400 bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600 px-3 py-1.5 rounded-full uppercase tracking-widest">
                                     {leaderboard.length} Ranked
                                 </span>
                             </div>
 
                             {/* Column heads */}
-                            <div className="flex items-center justify-between px-7 py-2.5 bg-slate-50/60">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rank · Student</span>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
+                            <div className="flex items-center justify-between px-4 sm:px-7 py-2.5 bg-slate-50/60 dark:bg-slate-700/30">
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Rank · Student</span>
+                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Score</span>
                             </div>
 
-                            <div className="divide-y divide-slate-50">
+                            <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
                                 {leaderboard.map((student, idx) => (
                                     <motion.div
                                         key={idx}
@@ -360,28 +371,28 @@ const Leaderboard = () => {
                                         variants={cardVariants}
                                         initial="hidden"
                                         animate="show"
-                                        className="flex items-center justify-between px-7 py-4 hover:bg-slate-50/70 transition-colors group"
+                                        className="flex items-center justify-between px-4 sm:px-7 py-4 hover:bg-slate-50/70 dark:hover:bg-slate-700/20 transition-colors group"
                                     >
                                         <div className="flex items-center gap-4">
                                             {/* Rank badge */}
                                             <RankBadge rank={idx + 1} />
                                             {/* Avatar circle */}
-                                            <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors overflow-hidden">
+                                            <div className="w-10 h-10 bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 group-hover:text-indigo-400 transition-colors overflow-hidden">
                                                 {getProfileUrl(student.profileImage) ? (
-                                                    <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" />
+                                                    <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                                                 ) : (
                                                     <FiUser size={16} />
                                                 )}
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-slate-800 text-sm">{student.name}</h4>
+                                                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{student.name}</h4>
                                                 <p className="text-[11px] font-medium text-slate-400 mt-0.5">
                                                     {student.testsTaken} {student.testsTaken === 1 ? 'test' : 'tests'} completed
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-black text-slate-900 text-lg tabular-nums">{student.totalScore}</p>
+                                            <p className="font-black text-slate-900 dark:text-slate-100 text-lg tabular-nums">{student.totalScore}</p>
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                                 avg {student.avgScore} pts
                                             </p>
@@ -396,7 +407,7 @@ const Leaderboard = () => {
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 p-8 rounded-[32px] flex items-center gap-6 shadow-xl shadow-indigo-100"
+                            className="bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 p-8 rounded-[32px] flex items-center gap-6 shadow-none dark:shadow-none"
                         >
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-bold text-white text-lg">Keep Competing!</h4>
