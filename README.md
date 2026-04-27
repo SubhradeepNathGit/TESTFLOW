@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="https://via.placeholder.com/200x200/0f172a/ffffff?text=TESTFLOW" alt="TestFlow Logo" />
 
-  # TESTFLOW Engine
+
+  # TESTFLOW
   
   **Enterprise-Grade Online Assessment & Examination Platform**
 
@@ -40,7 +40,7 @@ flowchart TB
         TQ["TanStack Query\nServer-State Cache"]:::client
         ZS["Zustand\nUI State Store"]:::client
         SC["Socket.io Client\nWSS Live Events"]:::client
-        PAGES["Pages & Components\nSuper Admin · Admin · Instructor · Student"]:::client
+        PAGES["Pages & Components\nStudent · Instructor · Admin"]:::client
         AX["Axios Interceptor\nJWT Auto-Refresh"]:::client
         PAGES --> TQ & ZS & SC
         TQ --> AX
