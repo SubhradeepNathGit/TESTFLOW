@@ -30,10 +30,20 @@ const seedSuperAdmin = async () => {
         await User.deleteMany({ role: 'super_admin' });
         await User.create(adminData);
 
-        console.log('------------------------------------');
-        console.log(' SUPER ADMIN SEEDED SUCCESSFULLY');
-        console.log(` EMAIL: ${email}`);
+        console.log('✅ SUPER ADMIN SEEDED SUCCESSFULLY');
+        console.log(`📧 EMAIL: ${email}`);
         console.log(`🔑 PASSWORD: ${password}`);
+        
+        // --- SELF-TEST ---
+        const bcrypt = require('bcryptjs');
+        const testUser = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+        const isMatch = await bcrypt.compare(password, testUser.password);
+        
+        if (isMatch) {
+            console.log('🏁 SELF-TEST: ✅ Password matches hash correctly!');
+        } else {
+            console.log('🏁 SELF-TEST: ❌ ERROR! Password does NOT match hash!');
+        }
         console.log('------------------------------------');
         process.exit(0);
     } catch (error) {
