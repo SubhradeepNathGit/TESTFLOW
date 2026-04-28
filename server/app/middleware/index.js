@@ -34,7 +34,7 @@ module.exports = (app) => {
         ? process.env.ALLOWED_ORIGINS.split(",").map(o => o.trim()) 
         : ["http://localhost:5173"];
     
-    console.log("🔒 CORS Allowed Origins:", allowedOrigins);
+    console.log("CORS Allowed Origins:", allowedOrigins);
         
     app.use(cors({
         origin: function (origin, callback) {

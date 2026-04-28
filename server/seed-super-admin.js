@@ -14,22 +14,27 @@ const seedSuperAdmin = async () => {
         });
 
         
+        const email = process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2.o@gmail.com';
+        const password = process.env.SUPER_ADMIN_PASSWORD || 'Admin@123';
+
         const adminData = {
-            name: process.env.SUPER_ADMIN_NAME || 'Super Admin',
-            email: process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2.o@gmail.com',
-            password: process.env.SUPER_ADMIN_PASSWORD || 'Admin@123',
+            name: 'Super Admin',
+            email: email.toLowerCase().trim(),
+            password: password,
             role: 'super_admin',
             isActive: true,
             isVerified: true
         };
 
-        
-        await User.deleteOne({ role: 'super_admin' });
+        // Delete existing and re-create
+        await User.deleteMany({ role: 'super_admin' });
         await User.create(adminData);
 
-        console.log('Super Admin created/updated successfully!');
-        console.log(`Email: ${process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2.o@gmail.com'}`);
-        console.log(`Password: ${process.env.SUPER_ADMIN_PASSWORD || 'Admin@123'}`);
+        console.log('------------------------------------');
+        console.log('✅ SUPER ADMIN SEEDED SUCCESSFULLY');
+        console.log(`📧 EMAIL: ${email}`);
+        console.log(`🔑 PASSWORD: ${password}`);
+        console.log('------------------------------------');
         process.exit(0);
     } catch (error) {
         console.error('Failed to seed Super Admin:', error);
