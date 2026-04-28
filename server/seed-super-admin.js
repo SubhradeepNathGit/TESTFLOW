@@ -31,8 +31,8 @@ const seedSuperAdmin = async () => {
         await User.create(adminData);
 
         console.log('------------------------------------');
-        console.log('✅ SUPER ADMIN SEEDED SUCCESSFULLY');
-        console.log(`📧 EMAIL: ${email}`);
+        console.log(' SUPER ADMIN SEEDED SUCCESSFULLY');
+        console.log(` EMAIL: ${email}`);
         console.log(`🔑 PASSWORD: ${password}`);
         console.log('------------------------------------');
         process.exit(0);
