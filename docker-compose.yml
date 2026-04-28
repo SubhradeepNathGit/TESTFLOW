@@ -7,7 +7,7 @@ services:
     ports:
       - "${PORT:-3006}:3006"
     env_file:
-      - server/.env
+      - ./server/.env
     restart: always
     networks:
       - testflow-network
