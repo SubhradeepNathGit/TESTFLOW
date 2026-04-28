@@ -1,0 +1,30 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: testflow-server
+    ports:
+      - "${PORT:-3006}:3006"
+    env_file:
+      - server/.env
+    restart: always
+    networks:
+      - testflow-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: testflow-client
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - testflow-network
+    depends_on:
+      - server
+
+networks:
+  testflow-network:
+    driver: bridge

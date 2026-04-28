@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import AuthContext from "../../context/AuthContext";
 import { Eye, EyeOff, ChevronDown, Check, ShieldCheck, Users } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
@@ -13,16 +13,15 @@ const Register = () => {
     const {
         register,
         handleSubmit,
-        watch,
         setValue,
+        control,
         formState: { errors, isSubmitting },
     } = useForm({
         defaultValues: { role: "owner" }
     });
 
     const navigate = useNavigate();
-    const currentRole = watch("role");
-    const passwordValue = watch("password");
+    const currentRole = useWatch({ control, name: "role", defaultValue: "owner" });
 
     const roles = [
         { id: "owner", title: "Institution Admin", desc: "Register a new institution", icon: ShieldCheck },
@@ -39,7 +38,9 @@ const Register = () => {
                 institutionName: data.institutionName
             });
             navigate("/verify-email", { state: { email: data.email } });
-        } catch { }
+        } catch {
+            // Error handling can be added here if needed
+        }
     };
 
     return (
