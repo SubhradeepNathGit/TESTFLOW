@@ -71,7 +71,7 @@ exports.login = async (email, password) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-        throw new ErrorResponse("Invalid credentials", 401);
+        throw new ErrorResponse("Invalid credentials - user not found", 401);
     }
 
     
@@ -97,7 +97,7 @@ exports.login = async (email, password) => {
             throw new ErrorResponse("Too many failed login attempts. Account locked for 15 minutes.", 401);
         }
 
-        throw new ErrorResponse("Invalid credentials", 401);
+        throw new ErrorResponse("Invalid credentials - password mismatch", 401);
     }
 
     if (!user.isVerified) {
@@ -110,15 +110,23 @@ exports.login = async (email, password) => {
         if (!institution) {
             throw new ErrorResponse("Your associated institution no longer exists. Please contact support.", 401);
         }
-        if (!institution.isActive) {
-            throw new ErrorResponse("This institution has been suspended by the platform administrator. Access denied.", 401);
+        if (institution.isArchived || !institution.isActive) {
+            throw new ErrorResponse("This institution has been archived or suspended by the platform administrator. Access denied.", 401);
+        }
+    }
+
+    // Individual User Check
+    if (user.isArchived || !user.isActive) {
+        if (user.role === "super_admin") {
+            // Safety: Never block Super Admin unless explicitly needed, 
+            // but for consistency we check it. Usually Super Admin won't be archived.
+        } else {
+            throw new ErrorResponse("Your account has been archived or deactivated. Please contact support.", 401);
         }
     }
 
     
-    if (user.studentId && !user.isActive) {
-        throw new ErrorResponse("Your individual account has been deactivated. Please contact your administrator.", 401);
-    }
+    // individual user check already done above for all non-super-admins
 
     
     // Reset login attempts and set joinedAt timestamp in memory

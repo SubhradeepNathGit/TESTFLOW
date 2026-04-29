@@ -11,7 +11,7 @@ const syncSuperAdmin = async () => {
         const adminPassword = process.env.SUPER_ADMIN_PASSWORD;
 
         if (!adminEmail || !adminPassword) {
-            console.warn("⚠️  SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD not found in .env. Skipping sync.");
+            console.warn("SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD not found in .env. Skipping sync.");
             return;
         }
 
@@ -20,7 +20,7 @@ const syncSuperAdmin = async () => {
 
         if (!admin) {
             // Create if not exists
-            console.log("🛠️  No Super Admin found. Creating from .env...");
+            console.log("No Super Admin found. Creating from .env...");
             await User.create({
                 name: "Platform Administrator",
                 email: adminEmail,
@@ -29,26 +29,26 @@ const syncSuperAdmin = async () => {
                 isVerified: true,
                 isActive: true
             });
-            console.log(`✅ Super Admin created with email: ${adminEmail}`);
+            console.log(`Super Admin created with email: ${adminEmail}`);
         } else {
             // Check for changes
             const isEmailDifferent = admin.email !== adminEmail;
             const isPasswordDifferent = !(await bcrypt.compare(adminPassword, admin.password));
 
             if (isEmailDifferent || isPasswordDifferent) {
-                console.log("🔄  Super Admin credentials in .env differ from database. Synchronizing...");
+                console.log("Super Admin credentials in .env differ from database. Synchronizing...");
                 
                 if (isEmailDifferent) admin.email = adminEmail;
                 if (isPasswordDifferent) admin.password = adminPassword; // Pre-save hook will hash this
 
                 await admin.save();
-                console.log("✅ Super Admin synchronized with .env successfully.");
+                console.log("Super Admin synchronized with .env successfully.");
             } else {
-                // console.log("✨  Super Admin credentials are in sync with .env.");
+                // console.log(" Super Admin credentials are in sync with .env.");
             }
         }
     } catch (err) {
-        console.error("❌  Failed to synchronize Super Admin:", err.message);
+        console.error("Failed to synchronize Super Admin:", err.message);
     }
 };
 

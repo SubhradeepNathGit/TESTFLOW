@@ -347,7 +347,7 @@ const Leaderboard = () => {
                             transition={{ delay: 0.45 }}
                             className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none overflow-hidden mb-8"
                         >
-                            <div className="px-7 py-6 border-b border-slate-50 dark:border-white/5/50 flex items-center justify-between">
+                            <div className="px-7 py-6 flex items-center justify-between">
                                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                     <FiTrendingUp size={18} className="text-emerald-500" />
                                     Full Rankings

@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    
+
     const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -46,7 +46,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    
+
     const isPublicRoute = originalRequest.url.includes('/auth/login') ||
       originalRequest.url.includes('/auth/register') ||
       originalRequest.url.includes('/auth/verify-email') ||
@@ -99,7 +99,7 @@ axiosInstance.interceptors.response.use(
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
 
-        
+
         window.dispatchEvent(new Event("auth-error"));
 
         return Promise.reject(refreshError);

@@ -3,7 +3,7 @@ import { Users, UserPlus, Mail, Search, X, Eye, ToggleLeft, ToggleRight, Trash2 
 import AuthContext from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosInstance';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
 
@@ -19,7 +19,7 @@ const StudentManagement = () => {
     const { data: students = [], isLoading: loading } = useQuery({
         queryKey: ['students', debouncedSearchTerm],
         queryFn: () => api.get(`/users/students?search=${debouncedSearchTerm}`).then(r => r.data.data || []),
-        keepPreviousData: true,
+        placeholderData: keepPreviousData,
     });
 
     const handleAddStudent = async (e) => {

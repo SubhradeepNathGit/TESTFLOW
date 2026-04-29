@@ -60,6 +60,10 @@ const UserSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        isArchived: {
+            type: Boolean,
+            default: false,
+        },
         joinedAt: {
             type: Date,
         },

@@ -56,8 +56,8 @@ const AuthLayout = ({ children }) => {
         <div className="flex h-screen bg-slate-50 dark:bg-black overflow-hidden">
             {/* Preload all images (hidden) */}
             <div className="hidden">
-                {Object.values(authImages).map(img => (
-                    <img key={img.src} src={img.src} alt="preload" />
+                {Object.entries(authImages).map(([path, img]) => (
+                    <img key={path} src={img.src} alt="preload" />
                 ))}
             </div>
 

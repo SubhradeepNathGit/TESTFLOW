@@ -14,7 +14,7 @@ const seedSuperAdmin = async () => {
         });
 
         
-        const email = process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2o@gmail.com';
+        const email = process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2.o@gmail.com';
         const password = process.env.SUPER_ADMIN_PASSWORD || 'Admin@123';
 
         const adminData = {
@@ -30,9 +30,9 @@ const seedSuperAdmin = async () => {
         await User.deleteMany({ role: 'super_admin' });
         await User.create(adminData);
 
-        console.log('✅ SUPER ADMIN SEEDED SUCCESSFULLY');
-        console.log(`📧 EMAIL: ${email}`);
-        console.log(`🔑 PASSWORD: ${password}`);
+        console.log(' SUPER ADMIN SEEDED SUCCESSFULLY');
+        console.log(` EMAIL: ${email}`);
+        console.log(` PASSWORD: ${password}`);
         
         // --- SELF-TEST ---
         const bcrypt = require('bcryptjs');
@@ -40,9 +40,9 @@ const seedSuperAdmin = async () => {
         const isMatch = await bcrypt.compare(password, testUser.password);
         
         if (isMatch) {
-            console.log('🏁 SELF-TEST: ✅ Password matches hash correctly!');
+            console.log('Password matches hash correctly!');
         } else {
-            console.log('🏁 SELF-TEST: ❌ ERROR! Password does NOT match hash!');
+            console.log('ERROR! Password does NOT match hash!');
         }
         console.log('------------------------------------');
         process.exit(0);

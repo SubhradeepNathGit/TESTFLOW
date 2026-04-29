@@ -18,18 +18,18 @@ import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
 
 const ProfileModal = ({ isOpen, onClose }) => {
-    const { user, updatePassword } = useContext(AuthContext);
+    const { user, updatePassword, setUser } = useContext(AuthContext);
 
     const [activeTab, setActiveTab] = useState("info");
 
-    
+
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState(user?.name || "");
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
 
-    
+
     const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -105,14 +105,15 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
             if (res.data.success) {
                 toast.success("Profile updated successfully!");
+                setUser(res.data.data);
                 setIsEditing(false);
                 setSelectedFile(null);
                 setPreviewUrl(null);
-                setTimeout(() => window.location.reload(), 1000);
+                onClose();
             }
         } catch (error) {
             console.error(error);
-            toast.error(error.response?.data?.error || "Failed to update profile");
+            toast.error(error.response?.data?.message || "Failed to update profile");
         } finally {
             setIsSaving(false);
         }
@@ -130,23 +131,23 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            {}
+            { }
             <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {}
-            <div className="relative w-full max-w-5xl bg-white dark:bg-black rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[85vh] min-h-[500px]">
-                {}
-                <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-xl shadow-slate-200">
-                            <User className="w-6 h-6 text-white" />
+            { }
+            <div className="relative w-full max-w-5xl bg-white dark:bg-black rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-full max-h-[100dvh] md:h-[85vh] md:min-h-[500px]">
+                { }
+                <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50">
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-slate-900 flex items-center justify-center shrink-0">
+                            <User className="w-5 h-5 md:w-6 md:h-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">My Profile</h2>
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                            <h2 className="text-lg md:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">My Profile</h2>
+                            <p className="text-[9px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest line-clamp-1">
                                 Manage account configuration
                             </p>
                         </div>
@@ -171,19 +172,19 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    {}
-                    <div className="w-full md:w-72 bg-slate-50/30 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/30 border-r border-slate-100 dark:border-white/5 p-6 space-y-2 shrink-0">
+                    { }
+                    <div className="w-full md:w-72 bg-slate-50/30 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/30 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 p-4 md:p-6 shrink-0 flex flex-row md:flex-col overflow-x-auto gap-2 md:gap-2 no-scrollbar">
                         <button
                             onClick={() => setActiveTab("info")}
-                            className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === "info"
+                            className={`flex items-center gap-2 md:gap-3 px-4 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all font-bold text-[10px] md:text-xs uppercase tracking-wider whitespace-nowrap ${activeTab === "info"
                                 ? "bg-slate-900 text-white shadow-xl shadow-slate-200 dark:shadow-none"
                                 : "text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm"
                                 }`}
                         >
-                            <User className="w-4 h-4" />
+                            <User className="w-4 h-4 shrink-0" />
                             <span className="flex-1 text-left">Personal Info</span>
                             {activeTab === "info" && (
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-4 h-4 hidden md:block" />
                             )}
                         </button>
 
@@ -191,30 +192,30 @@ const ProfileModal = ({ isOpen, onClose }) => {
                         {user?.role === 'student' && (
                             <button
                                 onClick={() => setActiveTab("security")}
-                                className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === "security"
+                                className={`flex items-center gap-2 md:gap-3 px-4 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all font-bold text-[10px] md:text-xs uppercase tracking-wider whitespace-nowrap ${activeTab === "security"
                                     ? "bg-slate-900 text-white shadow-xl shadow-slate-200 dark:shadow-none"
                                     : "text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm"
                                     }`}
                             >
-                                <Lock className="w-4 h-4" />
+                                <Lock className="w-4 h-4 shrink-0" />
                                 <span className="flex-1 text-left">Security</span>
                                 {activeTab === "security" && (
-                                    <ChevronRight className="w-4 h-4" />
+                                    <ChevronRight className="w-4 h-4 hidden md:block" />
                                 )}
                             </button>
                         )}
                     </div>
 
 
-                    {}
+                    { }
                     <div className="flex-1 overflow-y-auto bg-white/50 dark:bg-black/50">
-                        {}
+                        { }
                         {activeTab === "info" && (
-                            <div className="p-8 md:p-12">
-                                <div className="max-w-2xl mx-auto space-y-10">
-                                    <div className="flex flex-col items-center text-center pb-10">
-                                        <div className="relative group mb-8">
-                                            <div className="w-40 h-40 rounded-full overflow-hidden border-8 border-white dark:border-white/5 ring-1 ring-slate-100 dark:ring-white/10 shadow-none dark:shadow-none">
+                            <div className="p-5 md:p-12">
+                                <div className="max-w-2xl mx-auto space-y-6 md:space-y-10">
+                                    <div className="flex flex-col items-center text-center pb-6 md:pb-10">
+                                        <div className="relative group mb-6 md:mb-8">
+                                            <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 md:border-8 border-white dark:border-white/5 ring-1 ring-slate-100 dark:ring-white/10 shadow-none dark:shadow-none">
                                                 <img
                                                     src={profileImageUrl}
                                                     alt={user?.name}
@@ -242,10 +243,10 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
                                         {!isEditing ? (
                                             <>
-                                                <h3 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1 tracking-tight">
+                                                <h3 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1 tracking-tight">
                                                     {user?.name}
                                                 </h3>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                                                     {user?.role === 'owner' ? 'Institution Admin' : user?.role === 'instructor' ? 'Instructor' : user?.role === 'student' ? 'Student' : user?.role === 'super_admin' ? 'Platform Admin' : 'User'}
                                                 </p>
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
@@ -257,7 +258,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                 </p>
                                             </>
                                         ) : (
-                                            <div className="w-full space-y-6 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50 p-8 rounded-[2rem] border border-slate-100 dark:border-white/5">
+                                            <div className="w-full space-y-4 md:space-y-6 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 dark:border-white/5">
                                                 <div className="space-y-2 text-left">
                                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                                                     <input
@@ -268,7 +269,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                     />
                                                 </div>
 
-                                                <div className="flex gap-4">
+                                                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-4">
                                                     <button
                                                         onClick={() => {
                                                             setIsEditing(false);
@@ -276,7 +277,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                             setSelectedFile(null);
                                                             setPreviewUrl(null);
                                                         }}
-                                                        className="flex-1 py-4 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-2xl hover:bg-white dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-500 font-bold text-xs uppercase tracking-wider transition-all"
+                                                        className="w-full sm:flex-1 py-3 md:py-4 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-xl md:rounded-2xl hover:bg-white dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-500 font-bold text-xs uppercase tracking-wider transition-all"
                                                     >
                                                         Cancel
                                                     </button>
@@ -301,18 +302,18 @@ const ProfileModal = ({ isOpen, onClose }) => {
                             </div>
                         )}
 
-                        {}
+                        { }
                         {activeTab === "security" && (
-                            <div className="p-8 md:p-12">
+                            <div className="p-5 md:p-12">
                                 <div className="max-w-md mx-auto">
                                     <div className="bg-white dark:bg-white/5 dark:backdrop-blur-xl border-white/10 shadow-none">
-                                        <div className="flex items-center gap-4 mb-10">
-                                            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
-                                                <Lock className="w-6 h-6 text-slate-900" />
+                                        <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-50 flex items-center justify-center shrink-0">
+                                                <Lock className="w-5 h-5 md:w-6 md:h-6 text-slate-900" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Security</h3>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update credentials</p>
+                                                <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-100">Security</h3>
+                                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update credentials</p>
                                             </div>
                                         </div>
 

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthContext from '../../context/AuthContext';
@@ -8,7 +8,7 @@ import useSidebarStore from '../../store/useSidebarStore';
 import { getArchivedTests } from '../../api/testApi';
 import {
     LayoutDashboard, BookOpen, Trophy, Users,
-    LogOut, Menu, X, ChevronLeft, ChevronRight, BarChart3, Library, FileText, Briefcase
+    LogOut, Menu, X, ChevronLeft, ChevronRight, BarChart3, Library, FileText, Briefcase, Database, GraduationCap
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -17,8 +17,15 @@ const Sidebar = () => {
     const { isOpen, toggleSidebar } = useSidebarStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const isSuperAdmin = user?.role === 'super_admin';
     const isInstructor = user?.role === 'instructor';
@@ -36,7 +43,12 @@ const Sidebar = () => {
 
     const getNavLinks = () => {
         if (isSuperAdmin) return [
-            { label: 'Platform Overview', icon: LayoutDashboard, path: '/admin/dashboard' },
+            { label: 'Overview', icon: LayoutDashboard, path: '/admin/dashboard' },
+            { label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
+            { label: 'Institutions', icon: Database, path: '/admin/institutions' },
+            { label: 'Instructors', icon: Briefcase, path: '/admin/instructors' },
+            { label: 'Students', icon: GraduationCap, path: '/admin/students' },
+            { label: 'Archive', icon: Library, path: '/admin/archive' },
         ];
         if (isInstructor) return [
             { label: 'My Dashboard', icon: LayoutDashboard, path: '/instructor-dashboard' },
@@ -65,6 +77,8 @@ const Sidebar = () => {
         border: 'border-white/5',
         itemHover: 'hover:bg-black/40',
         itemActive: 'bg-white text-slate-900 shadow-none',
+        textMain: 'text-white',
+        textSub: 'text-slate-400',
     };
 
     const isActive = (path) => location.pathname === path;
@@ -114,7 +128,7 @@ const Sidebar = () => {
                 initial={false}
                 animate={{
                     width: isOpen ? 256 : 80,
-                    x: isMobileMenuOpen ? 0 : (window.innerWidth < 1024 ? -256 : 0)
+                    x: isMobileMenuOpen ? 0 : (windowWidth < 1024 ? -256 : 0)
                 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 className={`

@@ -32,7 +32,7 @@ exports.registerValidation = [
         .isString().withMessage("Email must be a string")
         .trim()
         .isEmail().withMessage("Please provide a valid email")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
     body("password")
         .isString().withMessage("Password must be a string")
         .notEmpty().withMessage("Password is required")
@@ -46,7 +46,7 @@ exports.loginValidation = [
         .trim()
         .notEmpty().withMessage("Email is required")
         .isEmail().withMessage("Please provide a valid email")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
     body("password")
         .isString().withMessage("Password must be a string")
         .notEmpty().withMessage("Password is required")
@@ -60,7 +60,7 @@ exports.emailValidation = [
         .trim()
         .notEmpty().withMessage("Email is required")
         .isEmail().withMessage("Please provide a valid email")
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
     validate,
 ];
 

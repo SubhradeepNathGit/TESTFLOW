@@ -14,8 +14,29 @@ class UserController {
     /** PUT /api/users/profile */
     async updateProfile(req, res, next) {
         try {
-            const fields = { name: req.body.name, email: req.body.email };
-            if (req.file) fields.profileImage = req.file.path;
+            const fields = {};
+            if (req.body.name) fields.name = req.body.name;
+            if (req.body.email) fields.email = req.body.email;
+            
+            if (req.file) {
+                fields.profileImage = req.file.path;
+                
+                // Delete old image from Cloudinary if it exists
+                const oldUser = await userService.getUserProfile(req.user.id);
+                if (oldUser.profileImage && oldUser.profileImage.includes("cloudinary.com")) {
+                    const cloudinary = require("../config/cloudinary");
+                    const urlParts = oldUser.profileImage.split("/");
+                    const publicIdWithExt = urlParts.slice(-2).join("/");
+                    const publicId = publicIdWithExt.substring(0, publicIdWithExt.lastIndexOf("."));
+                    if (publicId) {
+                        try {
+                            await cloudinary.uploader.destroy(publicId);
+                        } catch (cloudErr) {
+                            console.error("Failed to delete old image from Cloudinary:", cloudErr);
+                        }
+                    }
+                }
+            }
             const user = await userService.updateUserProfile(req.user.id, fields);
             res.status(statusCodes.OK).json({ status: true, success: true, data: user });
         } catch (err) { next(err); }

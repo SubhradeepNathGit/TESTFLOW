@@ -227,21 +227,19 @@ const StudentDashboard = () => {
                                         variants={cardVariants}
                                         initial="hidden"
                                         animate="show"
-                                        className={`bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-5 rounded-[22px] flex items-center justify-between gap-4 border transition-all duration-300 ${
-                                            isDone
+                                        className={`bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-5 rounded-[22px] flex items-center justify-between gap-4 border transition-all duration-300 ${isDone
                                                 ? 'border-slate-100 dark:border-white/[0.06]'
                                                 : 'border-slate-100 dark:border-white/[0.06] hover:border-indigo-200 dark:hover:border-indigo-500/30 cursor-pointer'
-                                        }`}
+                                            }`}
                                         onClick={() => !isDone && navigate(`/test/${test._id}`)}
                                     >
                                         <div className="flex items-center gap-4 min-w-0">
-                                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 ${
-                                                isDone
+                                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 ${isDone
                                                     ? 'bg-emerald-100 text-emerald-600'
                                                     : isInProgress
-                                                    ? 'bg-amber-100 text-amber-600'
-                                                    : 'bg-slate-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
-                                            }`}>
+                                                        ? 'bg-amber-100 text-amber-600'
+                                                        : 'bg-slate-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
+                                                }`}>
                                                 {isDone ? <FiAward size={19} /> : isInProgress ? <FiClock size={19} /> : <FiBook size={19} />}
                                             </div>
                                             <div className="min-w-0">
@@ -268,19 +266,18 @@ const StudentDashboard = () => {
                                         <button
                                             disabled={isDone}
                                             onClick={(e) => { e.stopPropagation(); if (!isDone) navigate(`/test/${test._id}`); }}
-                                            className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs shrink-0 active:scale-95 ${
-                                                isDone
+                                            className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs shrink-0 active:scale-95 ${isDone
                                                     ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
                                                     : isInProgress
-                                                    ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-md'
-                                                    : 'bg-slate-900 text-white hover:bg-indigo-600 shadow-md'
-                                            }`}
+                                                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-md'
+                                                        : 'bg-slate-900 text-white hover:bg-indigo-600 shadow-md'
+                                                }`}
                                         >
                                             {isDone
                                                 ? <><FiLock size={11} /> Done</>
                                                 : isInProgress
-                                                ? <><FiClock size={11} /> Resume</>
-                                                : <><FiLogIn size={11} /> Start</>
+                                                    ? <><FiClock size={11} /> Resume</>
+                                                    : <><FiLogIn size={11} /> Start</>
                                             }
                                         </button>
                                     </motion.div>

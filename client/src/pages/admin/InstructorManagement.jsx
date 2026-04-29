@@ -3,7 +3,7 @@ import { Briefcase, UserPlus, Mail, Search, X, ToggleLeft, ToggleRight, Trash2 }
 import AuthContext from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosInstance';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
 
@@ -16,7 +16,7 @@ const InstructorManagement = () => {
     const { data: instructors = [], isLoading: loading } = useQuery({
         queryKey: ['instructors', debouncedSearchTerm],
         queryFn: () => api.get(`/users/instructors?search=${debouncedSearchTerm}`).then(r => r.data.data || []),
-        keepPreviousData: true,
+        placeholderData: keepPreviousData,
     });
 
     const handleToggleStatus = async (instructorId, currentStatus) => {

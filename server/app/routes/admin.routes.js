@@ -5,10 +5,16 @@ const {
     getMetrics,
     getInstitutions,
     toggleInstitutionStatus,
-    deleteInstitution,
+    archiveInstitution,
     getGlobalUsers,
     toggleUserStatus,
-    deleteUser
+    archiveUser,
+    getComprehensiveAnalytics,
+    getArchivedItems,
+    restoreInstitution,
+    restoreUser,
+    permanentDeleteInstitution,
+    permanentDeleteUser
 } = require("../controllers/AdminController");
 
 const router = express.Router();
@@ -17,17 +23,25 @@ const router = express.Router();
 router.use(protect);
 router.use(checkRole("super_admin"));
 
-// Platform Metrics
+// Platform Metrics & Analytics
 router.get("/metrics", getMetrics);
+router.get("/analytics", getComprehensiveAnalytics);
+
+// Archive Management
+router.get("/archive", getArchivedItems);
+router.patch("/archive/institutions/:id/restore", restoreInstitution);
+router.patch("/archive/users/:id/restore", restoreUser);
+router.delete("/archive/institutions/:id", permanentDeleteInstitution);
+router.delete("/archive/users/:id", permanentDeleteUser);
 
 // Institution Management
 router.get("/institutions", getInstitutions);
 router.patch("/institutions/:id/toggle", toggleInstitutionStatus);
-router.delete("/institutions/:id", deleteInstitution);
+router.delete("/institutions/:id", archiveInstitution);
 
 // Global User Management
 router.get("/users", getGlobalUsers);
 router.patch("/users/:id/toggle", toggleUserStatus);
-router.delete("/users/:id", deleteUser);
+router.delete("/users/:id", archiveUser);
 
 module.exports = router;

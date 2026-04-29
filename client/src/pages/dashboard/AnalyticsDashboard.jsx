@@ -31,12 +31,14 @@ const chartFont = { family: "'Inter', system-ui, sans-serif", weight: '700' };
 const gridColor = 'rgba(148,163,184,0.08)';
 const baseLineOptions = (isDark) => ({
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: {
-        backgroundColor: isDark ? '#1e293b' : '#0f172a', 
-        titleColor: isDark ? '#f8fafc' : '#e2e8f0', 
-        bodyColor: isDark ? '#94a3b8' : '#94a3b8',
-        padding: 12, cornerRadius: 12, titleFont: chartFont,
-    }},
+    plugins: {
+        legend: { display: false }, tooltip: {
+            backgroundColor: isDark ? '#1e293b' : '#0f172a',
+            titleColor: isDark ? '#f8fafc' : '#e2e8f0',
+            bodyColor: isDark ? '#94a3b8' : '#94a3b8',
+            padding: 12, cornerRadius: 12, titleFont: chartFont,
+        }
+    },
     scales: {
         x: { grid: { color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(148,163,184,0.08)' }, ticks: { color: '#94a3b8', font: chartFont } },
         y: { grid: { color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(148,163,184,0.08)' }, ticks: { color: '#94a3b8', font: chartFont } },
@@ -200,7 +202,7 @@ const AnalyticsDashboard = () => {
             data: stats.questionDifficulty.map(q => q.accuracyRate),
             backgroundColor: stats.questionDifficulty.map(q =>
                 q.accuracyRate >= 70 ? 'rgba(16,185,129,0.8)' :
-                q.accuracyRate >= 40 ? 'rgba(245,158,11,0.8)' : 'rgba(244,63,94,0.8)'
+                    q.accuracyRate >= 40 ? 'rgba(245,158,11,0.8)' : 'rgba(244,63,94,0.8)'
             ),
             borderRadius: 8,
             borderSkipped: false,
@@ -217,9 +219,9 @@ const AnalyticsDashboard = () => {
     return (
         <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">
             <div className="max-w-7xl mx-auto">
-                <motion.div 
-                    variants={fadeUp} 
-                    initial="hidden" 
+                <motion.div
+                    variants={fadeUp}
+                    initial="hidden"
                     animate="show"
                     className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10"
                 >
@@ -297,7 +299,7 @@ const AnalyticsDashboard = () => {
                                                         </div>
                                                         <div className="h-[320px]">
                                                             {stats?.performance?.length > 0 ? (
-                                                                <Bar 
+                                                                <Bar
                                                                     data={{
                                                                         labels: stats.performance.map(p => p.studentName.split(' ')[0]),
                                                                         datasets: [{
@@ -306,8 +308,8 @@ const AnalyticsDashboard = () => {
                                                                             borderRadius: 8,
                                                                             barThickness: 32,
                                                                         }]
-                                                                    }} 
-                                                                    options={baseLineOptions(isDark)} 
+                                                                    }}
+                                                                    options={baseLineOptions(isDark)}
                                                                 />
                                                             ) : <Empty icon={FiActivity} title="Insufficient Data" desc="Scores will appear here once students submit." />}
                                                         </div>
@@ -320,7 +322,7 @@ const AnalyticsDashboard = () => {
                                                         </div>
                                                         <div className="h-[320px] flex items-center justify-center">
                                                             {stats ? (
-                                                                <Doughnut 
+                                                                <Doughnut
                                                                     data={{
                                                                         labels: ['Completed', 'Pending'],
                                                                         datasets: [{
@@ -366,7 +368,7 @@ const AnalyticsDashboard = () => {
                                                                     <td className="px-6 py-5">
                                                                         <div className="flex items-center gap-3">
                                                                             <div className="w-9 h-9 rounded-full overflow-hidden bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xs">
-                                                                                {p.profileImage 
+                                                                                {p.profileImage
                                                                                     ? <img src={p.profileImage.startsWith('http') ? p.profileImage : `http://localhost:3006/${p.profileImage}`} alt="" className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                                                                                     : p.studentName?.charAt(0).toUpperCase()}
                                                                             </div>
@@ -413,7 +415,7 @@ const AnalyticsDashboard = () => {
                                                     {stats?.questionDifficulty?.map((q, i) => (
                                                         <div key={i} className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-6 rounded-2xl border border-slate-100 dark:border-white/5 shadow-none group hover:border-indigo-500/30 transition-all duration-300">
                                                             <div className="flex items-center justify-between mb-4">
-                                                                 <span className="w-8 h-8 bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-xl flex items-center justify-center text-xs font-black text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/5">
+                                                                <span className="w-8 h-8 bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-xl flex items-center justify-center text-xs font-black text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/5">
                                                                     {i + 1}
                                                                 </span>
                                                                 <DiffBadge pct={q.accuracyRate} />

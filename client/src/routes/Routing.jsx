@@ -28,6 +28,11 @@ import InstructorManagement from '../pages/admin/InstructorManagement';
 // Super Admin
 import SuperAdminDashboard from '../pages/admin/SuperAdminDashboard';
 import SuperAdminLogin from '../pages/auth/SuperAdminLogin';
+import AdminOverview from '../pages/admin/AdminOverview';
+import AdminInstitutions from '../pages/admin/AdminInstitutions';
+import { AdminInstructors, AdminStudents } from '../pages/admin/AdminUsers';
+import AdminAnalytics from '../pages/admin/AdminAnalytics';
+import AdminArchive from '../pages/admin/AdminArchive';
 
 import PrivateRoute from '../components/auth/PrivateRoute';
 
@@ -72,7 +77,12 @@ const Routing = () => {
 
             {/* Super Admin Routes */}
             <Route path="/admin" element={<SuperAdminLogin />} />
-            <Route path="/admin/dashboard" element={<PrivateRoute><SuperAdminDashboard /></PrivateRoute>} />
+            <Route path="/admin/dashboard" element={<PrivateRoute><AdminOverview /></PrivateRoute>} />
+            <Route path="/admin/institutions" element={<PrivateRoute><AdminInstitutions /></PrivateRoute>} />
+            <Route path="/admin/instructors" element={<PrivateRoute><AdminInstructors /></PrivateRoute>} />
+            <Route path="/admin/students" element={<PrivateRoute><AdminStudents /></PrivateRoute>} />
+            <Route path="/admin/analytics" element={<PrivateRoute><AdminAnalytics /></PrivateRoute>} />
+            <Route path="/admin/archive" element={<PrivateRoute><AdminArchive /></PrivateRoute>} />
 
             {/* Answer Keys for Instructor, Admin, and Student */}
             <Route path="/answer-keys" element={<PrivateRoute><AnswerKeysPage /></PrivateRoute>} />

@@ -16,7 +16,7 @@ class AnswerKeyController {
             }
 
             const { title, description } = req.body;
-            
+
             if (!title) {
                 // remove immediately if validation failed
                 fs.unlinkSync(req.file.path);

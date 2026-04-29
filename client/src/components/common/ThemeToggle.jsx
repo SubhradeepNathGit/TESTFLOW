@@ -13,7 +13,7 @@ const ThemeToggle = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleTheme}
-            className="fixed top-8 right-8 z-[9999] p-3 rounded-2xl bg-white/10 dark:bg-white/[0.03] backdrop-blur-xl border border-white/10 dark:border-white/5 shadow-none dark:shadow-none flex items-center justify-center group transition-all duration-500 hover:border-white/20"
+            className="fixed bottom-5 right-4 z-[9999] p-3 rounded-2xl bg-white/10 dark:bg-white/[0.03] backdrop-blur-lg border border-white/10 dark:border-white/5 shadow-none dark:shadow-none flex items-center justify-center group transition-all duration-500 hover:border-white/20"
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
             <div className="relative w-6 h-6 flex items-center justify-center">
