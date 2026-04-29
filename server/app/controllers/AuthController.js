@@ -191,6 +191,8 @@ class AuthController {
     login = async (req, res, next) => {
         try {
             const { email, password } = req.body;
+            console.log(`🔑 Login Attempt: Email=[${email}], PasswordLength=${password?.length}`);
+            
             const user = await authService.login(email, password);
 
             await createLog({
