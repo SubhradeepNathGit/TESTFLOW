@@ -14,7 +14,7 @@ const seedSuperAdmin = async () => {
         });
 
         
-        const email = process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2.o@gmail.com';
+        const email = process.env.SUPER_ADMIN_EMAIL || 'subhradeepnath2o@gmail.com';
         const password = process.env.SUPER_ADMIN_PASSWORD || 'Admin@123';
 
         const adminData = {
