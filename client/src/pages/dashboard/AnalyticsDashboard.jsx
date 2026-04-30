@@ -243,7 +243,7 @@ const AnalyticsDashboard = () => {
                     </div>
                 </motion.div>
 
-                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none min-h-[500px] relative overflow-hidden group">
+                <div className={`bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none min-h-[500px] relative overflow-hidden group flex flex-col ${tests.length === 0 ? 'items-center justify-center' : ''}`}>
                     {tests.length === 0 ? (
                         <Empty icon={FiActivity} title="No Assessments" desc="Launch your first test to see analytics." />
                     ) : (
