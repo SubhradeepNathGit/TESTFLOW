@@ -103,9 +103,14 @@ const InstructorManagement = () => {
                                 <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
                                     {instructors.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="py-20 text-center">
-                                                <Briefcase className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                                <p className="text-slate-400 font-medium">No instructors found</p>
+                                            <td colSpan="5" className="py-24 text-center">
+                                                <div className="w-20 h-20 bg-slate-50 dark:bg-white/[0.02] rounded-3xl flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-white/5">
+                                                    <Briefcase size={32} className="text-slate-300 dark:text-slate-600" />
+                                                </div>
+                                                <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">No Instructors Found</h3>
+                                                <p className="text-slate-400 dark:text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed">
+                                                    Your teaching staff directory is currently empty. Staff members will appear here once they register.
+                                                </p>
                                             </td>
                                         </tr>
                                     ) : instructors.map(instructor => (
