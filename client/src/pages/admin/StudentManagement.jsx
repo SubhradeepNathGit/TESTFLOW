@@ -87,13 +87,17 @@ const StudentManagement = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     {[
-                        { label: 'Total Students', value: students.length },
-                        { label: 'Active', value: students.filter(s => s.isActive).length },
-                        { label: 'Inactive', value: students.filter(s => !s.isActive).length },
+                        { label: 'Total Students', value: students.length, icon: Users, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' },
+                        { label: 'Active', value: students.filter(s => s.isActive).length, icon: ToggleRight, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30' },
+                        { label: 'Inactive', value: students.filter(s => !s.isActive).length, icon: X, color: 'text-rose-600 bg-rose-50 dark:bg-rose-900/30' },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{stat.label}</p>
-                            <p className="text-3xl font-black text-slate-900 dark:text-slate-100">{stat.value}</p>
+                        <div key={i} className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border border-slate-100 dark:border-white/5 rounded-[24px] p-6 shadow-none dark:shadow-none group relative overflow-hidden transition-all hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 blur-[50px] pointer-events-none group-hover:bg-slate-500/10 transition-colors" />
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${stat.color}`}>
+                                <stat.icon size={18} />
+                            </div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                            <p className="text-3xl font-black text-slate-900 dark:text-slate-100 tabular-nums">{stat.value}</p>
                         </div>
                     ))}
                 </div>
