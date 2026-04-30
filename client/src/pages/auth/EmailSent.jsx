@@ -59,7 +59,12 @@ const EmailSent = () => {
                                 disabled={sending}
                                 className="font-bold text-slate-900 dark:text-slate-200 hover:text-indigo-600 transition-colors disabled:opacity-50"
                             >
-                                {sending ? "Sending..." : "Send Again"}
+                                {sending ? (
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 border-2 border-slate-900/30 border-t-slate-900 dark:border-white/30 dark:border-t-white rounded-full animate-spin" />
+                                        <span>Sending</span>
+                                    </div>
+                                ) : "Send Again"}
                             </button>
                         </p>
                     </div>
