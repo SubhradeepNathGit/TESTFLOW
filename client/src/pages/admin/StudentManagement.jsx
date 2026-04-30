@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Users, UserPlus, Mail, Search, X, Eye, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
+import { Users, UserPlus, Mail, Search, X, Eye, ToggleLeft, ToggleRight, Trash2, Ban } from 'lucide-react';
 import AuthContext from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosInstance';
@@ -89,7 +89,7 @@ const StudentManagement = () => {
                     {[
                         { label: 'Total Students', value: students.length, icon: Users, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' },
                         { label: 'Active', value: students.filter(s => s.isActive).length, icon: ToggleRight, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30' },
-                        { label: 'Inactive', value: students.filter(s => !s.isActive).length, icon: X, color: 'text-rose-600 bg-rose-50 dark:bg-rose-900/30' },
+                        { label: 'Inactive', value: students.filter(s => !s.isActive).length, icon: Ban, color: 'text-rose-600 bg-rose-50 dark:bg-rose-900/30' },
                     ].map((stat, i) => (
                         <div key={i} className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border border-slate-100 dark:border-white/5 rounded-[24px] p-6 shadow-none dark:shadow-none group relative overflow-hidden transition-all hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 blur-[50px] pointer-events-none group-hover:bg-slate-500/10 transition-colors" />
