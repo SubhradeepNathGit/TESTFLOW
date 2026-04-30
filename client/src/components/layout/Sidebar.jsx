@@ -73,7 +73,7 @@ const Sidebar = () => {
 
     const navLinks = getNavLinks();
     const sidebarStyle = {
-        bg: isSuperAdmin ? 'bg-[#0f112a]' : 'bg-slate-900',
+        bg: isSuperAdmin ? 'bg-purple-900' : 'bg-slate-900',
         border: 'border-white/5',
         itemHover: 'hover:bg-black/40',
         itemActive: 'bg-white text-slate-900 shadow-none',

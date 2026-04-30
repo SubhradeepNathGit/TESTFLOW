@@ -38,7 +38,7 @@ exports.updatePassword = async (userId, currentPassword, newPassword) => {
  * Get all students in an institution (for admin/instructor)
  */
 exports.getStudents = async (institutionId, search = "") => {
-    const query = { institutionId, role: "student" };
+    const query = { institutionId: institutionId?.toString(), role: "student" };
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
@@ -112,7 +112,7 @@ exports.deleteStudent = async (studentId, institutionId) => {
  * Get all instructors in an institution and their published tests/questions overview
  */
 exports.getInstructorsOverview = async (institutionId, search = "") => {
-    const query = { institutionId, role: "instructor" };
+    const query = { institutionId: institutionId?.toString(), role: "instructor" };
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
