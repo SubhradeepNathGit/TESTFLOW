@@ -190,6 +190,9 @@ class AdminController {
                 success: true,
                 message: `Institution ${institution.isActive ? 'activated' : 'suspended'}`
             });
+
+            // Real-time update
+            emitToSuperAdmin("admin:institution_toggled", { institutionId: req.params.id, isActive: institution.isActive });
         } catch (err) {
             next(err);
         }
@@ -215,6 +218,9 @@ class AdminController {
                 success: true,
                 message: `User ${user.isActive ? 'activated' : 'suspended'}`
             });
+
+            // Real-time update
+            emitToSuperAdmin("admin:user_toggled", { userId: req.params.id, isActive: user.isActive });
         } catch (err) {
             next(err);
         }
@@ -246,6 +252,7 @@ class AdminController {
 
             // Real-time update
             emitToSuperAdmin("admin:institution_archived", { institutionId: req.params.id });
+            emitToSuperAdmin("admin:users_archived", { institutionId: req.params.id });
         } catch (err) {
             next(err);
         }

@@ -43,10 +43,12 @@ const AdminInstitutions = () => {
         socket.on("admin:institution_archived", refresh);
         socket.on("admin:institution_restored", refresh);
         socket.on("admin:institution_deleted", refresh);
+        socket.on("admin:institution_toggled", refresh);
         return () => {
             socket.off("admin:institution_archived", refresh);
             socket.off("admin:institution_restored", refresh);
             socket.off("admin:institution_deleted", refresh);
+            socket.off("admin:institution_toggled", refresh);
         };
     }, [socket]);
 

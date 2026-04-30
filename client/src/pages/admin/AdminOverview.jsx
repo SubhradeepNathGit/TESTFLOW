@@ -81,7 +81,9 @@ const AdminOverview = () => {
         if (!socket) return;
         const events = [
             "admin:institution_archived", "admin:institution_restored", "admin:institution_deleted",
-            "admin:user_archived", "admin:user_restored", "admin:user_deleted"
+            "admin:institution_toggled",
+            "admin:user_archived", "admin:user_restored", "admin:user_deleted",
+            "admin:user_toggled"
         ];
         events.forEach(ev => socket.on(ev, refresh));
         return () => events.forEach(ev => socket.off(ev, refresh));
