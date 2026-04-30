@@ -306,14 +306,16 @@ const Leaderboard = () => {
 
                 {leaderboard.length === 0 ? (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/5 p-16 text-center shadow-none dark:shadow-none"
                     >
-                        <BarChart2 size={48} className="mx-auto text-slate-200 dark:text-slate-600 mb-6" />
-                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">No Rankings Yet</h3>
-                        <p className="text-slate-400 font-medium max-w-xs mx-auto text-sm leading-relaxed">
-                            Students need to complete assessments before rankings appear here.
+                        <div className="w-20 h-20 bg-slate-50 dark:bg-white/[0.02] rounded-3xl flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-white/5">
+                            <FiBarChart2 size={32} className="text-slate-300 dark:text-slate-600" />
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 tracking-tight">No Rankings Yet</h3>
+                        <p className="text-slate-400 dark:text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed">
+                            The competition hasn't started! Students need to complete assessments before rankings appear here.
                         </p>
                     </motion.div>
                 ) : (
