@@ -63,7 +63,7 @@ class AuthController {
                 <div style="border-top: 1px solid #edf2f7; padding-top: 32px;">
                     <p style="font-size: 16px; font-weight: 500; margin: 0 0 16px 0;">Hi ${user.name},</p>
                     <p style="font-size: 15px; color: #4a5568; line-height: 1.6; margin: 0 0 32px 0;">
-                        Welcome to TESTFLOW. To complete your registration as a ${user.role} for <strong>${institutionName}</strong>, please use the following verification code.
+                        Welcome to TESTFLOW. To complete your registration as a ${user.role === 'owner' ? 'Administration' : user.role.charAt(0).toUpperCase() + user.role.slice(1)} for <strong>${institutionName}</strong>, please use the following verification code.
                     </p>
                     <div style="text-align: center; margin: 40px 0;">
                         <span style="font-family: 'Courier New', Courier, monospace; font-size: 42px; font-weight: 700; letter-spacing: 8px; color: #000000; background-color: #f7fafc; padding: 20px 40px; border-radius: 8px; border: 1px solid #e2e8f0;">
