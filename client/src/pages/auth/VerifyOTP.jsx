@@ -74,7 +74,7 @@ const VerifyOTP = () => {
                             maxLength={6}
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                            className="w-full px-4 py-4 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-2xl text-center text-3xl font-black tracking-[0.5em] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none text-slate-900 dark:text-white shadow-sm"
+                            className="w-full h-16 px-4 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] rounded-2xl text-center text-3xl font-black tracking-[0.5em] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none text-slate-900 dark:text-white shadow-sm"
                             placeholder="000000"
                             autoFocus
                         />
@@ -97,7 +97,7 @@ const VerifyOTP = () => {
                     <button
                         type="submit"
                         disabled={verifying || otp.length !== 6}
-                        className="w-full py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-slate-900/10 dark:shadow-none hover:bg-black dark:hover:bg-slate-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full h-16 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-slate-900/10 dark:shadow-none hover:bg-black dark:hover:bg-slate-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {verifying ? "Verifying..." : "Verify & Continue"}
                     </button>
