@@ -66,7 +66,7 @@ class AuthController {
                         Welcome to TESTFLOW. To complete your registration as a ${user.role === 'owner' ? 'Administration' : user.role.charAt(0).toUpperCase() + user.role.slice(1)} for <strong>${institutionName}</strong>, please use the following verification code.
                     </p>
                     <div style="text-align: center; margin: 40px 0;">
-                        <span style="font-family: 'Courier New', Courier, monospace; font-size: 42px; font-weight: 700; letter-spacing: 8px; color: #000000; background-color: #f7fafc; padding: 20px 40px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <span style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #000000; background-color: #f8fafc; padding: 24px 44px; border-radius: 16px; border: 2px solid #e2e8f0; display: inline-block;">
                             ${otp}
                         </span>
                     </div>
@@ -75,7 +75,7 @@ class AuthController {
                     </p>
                     <div style="border-top: 1px solid #edf2f7; margin-top: 40px; padding-top: 32px; text-align: center;">
                         <p style="font-size: 14px; font-weight: 600; color: #000000; margin-bottom: 4px;">Subhradeep Nath</p>
-                        <p style="font-size: 12px; color: #718096; margin: 0;">App Developer, TESTFLOW</p>
+                        <p style="font-size: 12px; color: #718096; margin: 0;">Full-Stack Developer and Engineer, TESTFLOW</p>
                         <p style="font-size: 11px; color: #a0aec0; margin-top: 24px;">
                             &copy; ${new Date().getFullYear()} TESTFLOW. All rights reserved.
                         </p>
@@ -151,13 +151,13 @@ class AuthController {
                         Here is your new verification code. Please use it to complete your secure sign up process.
                     </p>
                     <div style="text-align: center; margin: 40px 0;">
-                        <span style="font-family: 'Courier New', Courier, monospace; font-size: 42px; font-weight: 700; letter-spacing: 8px; color: #000000; background-color: #f7fafc; padding: 20px 40px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <span style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #000000; background-color: #f8fafc; padding: 24px 44px; border-radius: 16px; border: 2px solid #e2e8f0; display: inline-block;">
                             ${otp}
                         </span>
                     </div>
                     <div style="border-top: 1px solid #edf2f7; margin-top: 40px; padding-top: 32px; text-align: center;">
                         <p style="font-size: 14px; font-weight: 600; color: #000000; margin-bottom: 4px;">Subhradeep Nath</p>
-                        <p style="font-size: 12px; color: #718096; margin: 0;">App Developer, TESTFLOW</p>
+                        <p style="font-size: 12px; color: #718096; margin: 0;">Full-Stack Developer and Engineer, TESTFLOW</p>
                     </div>
                 </div>
             </div>
@@ -346,7 +346,7 @@ class AuthController {
                     </p>
                     <div style="border-top: 1px solid #edf2f7; margin-top: 40px; padding-top: 32px; text-align: center;">
                         <p style="font-size: 14px; font-weight: 600; color: #000000; margin-bottom: 4px;">Subhradeep Nath</p>
-                        <p style="font-size: 12px; color: #718096; margin: 0;">App Developer, TESTFLOW</p>
+                        <p style="font-size: 12px; color: #718096; margin: 0;">Full-Stack Developer and Engineer, TESTFLOW</p>
                         <p style="font-size: 11px; color: #a0aec0; margin-top: 24px;">
                             &copy; ${new Date().getFullYear()} TESTFLOW. All rights reserved.
                         </p>
