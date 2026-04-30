@@ -76,16 +76,18 @@ export const AuthProvider = ({ children }) => {
             setToken(accessToken);
             setUser(userData);
 
-            toast.success("Login successful!");
-
             // Route to correct dashboard by role
             if (userData.role === "super_admin") {
+                toast.success("Welcome back, Platform Administrator!");
                 navigate("/admin/dashboard");
             } else if (userData.role === "instructor") {
+                toast.success("Instructor session started");
                 navigate("/instructor-dashboard");
             } else if (userData.role === "owner") {
+                toast.success("Management portal ready");
                 navigate("/students");
             } else {
+                toast.success("Welcome back!");
                 navigate("/student-dashboard");
             }
         } catch (error) {
