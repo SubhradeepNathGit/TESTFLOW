@@ -21,6 +21,10 @@ services:
     container_name: testflow-client
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt/live/testflow-api.duckdns.org/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
+      - /etc/letsencrypt/live/testflow-api.duckdns.org/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
     restart: always
     networks:
       - testflow-network

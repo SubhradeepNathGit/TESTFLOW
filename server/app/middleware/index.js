@@ -62,17 +62,26 @@ module.exports = (app) => {
             directives: {
                 defaultSrc: ["'self'"],
                 scriptSrc: ["'self'", "'unsafe-inline'", "https://testflow-portal.vercel.app"],
-                connectSrc: ["'self'", "http://testflow-api.duckdns.org", "ws://testflow-api.duckdns.org", "http://localhost:3006", "ws://localhost:3006"],
+                connectSrc: [
+                    "'self'",
+                    "https://testflow-api.duckdns.org",
+                    "wss://testflow-api.duckdns.org",
+                    "http://localhost:3006",
+                    "ws://localhost:3006"
+                ],
                 imgSrc: ["'self'", "data:", "https:", "http://localhost:3006"],
                 styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
                 fontSrc: ["'self'", "https://fonts.gstatic.com"],
-                objectSrc: ["'self'"],
+                objectSrc: ["'none'"],
                 mediaSrc: ["'self'"],
                 frameSrc: ["'self'"],
                 upgradeInsecureRequests: null,
             },
         },
-        hsts: false,
+        hsts: {
+            maxAge: 31536000,
+            includeSubDomains: false,
+        },
         crossOriginResourcePolicy: { policy: "cross-origin" }
     }));
 
