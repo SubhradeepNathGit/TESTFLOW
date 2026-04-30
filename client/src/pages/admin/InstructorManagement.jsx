@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Briefcase, UserPlus, Mail, Search, X, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
 import AuthContext from '../../context/AuthContext';
 import { toast } from 'react-toastify';
@@ -6,12 +6,33 @@ import api from '../../api/axiosInstance';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
+import { useSocket } from '../../context/SocketContext';
 
 const InstructorManagement = () => {
     const { user } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const socket = useSocket();
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleUpdate = (data) => {
+            // Only refetch if it's an instructor
+            if (data?.role === 'instructor') {
+                queryClient.invalidateQueries({ queryKey: ['instructors'] });
+            }
+        };
+
+        socket.on('userCreated', handleUpdate);
+        socket.on('userVerified', handleUpdate);
+
+        return () => {
+            socket.off('userCreated', handleUpdate);
+            socket.off('userVerified', handleUpdate);
+        };
+    }, [socket, queryClient]);
 
     const { data: instructors = [], isLoading: loading } = useQuery({
         queryKey: ['instructors', debouncedSearchTerm],

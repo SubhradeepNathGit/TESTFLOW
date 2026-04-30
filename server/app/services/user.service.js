@@ -3,6 +3,7 @@ const Test = require("../models/Test");
 const Question = require("../models/Question");
 const ErrorResponse = require("../utils/errorResponse");
 const { generatePassword } = require("../utils/passwordGenerator");
+const { emitToInstitution } = require("../utils/socket");
 
 /** Get current user's profile */
 exports.getUserProfile = async (userId) => {
@@ -79,6 +80,8 @@ exports.createStudent = async (institutionId, adminId, { name, email }) => {
         createdBy: adminId,
         joinedAt: new Date(),
     });
+
+    emitToInstitution(institutionId, 'userCreated', student);
 
     return { student, password, studentId };
 };
@@ -160,6 +163,8 @@ exports.createInstructor = async (institutionId, adminId, { name, email }) => {
         createdBy: adminId,
         joinedAt: new Date(),
     });
+
+    emitToInstitution(institutionId, 'userCreated', instructor);
 
     return { instructor, password, instructorId };
 };

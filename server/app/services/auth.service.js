@@ -3,7 +3,7 @@ const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 
 const Institution = require("../models/Institution");
-const { emitToSuperAdmin } = require("../utils/socket");
+const { emitToSuperAdmin, emitToInstitution } = require("../utils/socket");
 
 
 exports.register = async (userData) => {
@@ -58,6 +58,9 @@ exports.register = async (userData) => {
     await user.save();
 
     emitToSuperAdmin('userCreated', user);
+    if (user.institutionId) {
+        emitToInstitution(user.institutionId, 'userCreated', user);
+    }
 
     return { user, otp };
 };
@@ -167,6 +170,10 @@ exports.verifyEmail = async (email, otp) => {
     user.otp = undefined;
     user.otpExpire = undefined;
     await user.save();
+
+    if (user.institutionId) {
+        emitToInstitution(user.institutionId, 'userVerified', user);
+    }
 
     return user;
 };

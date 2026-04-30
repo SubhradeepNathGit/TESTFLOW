@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Users, UserPlus, Mail, Search, X, Eye, ToggleLeft, ToggleRight, Trash2, Ban } from 'lucide-react';
 import AuthContext from '../../context/AuthContext';
 import { toast } from 'react-toastify';
@@ -6,12 +6,33 @@ import api from '../../api/axiosInstance';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
+import { useSocket } from '../../context/SocketContext';
 
 const StudentManagement = () => {
     const { user } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const socket = useSocket();
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleUpdate = (data) => {
+            // Only refetch if it's a student
+            if (data?.role === 'student') {
+                queryClient.invalidateQueries({ queryKey: ['students'] });
+            }
+        };
+
+        socket.on('userCreated', handleUpdate);
+        socket.on('userVerified', handleUpdate);
+
+        return () => {
+            socket.off('userCreated', handleUpdate);
+            socket.off('userVerified', handleUpdate);
+        };
+    }, [socket, queryClient]);
     const [showAddModal, setShowAddModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [newStudent, setNewStudent] = useState({ name: '', email: '' });
