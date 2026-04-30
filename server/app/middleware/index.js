@@ -57,7 +57,22 @@ module.exports = (app) => {
     app.use(morgan("dev"));
 
     
-    app.use(helmet());
+    app.use(helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "https://testflow-portal.vercel.app"],
+                connectSrc: ["'self'", "https://testflow-api.duckdns.org", "wss://testflow-api.duckdns.org", "http://localhost:3006", "ws://localhost:3006"],
+                imgSrc: ["'self'", "data:", "https:", "http://localhost:3006"],
+                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                objectSrc: ["'self'"],
+                mediaSrc: ["'self'"],
+                frameSrc: ["'self'"],
+            },
+        },
+        crossOriginResourcePolicy: { policy: "cross-origin" }
+    }));
 
     
     app.use(compression());

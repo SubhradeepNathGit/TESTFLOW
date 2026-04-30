@@ -4,6 +4,7 @@ import { FiFileText, FiUploadCloud, FiTrash2, FiExternalLink, FiX, FiCheckCircle
 import { toast } from 'react-toastify';
 import AuthContext from '../../context/AuthContext';
 import { getAnswerKeys, uploadAnswerKey, deleteAnswerKey } from '../../api/answerKeyApi';
+import { getAssetUrl } from '../../utils/assets';
 
 // Upload Modal
 const UploadModal = ({ isOpen, onClose, onUploaded }) => {
@@ -232,7 +233,7 @@ const AnswerKeysPage = () => {
 
                                 <div className="mt-auto pt-4 border-t border-slate-50 dark:border-white/5 flex items-center justify-between gap-2">
                                     <a
-                                        href={`http://localhost:3006/${item.pdfUrl}`}
+                                        href={getAssetUrl(item.pdfUrl)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"

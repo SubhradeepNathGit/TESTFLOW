@@ -6,6 +6,8 @@ services:
     container_name: testflow-server
     ports:
       - "${PORT:-3006}:3006"
+    volumes:
+      - ./server/uploads:/usr/src/app/server/uploads
     env_file:
       - ./server/.env
     restart: always
