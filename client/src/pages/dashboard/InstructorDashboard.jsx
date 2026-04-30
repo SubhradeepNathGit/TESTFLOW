@@ -244,7 +244,7 @@ const InstructorDashboard = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Instructor Panel</h1>
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">Instructor Panel</h1>
                         <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Design precision assessments and monitor academic integrity.</p>
                     </div>
                 </div>

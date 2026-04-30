@@ -29,7 +29,7 @@ const ConfirmationModal = ({
     if (!isOpen && !isAnimating) return null;
 
     const iconColor = type === 'danger' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400';
-    const confirmButtonColor = type === 'danger' ? 'bg-red-600 hover:bg-red-700 shadow-red-100 dark:shadow-none' : 'bg-slate-900 dark:bg-white/10 dark:hover:bg-white/20';
+    const confirmButtonColor = type === 'danger' ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-100 dark:shadow-none' : 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-white/10 dark:hover:bg-white/20 dark:text-slate-100';
 
     return (
         <div

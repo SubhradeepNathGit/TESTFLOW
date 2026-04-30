@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiFileText, FiUploadCloud, FiTrash2, FiExternalLink, FiX, FiCheckCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import AuthContext from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 import { getAnswerKeys, uploadAnswerKey, deleteAnswerKey } from '../../api/answerKeyApi';
 import { getAssetUrl } from '../../utils/assets';
+import ConfirmationModal from '../../components/modals/ConfirmationModal';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Upload Modal
 const UploadModal = ({ isOpen, onClose, onUploaded }) => {
@@ -130,53 +133,78 @@ const UploadModal = ({ isOpen, onClose, onUploaded }) => {
 // Main Component
 const AnswerKeysPage = () => {
     const { user } = useContext(AuthContext);
-    const [answerKeys, setAnswerKeys] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const socket = useSocket();
+    const queryClient = useQueryClient();
     const [modalOpen, setModalOpen] = useState(false);
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        confirmText: '',
+        type: 'warning',
+        onConfirm: () => {}
+    });
 
     const isManager = user?.role === 'instructor' || user?.role === 'owner';
 
+    const { data: answerKeys = [], isLoading: loading, refetch } = useQuery({
+        queryKey: ['answer-keys'],
+        queryFn: () => getAnswerKeys().then(r => r.data.data),
+        onError: () => toast.error("Failed to load answer keys")
+    });
+
     useEffect(() => {
-        fetchKeys();
-    }, []);
+        if (!socket) return;
 
-    const fetchKeys = async () => {
-        setLoading(true);
-        try {
-            const { data } = await getAnswerKeys();
-            setAnswerKeys(data.data || []);
-        } catch {
-            toast.error('Failed to automatically load answer keys');
-        } finally {
-            setLoading(false);
-        }
-    };
+        const handleUpdate = () => queryClient.invalidateQueries({ queryKey: ['answer-keys'] });
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this answer key?")) return;
-        try {
-            await deleteAnswerKey(id);
-            toast.success("Deleted successfully");
-            fetchKeys();
-        } catch {
-            toast.error("Failed to delete");
-        }
+        socket.on('answerKey:updated', handleUpdate);
+        socket.on('answerKey:archived', handleUpdate);
+        socket.on('answerKey:restored', handleUpdate);
+        socket.on('answerKey:deleted', handleUpdate);
+
+        return () => {
+            socket.off('answerKey:updated', handleUpdate);
+            socket.off('answerKey:archived', handleUpdate);
+            socket.off('answerKey:restored', handleUpdate);
+            socket.off('answerKey:deleted', handleUpdate);
+        };
+    }, [socket, queryClient]);
+
+    const handleArchive = async (id) => {
+        setConfirmModal({
+            isOpen: true,
+            title: "Archive Answer Key",
+            message: "Archiving this answer key will hide it from students. You can restore it later from the Archive repository.",
+            confirmText: "Archive",
+            type: "warning",
+            onConfirm: async () => {
+                setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                try {
+                    await deleteAnswerKey(id);
+                    toast.success("Moved to archive");
+                    queryClient.invalidateQueries({ queryKey: ['answer-keys'] });
+                } catch {
+                    toast.error("Failed to archive");
+                }
+            }
+        });
     };
 
     return (
-        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10 transition-colors duration-500">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
                     <div>
-                        <h1 className="text-3xl sm:text-4xl font-black text-slate-800 dark:text-slate-100 tracking-tight flex items-center gap-3">
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-slate-100 tracking-tight flex items-center gap-3 leading-none">
                             <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
                                 <FiFileText size={20} />
                             </div>
                             Answer Keys
                         </h1>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Review official answers for recent assessments.</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium mt-2">Review official answers for recent assessments.</p>
                     </div>
 
                     {isManager && (
@@ -192,8 +220,10 @@ const AnswerKeysPage = () => {
 
                 {/* List */}
                 {loading ? (
-                    <div className="flex justify-center p-20">
-                        <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="bg-white dark:bg-white/[0.03] h-48 rounded-[24px] animate-pulse border border-slate-100 dark:border-white/5" />
+                        ))}
                     </div>
                 ) : answerKeys.length === 0 ? (
                     <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-16 rounded-[32px] border border-slate-100 dark:border-white/5 text-center shadow-none dark:shadow-none relative overflow-hidden">
@@ -202,51 +232,54 @@ const AnswerKeysPage = () => {
                             <FiCheckCircle size={32} className="text-slate-300 dark:text-slate-600" />
                         </div>
                         <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">No Answer Keys Yet</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 max-w-sm mx-auto">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 max-w-sm mx-auto font-medium">
                             {isManager
                                 ? "You haven't uploaded any answer keys for your students."
                                 : "Instructors haven't posted any answer keys here yet."}
                         </p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {answerKeys.map((item, idx) => (
                             <motion.div
                                 key={item._id}
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-6 rounded-[24px] border border-slate-100 dark:border-white/5 shadow-sm flex flex-col hover:shadow-md transition-shadow"
+                                className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none flex flex-col hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300"
                             >
-                                <div className="flex items-start justify-between gap-4 mb-4">
-                                    <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400 rounded-2xl flex items-center justify-center shrink-0">
-                                        <FiFileText size={22} />
+                                <div className="flex items-start justify-between gap-4 mb-6">
+                                    <div className="w-14 h-14 bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                                        <FiFileText size={24} />
                                     </div>
                                     <div className="flex-1 min-w-0 pt-1">
-                                        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug break-words">{item.title}</h3>
+                                        <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 leading-snug break-words">{item.title}</h3>
                                         {item.description && (
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{item.description}</p>
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 line-clamp-2 font-medium">{item.description}</p>
                                         )}
-                                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-2">{new Date(item.createdAt).toLocaleDateString()}</p>
+                                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-4 flex items-center gap-1.5">
+                                            <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                                            {new Date(item.createdAt).toLocaleDateString()}
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="mt-auto pt-4 border-t border-slate-50 dark:border-white/5 flex items-center justify-between gap-2">
+                                <div className="mt-auto pt-6 border-t border-slate-50 dark:border-white/5 flex items-center justify-between gap-3">
                                     <a
                                         href={getAssetUrl(item.pdfUrl)}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                                        className="flex-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-slate-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wide flex items-center justify-center gap-2 transition-all"
                                     >
-                                        View PDF <FiExternalLink size={12} />
+                                        View PDF <FiExternalLink size={14} />
                                     </a>
                                     {isManager && (
                                         <button
-                                            onClick={() => handleDelete(item._id)}
-                                            className="p-2.5 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-rose-400 rounded-xl transition-colors shrink-0"
-                                            title="Delete"
+                                            onClick={() => handleArchive(item._id)}
+                                            className="p-3 text-slate-400 dark:text-slate-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 dark:hover:text-rose-400 rounded-xl transition-all border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
+                                            title="Archive"
                                         >
-                                            <FiTrash2 size={16} />
+                                            <FiTrash2 size={18} />
                                         </button>
                                     )}
                                 </div>
@@ -258,7 +291,17 @@ const AnswerKeysPage = () => {
                 <UploadModal
                     isOpen={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    onUploaded={fetchKeys}
+                    onUploaded={refetch}
+                />
+
+                <ConfirmationModal
+                    isOpen={confirmModal.isOpen}
+                    onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                    onConfirm={confirmModal.onConfirm}
+                    title={confirmModal.title}
+                    message={confirmModal.message}
+                    confirmText={confirmModal.confirmText}
+                    type={confirmModal.type}
                 />
             </div>
         </div>

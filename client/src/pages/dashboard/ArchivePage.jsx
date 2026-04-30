@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getArchivedTests, restoreTest, permanentDeleteTest } from '../../api/testApi';
-import { FiRotateCcw, FiTrash2, FiInbox, FiClock, FiFileText, FiBookmark } from 'react-icons/fi';
+import { getArchivedAnswerKeys, restoreAnswerKey, permanentDeleteAnswerKey } from '../../api/answerKeyApi';
+import { FiRotateCcw, FiTrash2, FiInbox, FiClock, FiFileText, FiBookmark, FiKey } from 'react-icons/fi';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CardSkeleton } from '../../components/common/Skeleton';
+import { useSocket } from '../../context/SocketContext';
 
 const cardVariants = {
     hidden: { opacity: 0, y: 16 },
@@ -14,6 +16,8 @@ const cardVariants = {
 
 const ArchivePage = () => {
     const queryClient = useQueryClient();
+    const socket = useSocket();
+    const [activeTab, setActiveTab] = useState('tests'); // 'tests' or 'keys'
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         title: '',
@@ -23,27 +27,63 @@ const ArchivePage = () => {
         onConfirm: () => {}
     });
 
-    const { data: archivedTests = [], isLoading: loading } = useQuery({
+    // Queries
+    const { data: archivedTests = [], isLoading: loadingTests } = useQuery({
         queryKey: ['archived-tests'],
         queryFn: () => getArchivedTests().then(r => r.data.data),
-        onError: () => toast.error("Failed to fetch archive"),
+        onError: () => toast.error("Failed to fetch archived tests"),
     });
 
-    const handleRestore = async (id) => {
+    const { data: archivedKeys = [], isLoading: loadingKeys } = useQuery({
+        queryKey: ['archived-keys'],
+        queryFn: () => getArchivedAnswerKeys().then(r => r.data.data),
+        onError: () => toast.error("Failed to fetch archived answer keys"),
+    });
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const refreshTests = () => {
+            queryClient.invalidateQueries({ queryKey: ['archived-tests'] });
+            queryClient.invalidateQueries({ queryKey: ['instructor-tests'] });
+        };
+
+        const refreshKeys = () => {
+            queryClient.invalidateQueries({ queryKey: ['archived-keys'] });
+            queryClient.invalidateQueries({ queryKey: ['answer-keys'] });
+        };
+
+        socket.on('test:archived', refreshTests);
+        socket.on('test:published', refreshTests);
+        
+        socket.on('answerKey:archived', refreshKeys);
+        socket.on('answerKey:restored', refreshKeys);
+        socket.on('answerKey:deleted', refreshKeys);
+        socket.on('answerKey:updated', refreshKeys);
+
+        return () => {
+            socket.off('test:archived', refreshTests);
+            socket.off('test:published', refreshTests);
+            socket.off('answerKey:archived', refreshKeys);
+            socket.off('answerKey:restored', refreshKeys);
+            socket.off('answerKey:deleted', refreshKeys);
+            socket.off('answerKey:updated', refreshKeys);
+        };
+    }, [socket, queryClient]);
+
+    const handleRestoreTest = async (id) => {
         try {
             await restoreTest(id);
             toast.success("Test restored to dashboard");
             queryClient.invalidateQueries({ queryKey: ['archived-tests'] });
             queryClient.invalidateQueries({ queryKey: ['instructor-tests'] });
-        } catch {
-            toast.error("Failed to restore test");
-        }
+        } catch { toast.error("Failed to restore test"); }
     };
 
-    const handlePermanentDelete = (id) => {
+    const handlePermanentDeleteTest = (id) => {
         setConfirmModal({
             isOpen: true,
-            title: "Permanent Delete",
+            title: "Permanent Delete Test",
             message: "CRITICAL: This will permanently delete the test and all associated student results. This cannot be undone. Proceed?",
             confirmText: "Delete Permanently",
             type: "danger",
@@ -53,48 +93,95 @@ const ArchivePage = () => {
                     await permanentDeleteTest(id);
                     toast.success("Test permanently deleted");
                     queryClient.invalidateQueries({ queryKey: ['archived-tests'] });
-                } catch {
-                    toast.error("Failed to delete test");
-                }
+                } catch { toast.error("Failed to delete test"); }
             }
         });
     };
 
+    const handleRestoreKey = async (id) => {
+        try {
+            await restoreAnswerKey(id);
+            toast.success("Answer Key restored");
+            queryClient.invalidateQueries({ queryKey: ['archived-keys'] });
+            queryClient.invalidateQueries({ queryKey: ['answer-keys'] });
+        } catch { toast.error("Failed to restore answer key"); }
+    };
+
+    const handlePermanentDeleteKey = (id) => {
+        setConfirmModal({
+            isOpen: true,
+            title: "Permanent Delete Key",
+            message: "This will permanently delete the answer key PDF. This action cannot be undone. Proceed?",
+            confirmText: "Delete Permanently",
+            type: "danger",
+            onConfirm: async () => {
+                setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                try {
+                    await permanentDeleteAnswerKey(id);
+                    toast.success("Answer Key permanently deleted");
+                    queryClient.invalidateQueries({ queryKey: ['archived-keys'] });
+                } catch { toast.error("Failed to delete answer key"); }
+            }
+        });
+    };
+
+    const loading = activeTab === 'tests' ? loadingTests : loadingKeys;
+    const currentItems = activeTab === 'tests' ? archivedTests : archivedKeys;
+
     return (
-        <div className="min-h-screen bg-[#FDFDFD] dark:bg-black p-4 sm:p-6 lg:p-10">
+        <div className="min-h-screen bg-[#FDFDFD] dark:bg-black p-4 sm:p-6 lg:p-10 transition-colors duration-500">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
-                <div className="mb-10">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="w-11 h-11 bg-amber-500 text-white rounded-2xl flex items-center justify-center">
-                            <FiBookmark size={20} />
+                <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                            <FiBookmark size={24} />
                         </div>
                         <div>
-                            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
+                            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
                                 Archive Repository
                             </h1>
-                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                Shadowed Assessments
+                            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-1.5">
+                                Shadowed Assets
                             </p>
                         </div>
                     </div>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-3 pl-0.5">
-                        Restore soft-deleted assessments to the dashboard, or permanently clean them up.
-                    </p>
+
+                    {/* Tab Switcher */}
+                    <div className="flex bg-slate-100 dark:bg-white/[0.03] p-1.5 rounded-[20px] border border-slate-200/50 dark:border-white/5">
+                        <button 
+                            onClick={() => setActiveTab('tests')}
+                            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === 'tests' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                        >
+                            <FiFileText size={14} /> Assessments ({archivedTests.length})
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('keys')}
+                            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === 'keys' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                        >
+                            <FiKey size={14} /> Answer Keys ({archivedKeys.length})
+                        </button>
+                    </div>
                 </div>
+
+                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mb-10 max-w-2xl">
+                    Restore soft-deleted {activeTab === 'tests' ? 'assessments' : 'answer keys'} to the dashboard, or permanently purge them from the system.
+                </p>
 
                 {/* Content */}
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <CardSkeleton /><CardSkeleton /><CardSkeleton />
                     </div>
-                ) : archivedTests.length === 0 ? (
-                    <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[40px] border-2 border-dashed border-slate-100 dark:border-white/5 p-10 sm:p-20 text-center">
-                        <FiInbox size={48} className="mx-auto text-slate-200 mb-6" />
-                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Archive is Empty</h3>
+                ) : currentItems.length === 0 ? (
+                    <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl rounded-[40px] border-2 border-dashed border-slate-100 dark:border-white/5 p-16 sm:p-24 text-center group hover:border-amber-500/20 transition-all duration-700">
+                        <div className="w-20 h-20 bg-slate-50 dark:bg-black rounded-3xl flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-white/5 group-hover:scale-110 transition-transform duration-500">
+                            <FiInbox size={32} className="text-slate-300 dark:text-slate-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">No Archived {activeTab === 'tests' ? 'Tests' : 'Keys'}</h3>
                         <p className="text-slate-400 dark:text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed">
-                            Assessments you delete will appear here before permanent removal.
+                            Deleted {activeTab === 'tests' ? 'assessments' : 'documents'} will appear here for final review before permanent removal.
                         </p>
                     </div>
                 ) : (
@@ -104,64 +191,69 @@ const ArchivePage = () => {
                         variants={{ show: { transition: { staggerChildren: 0.08 } } }}
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                     >
-                        <AnimatePresence>
-                            {archivedTests.map((test) => (
+                        <AnimatePresence mode="popLayout">
+                            {currentItems.map((item) => (
                                 <motion.div
-                                    key={test._id}
+                                    key={item._id}
                                     variants={cardVariants}
                                     layout
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-500 group relative overflow-hidden"
+                                    className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none hover:border-amber-100 dark:hover:border-amber-500/30 transition-all duration-500 group relative overflow-hidden"
                                 >
                                     {/* Card Top */}
-                                    <div className="flex items-start justify-between mb-6">
-                                        <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center shadow-sm">
-                                            <FiFileText size={22} />
+                                    <div className="flex items-start justify-between mb-8">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${activeTab === 'tests' ? 'bg-indigo-50 text-indigo-500' : 'bg-rose-50 text-rose-500'}`}>
+                                            {activeTab === 'tests' ? <FiFileText size={24} /> : <FiKey size={24} />}
                                         </div>
-                                        {/* Always-visible actions */}
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={() => handleRestore(test._id)}
-                                                className="p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl transition-all"
-                                                title="Restore to Dashboard"
+                                                onClick={() => activeTab === 'tests' ? handleRestoreTest(item._id) : handleRestoreKey(item._id)}
+                                                className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all border border-emerald-100/50"
+                                                title="Restore"
                                             >
-                                                <FiRotateCcw size={15} />
+                                                <FiRotateCcw size={16} />
                                             </button>
                                             <button
-                                                onClick={() => handlePermanentDelete(test._id)}
-                                                className="p-2.5 bg-rose-50 text-rose-500 hover:bg-rose-600 hover:text-white rounded-xl transition-all"
-                                                title="Permanently Delete"
+                                                onClick={() => activeTab === 'tests' ? handlePermanentDeleteTest(item._id) : handlePermanentDeleteKey(item._id)}
+                                                className="p-3 bg-rose-50 text-rose-500 hover:bg-rose-600 hover:text-white rounded-xl transition-all border border-rose-100/50"
+                                                title="Delete Permanently"
                                             >
-                                                <FiTrash2 size={15} />
+                                                <FiTrash2 size={16} />
                                             </button>
                                         </div>
                                     </div>
 
-                                    {/* Test Info */}
-                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-1 truncate leading-snug">{test.title}</h3>
-                                    {test.description && (
-                                        <p className="text-xs text-slate-400 font-medium mb-4 line-clamp-2">{test.description}</p>
-                                    )}
+                                    {/* Info */}
+                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-2 truncate leading-snug">{item.title}</h3>
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium mb-6 line-clamp-2 leading-relaxed">
+                                        {item.description || "No description provided."}
+                                    </p>
 
                                     {/* Meta */}
-                                    <div className="space-y-2.5 mt-5 pt-5 border-t border-slate-50 dark:border-white/5">
-                                        <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+                                    <div className="space-y-3 mt-6 pt-6 border-t border-slate-50 dark:border-white/5">
+                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                             <FiClock size={12} className="shrink-0" />
-                                            <span>Archived {new Date(test.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                            <span>Archived {new Date(item.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-3 py-1 bg-slate-50 dark:bg-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
-                                                {test.totalMarks} Marks
-                                            </span>
-                                            <span className="px-3 py-1 bg-slate-50 dark:bg-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
-                                                {test.duration} Min
-                                            </span>
-                                            <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ml-auto ${
-                                                test.status === 'Published' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 dark:bg-white/10 text-slate-400'
-                                            }`}>
-                                                {test.status}
-                                            </span>
-                                        </div>
+                                        
+                                        {activeTab === 'tests' && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="px-3 py-1 bg-slate-50 dark:bg-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                                                    {item.totalMarks} Marks
+                                                </span>
+                                                <span className="px-3 py-1 bg-slate-50 dark:bg-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                                                    {item.duration} Min
+                                                </span>
+                                            </div>
+                                        )}
+                                        
+                                        {activeTab === 'keys' && item.uploadedBy && (
+                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                                <span className="px-3 py-1 bg-slate-50 dark:bg-white/10 rounded-full">
+                                                    Uploaded by {item.uploadedBy.name}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             ))}
