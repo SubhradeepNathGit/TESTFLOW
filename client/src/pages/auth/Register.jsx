@@ -158,7 +158,12 @@ const Register = () => {
                         disabled={isSubmitting}
                         className="w-full py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-slate-900/10 dark:shadow-none hover:bg-black dark:hover:bg-slate-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                     >
-                        {isSubmitting ? "Creating Account..." : "Sign Up"}
+                        {isSubmitting ? (
+                            <div className="flex items-center justify-center gap-3">
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white dark:border-slate-900/30 dark:border-t-slate-900 rounded-full animate-spin" />
+                                <span>Creating Account</span>
+                            </div>
+                        ) : "Sign Up"}
                     </button>
                 </form>
 
