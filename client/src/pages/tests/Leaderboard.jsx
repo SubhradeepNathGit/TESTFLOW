@@ -298,7 +298,7 @@ const Leaderboard = () => {
                             <FiAward size={20} />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Global Leaderboard</h1>
+                            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Global Leaderboard</h1>
                             <p className="text-sm font-medium text-slate-400 dark:text-slate-500">Top performers ranked by cumulative score</p>
                         </div>
                     </div>

@@ -71,7 +71,7 @@ const ArchivePage = () => {
                             <FiBookmark size={20} />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
+                            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
                                 Archive Repository
                             </h1>
                             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">

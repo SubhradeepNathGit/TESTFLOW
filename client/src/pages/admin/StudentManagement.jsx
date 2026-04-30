@@ -68,7 +68,7 @@ const StudentManagement = () => {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                     <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Management</p>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                             Student <span className="text-slate-400 font-light">Management</span>
                         </h1>
                         <p className="text-slate-500 font-medium mt-1">Add and manage examinees for your institution</p>

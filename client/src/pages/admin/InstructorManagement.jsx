@@ -49,7 +49,7 @@ const InstructorManagement = () => {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                     <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Management</p>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                             Instructor <span className="text-slate-400 font-light">Management</span>
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Manage teaching staff and view their activity</p>

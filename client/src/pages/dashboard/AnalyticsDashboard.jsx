@@ -226,7 +226,7 @@ const AnalyticsDashboard = () => {
                     className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10"
                 >
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mb-2">
+                        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mb-2">
                             Intelligence <span className="text-slate-400 dark:text-slate-500 font-light">Suite</span>
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Deep assessment analytics and performance trends.</p>
