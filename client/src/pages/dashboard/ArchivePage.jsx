@@ -10,6 +10,7 @@ import { CardSkeleton } from '../../components/common/Skeleton';
 import { useSocket } from '../../context/SocketContext';
 import AuthContext from '../../context/AuthContext';
 import api from '../../api/axiosInstance';
+import { getAssetUrl } from '../../utils/assets';
 
 const cardVariants = {
     hidden: { opacity: 0, y: 16 },
@@ -281,18 +282,25 @@ const ArchivePage = () => {
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-8 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none hover:border-amber-100 dark:hover:border-amber-500/30 transition-all duration-500 group relative overflow-hidden"
                                 >
-                                    {/* Card Top */}
-                                    <div className="flex items-start justify-between mb-8">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${
+                                    <div className="flex items-start justify-between mb-6">
+                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm overflow-hidden ${
                                             activeTab === 'tests' ? 'bg-indigo-50 text-indigo-500' : 
                                             activeTab === 'keys' ? 'bg-rose-50 text-rose-500' :
-                                            activeTab === 'instructors' ? 'bg-amber-50 text-amber-500' :
-                                            'bg-emerald-50 text-emerald-500'
+                                            'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'
                                         }`}>
-                                            {activeTab === 'tests' ? <FiFileText size={24} /> : 
-                                             activeTab === 'keys' ? <FiKey size={24} /> :
-                                             activeTab === 'instructors' ? <FiBriefcase size={24} /> :
-                                             <FiUser size={24} />}
+                                            {(activeTab === 'students' || activeTab === 'instructors') ? (
+                                                item.profileImage ? (
+                                                    <img 
+                                                        src={getAssetUrl(item.profileImage)} 
+                                                        className="w-full h-full object-cover" 
+                                                        alt="Profile" 
+                                                    />
+                                                ) : (
+                                                    <span className="font-black text-xl">{(item.name || "U").charAt(0).toUpperCase()}</span>
+                                                )
+                                            ) : (
+                                                activeTab === 'tests' ? <FiFileText size={24} /> : <FiKey size={24} />
+                                            )}
                                         </div>
                                         <div className="flex gap-2">
                                             <button
@@ -301,7 +309,7 @@ const ArchivePage = () => {
                                                     else if (activeTab === 'keys') handleRestoreKey(item._id);
                                                     else handleRestoreUser(item._id, activeTab.slice(0, -1));
                                                 }}
-                                                className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all border border-emerald-100/50"
+                                                className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl transition-all border border-emerald-100/50 dark:border-emerald-500/20"
                                                 title="Restore"
                                             >
                                                 <FiRotateCcw size={16} />
@@ -312,7 +320,7 @@ const ArchivePage = () => {
                                                     else if (activeTab === 'keys') handlePermanentDeleteKey(item._id);
                                                     else handlePermanentDeleteUser(item._id, activeTab.slice(0, -1), item.name);
                                                 }}
-                                                className="p-3 bg-rose-50 text-rose-500 hover:bg-rose-600 hover:text-white rounded-xl transition-all border border-rose-100/50"
+                                                className="p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-500 dark:text-rose-400 hover:bg-rose-600 hover:text-white rounded-xl transition-all border border-rose-100/50 dark:border-rose-500/20"
                                                 title="Delete Permanently"
                                             >
                                                 <FiTrash2 size={16} />
