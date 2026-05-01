@@ -35,12 +35,9 @@ const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-                        className="relative w-full max-w-md bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none"
+                        className="relative w-full max-w-md bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl border border-slate-100 dark:border-white/[0.08] rounded-[2.5rem] shadow-2xl dark:shadow-none overflow-hidden"
                     >
-                        {/* Top accent bar */}
-                        <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-600" />
-
-                        <div className="p-5 sm:p-8">
+                        <div className="p-8">
                             <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-6">
                                 <FiSend size={26} />
                             </div>
@@ -49,21 +46,20 @@ const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total
                                 Once submitted, you cannot modify your answers. Please review carefully.
                             </p>
 
-                            {/* Stats row */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                                <div className="flex-1 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-2xl p-4 text-center">
-                                    <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{answered}</p>
-                                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-0.5">Answered</p>
+                                <div className="flex-1 bg-emerald-50/50 dark:bg-emerald-900/20 border border-emerald-100/50 dark:border-emerald-500/20 rounded-2xl p-4 text-center">
+                                    <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{answered}</p>
+                                    <p className="text-[10px] font-black text-emerald-500/70 uppercase tracking-widest mt-0.5">Answered</p>
                                 </div>
                                 {unanswered > 0 && (
-                                    <div className="flex-1 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-2xl p-4 text-center">
-                                        <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{unanswered}</p>
-                                        <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-0.5">Unanswered</p>
+                                    <div className="flex-1 bg-amber-50/50 dark:bg-amber-900/20 border border-amber-100/50 dark:border-amber-500/20 rounded-2xl p-4 text-center">
+                                        <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{unanswered}</p>
+                                        <p className="text-[10px] font-black text-amber-500/70 uppercase tracking-widest mt-0.5">Unanswered</p>
                                     </div>
                                 )}
-                                <div className="flex-1 bg-slate-50 dark:bg-white/5/50 border border-slate-100 dark:border-slate-600 rounded-2xl p-4 text-center">
-                                    <p className="text-2xl font-black text-slate-700 dark:text-slate-300">{total}</p>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Total</p>
+                                <div className="flex-1 bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-500/20 rounded-2xl p-4 text-center">
+                                    <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{total}</p>
+                                    <p className="text-[10px] font-black text-blue-500/70 uppercase tracking-widest mt-0.5">Total</p>
                                 </div>
                             </div>
 
@@ -224,7 +220,7 @@ const TestPlayer = () => {
                 </header>
                 <main className="flex-1 p-6 lg:p-10 flex flex-col">
                     <div className="max-w-3xl w-full mx-auto my-auto">
-                        <div className="bg-white dark:bg-transparent space-y-6">
+                        <div className="bg-[#F8F9FD] dark:bg-transparent space-y-6">
                             <Skeleton className="w-32 h-4 mb-4" />
                             <Skeleton className="w-full h-8 mb-6" />
                             <div className="space-y-3">
@@ -335,7 +331,7 @@ const TestPlayer = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -24 }}
                                     transition={{ duration: 0.18, ease: 'easeOut' }}
-                                    className="bg-white dark:bg-transparent"
+                                    className="bg-[#F8F9FD] dark:bg-transparent"
                                 >
                                     {/* Question header */}
                                     <div className="flex items-center justify-between mb-7">

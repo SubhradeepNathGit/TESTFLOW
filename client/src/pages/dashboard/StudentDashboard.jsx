@@ -129,17 +129,17 @@ const StudentDashboard = () => {
     const kpis = [
         {
             label: 'Available Tests', value: tests.length,
-            icon: FiBook, color: 'text-indigo-600', bg: 'bg-indigo-50', ring: 'ring-indigo-100',
+            icon: FiBook, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/30', ring: 'ring-indigo-100 dark:ring-indigo-500/10',
             sub: 'Ready to attempt'
         },
         {
             label: 'Completed', value: completedCount,
-            icon: FiCheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-100',
+            icon: FiCheckCircle, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/30', ring: 'ring-emerald-100 dark:ring-emerald-500/10',
             sub: 'Tests finished'
         },
         {
             label: 'Best Score', value: highestScore,
-            icon: FiAward, color: 'text-amber-600', bg: 'bg-amber-50', ring: 'ring-amber-100',
+            icon: FiAward, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/30', ring: 'ring-amber-100 dark:ring-amber-500/10',
             sub: 'Personal best'
         },
     ];
@@ -157,7 +157,7 @@ const StudentDashboard = () => {
                 >
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700" />
                     <div className="relative z-10 flex items-center gap-6 lg:gap-8">
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-slate-100 shadow-none dark:shadow-none flex items-center justify-center bg-indigo-50 text-indigo-600 text-3xl font-black shrink-0 overflow-hidden relative">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-slate-100 dark:border-white/10 shadow-none dark:shadow-none flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-5xl font-black shrink-0 overflow-hidden relative">
                             {user?.profileImage ? (
                                 <img src={user.profileImage.startsWith('http') ? user.profileImage : `http://localhost:3006/${user.profileImage}`} alt="Profile" className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                             ) : (
@@ -189,7 +189,7 @@ const StudentDashboard = () => {
                             animate="show"
                             className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-5 rounded-[24px] border border-slate-100 dark:border-white/5 shadow-none flex items-center gap-4 group hover:border-indigo-500/30 transition-all duration-300"
                         >
-                            <div className={`p-3.5 ${kpi.bg} ${kpi.color} rounded-2xl ring-4 ${kpi.ring} shrink-0`}>
+                            <div className={`p-3.5 ${kpi.bg} ${kpi.color} rounded-xl ring-4 ${kpi.ring} shrink-0`}>
                                 <kpi.icon size={20} />
                             </div>
                             <div>
