@@ -13,7 +13,7 @@ const StudentManagement = () => {
     const { user } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
-    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const { confirm, ConfirmModal } = useConfirm();
     const socket = useSocket();
 

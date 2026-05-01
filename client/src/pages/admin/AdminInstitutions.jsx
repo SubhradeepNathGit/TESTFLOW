@@ -25,7 +25,7 @@ const AdminInstitutions = () => {
     const { user, loading: authLoading } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
-    const debouncedSearch = useDebounce(search, 400);
+    const debouncedSearch = useDebounce(search, 300);
     const { confirm, ConfirmModal } = useConfirm();
     const socket = useSocket();
 
