@@ -497,8 +497,8 @@ const TestPlayer = () => {
                                                 whileHover={{ y: -2, scale: 1.02 }}
                                                 whileTap={{ y: 2, scale: 0.98, boxShadow: 'none' }}
                                                 onClick={() => setCurrentIdx(idx)}
-                                                className={`w-full aspect-square rounded-xl flex items-center justify-center text-[11px] font-black transition-all relative ${qStatusStyles[status]} ${
-                                                    isCurrent ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-white dark:ring-offset-black !shadow-none' : ''
+                                                className={`w-full aspect-square rounded-xl flex items-center justify-center text-[13px] font-black transition-all relative ${qStatusStyles[status]} ${
+                                                    isCurrent ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-white dark:ring-offset-black !shadow-none' : ''
                                                 }`}
                                             >
                                                 {idx + 1}
