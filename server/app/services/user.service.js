@@ -78,7 +78,6 @@ exports.createStudent = async (institutionId, adminId, { name, email }) => {
         isActive: true,
         isFirstLogin: true,
         createdBy: adminId,
-        joinedAt: new Date(),
     });
 
     emitToInstitution(institutionId, 'userCreated', student);
@@ -161,7 +160,6 @@ exports.createInstructor = async (institutionId, adminId, { name, email }) => {
         isActive: true,
         isFirstLogin: true,
         createdBy: adminId,
-        joinedAt: new Date(),
     });
 
     emitToInstitution(institutionId, 'userCreated', instructor);

@@ -197,7 +197,7 @@ const StudentManagement = () => {
                                             <td className="px-6 py-4 text-sm text-slate-500 font-medium">
                                                 {student.joinedAt
                                                     ? new Date(student.joinedAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })
-                                                    : <span className="text-slate-300 italic">Not yet</span>
+                                                    : <span className="text-slate-400 dark:text-slate-500 italic text-[11px]">Not joined yet</span>
                                                 }
                                             </td>
                                             <td className="px-6 py-4">
