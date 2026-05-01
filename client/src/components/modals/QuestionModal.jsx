@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Save, HelpCircle } from 'lucide-react';
+import { X, Save, Edit, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { addQuestion, updateQuestion } from '../../api/testApi';
 
@@ -81,7 +81,7 @@ const QuestionModal = ({ isOpen, onClose, testId, onSuccess, initialData }) => {
                     <div className="px-8 py-6 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg dark:shadow-none">
-                                <HelpCircle className="w-6 h-6 text-white" />
+                                {initialData ? <Edit className="w-5 h-5 text-white" /> : <Plus className="w-6 h-6 text-white" />}
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
