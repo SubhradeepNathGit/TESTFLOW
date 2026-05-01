@@ -267,7 +267,7 @@ const StudentManagement = () => {
                                 </div>
                                 <p className="text-[13px] text-indigo-700 dark:text-indigo-300 font-medium leading-relaxed">
                                     <strong className="block text-indigo-900 dark:text-indigo-200 font-bold mb-0.5 tracking-tight">Automated Provisioning</strong>
-                                    A secure temporary password and unique Student ID will be automatically generated and privately dispatched to the candidate's email address.
+                                    A secure temporary password and unique Student ID will be generated and privately dispatched to the candidate's email address.
                                 </p>
                             </div>
 
