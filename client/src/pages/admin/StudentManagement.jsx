@@ -7,6 +7,7 @@ import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-quer
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
 import { useConfirm } from '../../hooks/useConfirm';
+import { useSocket } from '../../context/SocketContext';
 
 const StudentManagement = () => {
     const { user } = useContext(AuthContext);
@@ -14,6 +15,7 @@ const StudentManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const { confirm, ConfirmModal } = useConfirm();
+    const socket = useSocket();
 
     useEffect(() => {
         if (!socket) return;
