@@ -145,12 +145,12 @@ const ResultsPage = () => {
                     className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border border-white/[0.06] dark:border-white/[0.08] rounded-[28px] overflow-hidden shadow-xl dark:shadow-none"
                 >
                     {/* Top gradient header */}
-                    <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-8 pb-24 text-center relative overflow-hidden">
-                        <div className="absolute -right-8 -top-8 w-48 h-48 bg-white/5 rounded-full pointer-events-none" />
+                    <div className="bg-gradient-to-br from-indigo-600 via-indigo-800 to-slate-900 p-8 pb-24 text-center relative overflow-hidden">
+                        <div className="absolute -right-8 -top-8 w-48 h-48 bg-white/5 rounded-full pointer-events-none animate-pulse" />
                         <div className="absolute -left-4 -bottom-4 w-28 h-28 bg-white/5 rounded-full pointer-events-none" />
                         <div className="relative z-10">
-                            <p className="text-indigo-200 font-semibold text-sm mb-1 uppercase tracking-widest">Assessment Complete</p>
-                            <h1 className="text-3xl font-black text-white mb-1 px-4 drop-shadow-md">{testTitle}</h1>
+                            <p className="text-indigo-200/80 font-black text-[10px] uppercase tracking-[0.2em] mb-2">Assessment Complete</p>
+                            <h1 className="text-3xl font-black text-white mb-1 px-4 drop-shadow-2xl tracking-tight">{testTitle}</h1>
                         </div>
                     </div>
 
@@ -209,16 +209,16 @@ const ResultsPage = () => {
                     >
                         <button
                             onClick={() => navigate('/student-dashboard')}
-                            className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition-all flex items-center justify-center gap-3 text-sm shadow-md active:scale-95"
+                            className="w-full bg-slate-950 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-widest shadow-xl active:scale-95"
                         >
-                            <FiArrowLeft size={16} />
+                            <FiArrowLeft size={14} />
                             Back to Dashboard
                         </button>
                         <button
                             onClick={() => navigate('/leaderboard')}
-                            className="w-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 font-bold py-3.5 rounded-2xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all flex items-center justify-center gap-3 text-sm active:scale-95"
+                            className="w-full bg-indigo-50 dark:bg-white/[0.05] border border-indigo-100 dark:border-white/[0.08] text-indigo-700 dark:text-indigo-400 font-black py-3.5 rounded-2xl hover:bg-indigo-100 dark:hover:bg-white/[0.1] transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-widest active:scale-95"
                         >
-                            <FiTrendingUp size={16} />
+                            <FiTrendingUp size={14} />
                             View Leaderboard
                         </button>
                         <p className="text-center text-[11px] font-semibold text-slate-400">
