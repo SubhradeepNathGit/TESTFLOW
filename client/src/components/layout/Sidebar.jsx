@@ -61,6 +61,7 @@ const Sidebar = () => {
             { label: 'Manage Instructors', icon: Briefcase, path: '/instructors' },
             { label: 'Manage Students', icon: Users, path: '/students' },
             { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+            { label: 'Archive', icon: Library, path: '/archive' },
             { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
             { label: 'Answer Keys', icon: FileText, path: '/answer-keys' },
         ];
