@@ -45,12 +45,16 @@ const AdminUsers = ({ role }) => {
 
     useEffect(() => {
         if (!socket) return;
+        socket.on("admin:user_created", refresh);
+        socket.on("admin:user_updated", refresh);
         socket.on("admin:user_archived", refresh);
         socket.on("admin:users_archived", refresh); // Bulk archive from institution
         socket.on("admin:user_restored", refresh);
         socket.on("admin:user_deleted", refresh);
         socket.on("admin:user_toggled", refresh);
         return () => {
+            socket.off("admin:user_created", refresh);
+            socket.off("admin:user_updated", refresh);
             socket.off("admin:user_archived", refresh);
             socket.off("admin:users_archived", refresh);
             socket.off("admin:user_restored", refresh);

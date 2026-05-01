@@ -123,14 +123,21 @@ const AnalyticsDashboard = () => {
         const handleUpdate = (data) => {
             if (selectedTest === data?.testId || data?.testId === 'REFRESH') handleTestSelect(selectedTest);
         };
-        const handleArchive = () => queryClient.invalidateQueries({ queryKey: ['analytics-tests'] });
+        const handleRefetchTests = () => queryClient.invalidateQueries({ queryKey: ['analytics-tests'] });
+        
         socket.on('test:attempt_submitted', handleUpdate);
-        socket.on('test:updated', handleUpdate);
-        socket.on('test:archived', handleArchive);
+        socket.on('test:updated', (data) => {
+            handleRefetchTests();
+            handleUpdate(data);
+        });
+        socket.on('test:archived', handleRefetchTests);
+        socket.on('test:published', handleRefetchTests);
+
         return () => {
             socket.off('test:attempt_submitted', handleUpdate);
-            socket.off('test:updated', handleUpdate);
-            socket.off('test:archived', handleArchive);
+            socket.off('test:updated');
+            socket.off('test:archived', handleRefetchTests);
+            socket.off('test:published', handleRefetchTests);
         };
     }, [socket, selectedTest, queryClient]);
 

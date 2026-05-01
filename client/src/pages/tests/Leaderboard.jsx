@@ -251,11 +251,16 @@ const Leaderboard = () => {
 
     const leaderboard = data || [];
 
-    // WebSocket Listener
     useEffect(() => {
         if (!socket) return;
         socket.on('leaderboard:update', refetch);
-        return () => socket.off('leaderboard:update', refetch);
+        socket.on('test:deleted', refetch);
+        socket.on('test:archived', refetch);
+        return () => {
+            socket.off('leaderboard:update', refetch);
+            socket.off('test:deleted', refetch);
+            socket.off('test:archived', refetch);
+        };
     }, [socket, refetch]);
 
     if (loading) return (

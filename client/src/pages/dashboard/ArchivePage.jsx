@@ -55,6 +55,8 @@ const ArchivePage = () => {
 
         socket.on('test:archived', refreshTests);
         socket.on('test:published', refreshTests);
+        socket.on('test:restored', refreshTests);
+        socket.on('test:deleted', refreshTests);
         
         socket.on('answerKey:archived', refreshKeys);
         socket.on('answerKey:restored', refreshKeys);
@@ -64,6 +66,8 @@ const ArchivePage = () => {
         return () => {
             socket.off('test:archived', refreshTests);
             socket.off('test:published', refreshTests);
+            socket.off('test:restored', refreshTests);
+            socket.off('test:deleted', refreshTests);
             socket.off('answerKey:archived', refreshKeys);
             socket.off('answerKey:restored', refreshKeys);
             socket.off('answerKey:deleted', refreshKeys);

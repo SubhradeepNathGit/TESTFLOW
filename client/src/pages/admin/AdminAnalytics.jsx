@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useContext, useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSocket } from '../../context/SocketContext';
 import api from '../../api/axiosInstance';
 import AuthContext from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -116,6 +117,25 @@ const AdminAnalytics = () => {
         queryFn: () => api.get('/admin/analytics').then(r => r.data.data),
         enabled: !authLoading && user?.role === 'super_admin',
     });
+
+    const socket = useSocket();
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (!socket) return;
+        const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-comprehensive-analytics'] });
+        const events = [
+            "admin:institution_created", "admin:institution_updated",
+            "admin:institution_archived", "admin:institution_restored", "admin:institution_deleted",
+            "admin:institution_toggled",
+            "admin:user_created", "admin:user_updated",
+            "admin:user_archived", "admin:users_archived", "admin:user_restored", "admin:user_deleted",
+            "admin:user_toggled",
+            "test:published", "test:archived", "test:restored", "test:deleted", "test:attempt_submitted"
+        ];
+        events.forEach(ev => socket.on(ev, refresh));
+        return () => events.forEach(ev => socket.off(ev, refresh));
+    }, [socket, queryClient]);
 
     /* ─── Loading skeleton ─── */
     if (isLoading) return (

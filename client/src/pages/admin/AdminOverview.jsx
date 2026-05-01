@@ -80,10 +80,13 @@ const AdminOverview = () => {
     useEffect(() => {
         if (!socket) return;
         const events = [
+            "admin:institution_created", "admin:institution_updated",
             "admin:institution_archived", "admin:institution_restored", "admin:institution_deleted",
             "admin:institution_toggled",
-            "admin:user_archived", "admin:user_restored", "admin:user_deleted",
-            "admin:user_toggled"
+            "admin:user_created", "admin:user_updated",
+            "admin:user_archived", "admin:users_archived", "admin:user_restored", "admin:user_deleted",
+            "admin:user_toggled",
+            "test:published", "test:archived", "test:restored", "test:deleted", "test:attempt_submitted"
         ];
         events.forEach(ev => socket.on(ev, refresh));
         return () => events.forEach(ev => socket.off(ev, refresh));
