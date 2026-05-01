@@ -2,23 +2,40 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import AuthContext from "../../context/AuthContext";
-import { Eye, EyeOff, ChevronDown, Check, ShieldCheck, Users } from "lucide-react";
+import { Eye, EyeOff, ChevronDown, Check, ShieldCheck, Users, X } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
+
+const passwordRules = [
+    { id: 'len',     label: 'At least 8 characters',       test: (v) => v.length >= 8 },
+    { id: 'upper',  label: '1 uppercase letter (A–Z)',     test: (v) => /[A-Z]/.test(v) },
+    { id: 'lower',  label: '1 lowercase letter (a–z)',     test: (v) => /[a-z]/.test(v) },
+    { id: 'digit',  label: '1 number (0–9)',               test: (v) => /[0-9]/.test(v) },
+    { id: 'special',label: '1 special character (!@#$…)',  test: (v) => /[^A-Za-z0-9]/.test(v) },
+];
+
+const getStrength = (val) => passwordRules.filter(r => r.test(val)).length;
+const strengthColors = ['bg-red-500','bg-red-400','bg-orange-400','bg-amber-400','bg-emerald-500'];
+const strengthLabels = ['Very Weak','Weak','Fair','Good','Strong'];
 
 const Register = () => {
     const { register: registerUser } = useContext(AuthContext);
     const [showPassword, setShowPassword] = useState(false);
     const [isRoleOpen, setIsRoleOpen] = useState(false);
+    const [passwordFocused, setPasswordFocused] = useState(false);
 
     const {
         register,
         handleSubmit,
         setValue,
         control,
+        watch,
         formState: { errors, isSubmitting },
     } = useForm({
         defaultValues: { role: "owner" }
     });
+
+    const passwordValue = watch("password", "");
+    const strength = getStrength(passwordValue);
 
     const navigate = useNavigate();
     const currentRole = useWatch({ control, name: "role", defaultValue: "owner" });
@@ -136,8 +153,17 @@ const Register = () => {
                                     type={showPassword ? "text" : "password"}
                                     {...register("password", {
                                         required: "Password is required",
-                                        minLength: { value: 6, message: "Password must be at least 6 characters" }
+                                        validate: (val) => {
+                                            if (val.length < 8) return "At least 8 characters required";
+                                            if (!/[A-Z]/.test(val)) return "Must contain an uppercase letter";
+                                            if (!/[a-z]/.test(val)) return "Must contain a lowercase letter";
+                                            if (!/[0-9]/.test(val)) return "Must contain a number";
+                                            if (!/[^A-Za-z0-9]/.test(val)) return "Must contain a special character";
+                                            return true;
+                                        }
                                     })}
+                                    onFocus={() => setPasswordFocused(true)}
+                                    onBlur={() => setPasswordFocused(false)}
                                     className={`w-full px-4 py-3 bg-slate-50 dark:bg-white/[0.03] border rounded-xl focus:ring-4 focus:ring-slate-900/10 dark:focus:ring-white/10 focus:border-slate-900 dark:focus:border-white/20 transition-all outline-none text-slate-900 dark:text-slate-100 text-sm font-medium placeholder-slate-400 shadow-sm ${errors.password ? 'border-red-500' : 'border-slate-200 dark:border-white/[0.06] hover:border-slate-300'}`}
                                     placeholder="••••••••"
                                 />
@@ -149,6 +175,44 @@ const Register = () => {
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
+
+                            {/* Strength bar */}
+                            {passwordValue.length > 0 && (
+                                <div className="mt-2.5 space-y-2">
+                                    <div className="flex gap-1">
+                                        {[0,1,2,3,4].map(i => (
+                                            <div key={i} className="flex-1 h-1 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
+                                                <div
+                                                    className={`h-full rounded-full transition-all duration-300 ${i < strength ? strengthColors[strength - 1] : ''}`}
+                                                    style={{ width: i < strength ? '100%' : '0%' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className={`text-[11px] font-bold ${strengthColors[strength-1]?.replace('bg-','text-') || 'text-slate-400'}`}>
+                                        {passwordValue.length > 0 ? strengthLabels[strength - 1] || 'Very Weak' : ''}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Live checklist */}
+                            {(passwordFocused || passwordValue.length > 0) && (
+                                <ul className="mt-2 space-y-1">
+                                    {passwordRules.map(rule => {
+                                        const passed = rule.test(passwordValue);
+                                        return (
+                                            <li key={rule.id} className={`flex items-center gap-2 text-[11px] font-semibold transition-colors ${passed ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                                                {passed
+                                                    ? <Check size={11} className="shrink-0" />
+                                                    : <X size={11} className="shrink-0" />
+                                                }
+                                                {rule.label}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+
                             {errors.password && <p className="mt-1.5 text-xs font-bold text-red-500">{errors.password.message}</p>}
                         </div>
                     </div>
