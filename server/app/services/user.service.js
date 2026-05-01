@@ -38,7 +38,7 @@ exports.updatePassword = async (userId, currentPassword, newPassword) => {
  * Get all students in an institution (for admin/instructor)
  */
 exports.getStudents = async (institutionId, search = "") => {
-    const query = { institutionId: institutionId?.toString(), role: "student" };
+    const query = { institutionId: institutionId?.toString(), role: "student", isArchived: { $ne: true } };
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
@@ -102,16 +102,20 @@ exports.toggleStudentStatus = async (studentId, institutionId) => {
 exports.deleteStudent = async (studentId, institutionId) => {
     const student = await User.findOne({ _id: studentId, institutionId, role: "student" });
     if (!student) throw new ErrorResponse("Student not found", 404);
-    if (student.isActive) throw new ErrorResponse("Cannot delete an active student. Deactivate first.", 400);
-    await User.findByIdAndDelete(studentId);
-    return { message: "Student removed successfully" };
+    if (student.isActive) throw new ErrorResponse("Cannot archive an active student. Deactivate first.", 400);
+    
+    student.isArchived = true;
+    student.isActive = false;
+    await student.save();
+    
+    return { message: "Student moved to archive successfully" };
 };
 
 /**
  * Get all instructors in an institution and their published tests/questions overview
  */
 exports.getInstructorsOverview = async (institutionId, search = "") => {
-    const query = { institutionId: institutionId?.toString(), role: "instructor" };
+    const query = { institutionId: institutionId?.toString(), role: "instructor", isArchived: { $ne: true } };
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
@@ -184,9 +188,11 @@ exports.toggleInstructorStatus = async (instructorId, institutionId) => {
 exports.deleteInstructor = async (instructorId, institutionId) => {
     const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor" });
     if (!instructor) throw new ErrorResponse("Instructor not found", 404);
-    if (instructor.isActive) throw new ErrorResponse("Cannot delete an active instructor. Deactivate first.", 400);
+    if (instructor.isActive) throw new ErrorResponse("Cannot archive an active instructor. Deactivate first.", 400);
     
-    // Check if they have active dependencies? Allow delete but keep data? For simplicity, just delete user document.
-    await User.findByIdAndDelete(instructorId);
-    return { message: "Instructor removed successfully" };
+    instructor.isArchived = true;
+    instructor.isActive = false;
+    await instructor.save();
+    
+    return { message: "Instructor moved to archive successfully" };
 };

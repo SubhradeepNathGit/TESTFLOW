@@ -6,14 +6,14 @@ import api from '../../api/axiosInstance';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
-import { useSocket } from '../../context/SocketContext';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const StudentManagement = () => {
     const { user } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
-    const socket = useSocket();
+    const { confirm, ConfirmModal } = useConfirm();
 
     useEffect(() => {
         if (!socket) return;
@@ -69,14 +69,21 @@ const StudentManagement = () => {
         }
     };
 
-    const handleDelete = async (studentId) => {
-        if (!window.confirm('Permanently delete this student? This cannot be undone.')) return;
-        try {
-            await api.delete(`/users/students/${studentId}`);
-            toast.success('Student removed');
-            queryClient.invalidateQueries({ queryKey: ['students'] });
-        } catch {
-            toast.error('Failed to delete student');
+    const handleDelete = async (studentId, studentName) => {
+        const ok = await confirm({
+            title: 'Archive Student',
+            message: `Are you sure you want to move "${studentName}" to the archive? Their profile will be hidden but can be restored by a Super Admin.`,
+            confirmText: 'Archive'
+        });
+
+        if (ok) {
+            try {
+                await api.delete(`/users/students/${studentId}`);
+                toast.success('Student moved to archive');
+                queryClient.invalidateQueries({ queryKey: ['students'] });
+            } catch (err) {
+                toast.error(err.response?.data?.message || 'Failed to archive student');
+            }
         }
     };
 
@@ -204,8 +211,9 @@ const StudentManagement = () => {
                                                 <div className="flex items-center gap-2">
                                                     {!student.isActive && user?.role === 'owner' && (
                                                         <button
-                                                            onClick={() => handleDelete(student._id)}
-                                                            className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-xl transition-colors"
+                                                            onClick={() => handleDelete(student._id, student.name)}
+                                                            className="p-2.5 bg-red-50/50 dark:bg-red-900/20 text-red-500 hover:text-red-600 border border-red-100/50 dark:border-red-500/10 rounded-xl transition-all active:scale-90"
+                                                            title="Move to Archive"
                                                         >
                                                             <Trash2 size={14} />
                                                         </button>
@@ -289,6 +297,7 @@ const StudentManagement = () => {
                     </div>
                 </div>
             )}
+            <ConfirmModal />
         </div>
     );
 };
