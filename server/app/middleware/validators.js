@@ -36,7 +36,11 @@ exports.registerValidation = [
     body("password")
         .isString().withMessage("Password must be a string")
         .notEmpty().withMessage("Password is required")
-        .isLength({ min: 6, max: 128 }).withMessage("Password must be between 6 and 128 characters long"),
+        .isLength({ min: 8, max: 128 }).withMessage("Password must be at least 8 characters long")
+        .matches(/[A-Z]/).withMessage("Password must contain at least one uppercase letter")
+        .matches(/[a-z]/).withMessage("Password must contain at least one lowercase letter")
+        .matches(/[0-9]/).withMessage("Password must contain at least one number")
+        .matches(/[^A-Za-z0-9]/).withMessage("Password must contain at least one special character"),
     validate,
 ];
 
@@ -68,7 +72,11 @@ exports.resetPasswordValidation = [
     body("password")
         .isString().withMessage("Password must be a string")
         .notEmpty().withMessage("Password is required")
-        .isLength({ min: 6, max: 128 }).withMessage("Password must be between 6 and 128 characters long"),
+        .isLength({ min: 8, max: 128 }).withMessage("Password must be at least 8 characters long")
+        .matches(/[A-Z]/).withMessage("Password must contain at least one uppercase letter")
+        .matches(/[a-z]/).withMessage("Password must contain at least one lowercase letter")
+        .matches(/[0-9]/).withMessage("Password must contain at least one number")
+        .matches(/[^A-Za-z0-9]/).withMessage("Password must contain at least one special character"),
     validate,
 ];
 
@@ -80,6 +88,10 @@ exports.updatePasswordValidation = [
     body("newPassword")
         .isString().withMessage("New password must be a string")
         .notEmpty().withMessage("New password is required")
-        .isLength({ min: 6, max: 128 }).withMessage("New password must be between 6 and 128 characters long"),
+        .isLength({ min: 8, max: 128 }).withMessage("New password must be at least 8 characters long")
+        .matches(/[A-Z]/).withMessage("New password must contain at least one uppercase letter")
+        .matches(/[a-z]/).withMessage("New password must contain at least one lowercase letter")
+        .matches(/[0-9]/).withMessage("New password must contain at least one number")
+        .matches(/[^A-Za-z0-9]/).withMessage("New password must contain at least one special character"),
     validate,
 ];
