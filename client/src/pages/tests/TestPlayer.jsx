@@ -260,11 +260,11 @@ const TestPlayer = () => {
     };
 
     const qStatusStyles = {
-        'answered':        'bg-emerald-500 text-white shadow-[0_4px_0_0_#059669] border-t border-white/20',
-        'marked':          'bg-amber-400 text-white shadow-[0_4px_0_0_#b45309] border-t border-white/20',
-        'marked-answered': 'bg-violet-600 text-white shadow-[0_4px_0_0_#4c1d95] border-t border-white/20',
-        'visited':         'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 shadow-[0_4px_0_0_rgba(0,0,0,0.08)]',
-        'not-visited':     'bg-slate-100 dark:bg-white/5 text-slate-400 shadow-[0_4px_0_0_rgba(0,0,0,0.08)] border border-transparent',
+        'answered':        'bg-emerald-500 text-white shadow-sm dark:shadow-none',
+        'marked':          'bg-amber-400 text-white shadow-sm dark:shadow-none',
+        'marked-answered': 'bg-violet-600 text-white shadow-sm dark:shadow-none',
+        'visited':         'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800',
+        'not-visited':     'bg-slate-100 dark:bg-white/5 text-slate-400 border border-transparent',
     };
 
     return (
@@ -487,18 +487,18 @@ const TestPlayer = () => {
                                 </div>
 
                                 {/* Grid */}
-                                <div className="grid grid-cols-5 gap-2 max-h-[48vh] overflow-y-auto no-scrollbar p-1.5">
+                                <div className="grid grid-cols-5 gap-3 max-h-[48vh] overflow-y-auto no-scrollbar p-1.5">
                                     {questions.map((q, idx) => {
                                         const status = getQStatus(q, idx);
                                         const isCurrent = currentIdx === idx;
                                         return (
                                             <motion.button
                                                 key={idx}
-                                                whileHover={{ y: -2, scale: 1.02 }}
-                                                whileTap={{ y: 2, scale: 0.98, boxShadow: 'none' }}
+                                                whileHover={{ scale: 1.1, zIndex: 10 }}
+                                                whileTap={{ scale: 0.9 }}
                                                 onClick={() => setCurrentIdx(idx)}
                                                 className={`w-full aspect-square rounded-xl flex items-center justify-center text-[13px] font-black transition-all relative ${qStatusStyles[status]} ${
-                                                    isCurrent ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-white dark:ring-offset-black !shadow-none' : ''
+                                                    isCurrent ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-white dark:ring-offset-black' : ''
                                                 }`}
                                             >
                                                 {idx + 1}
