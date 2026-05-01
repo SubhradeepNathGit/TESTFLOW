@@ -167,7 +167,7 @@ const StudentManagement = () => {
                                         <tr key={student._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-black text-sm">
+                                                    <div className="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-black text-sm">
                                                         {student.name?.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
