@@ -17,20 +17,18 @@ const InstructorManagement = () => {
 
     useEffect(() => {
         if (!socket) return;
-
-        const handleUpdate = (data) => {
-            // Only refetch if it's an instructor
-            if (data?.role === 'instructor') {
-                queryClient.invalidateQueries({ queryKey: ['instructors'] });
-            }
-        };
-
-        socket.on('userCreated', handleUpdate);
-        socket.on('userVerified', handleUpdate);
+        const refresh = () => queryClient.invalidateQueries({ queryKey: ['instructors'] });
+        
+        socket.on('admin:user_created', (data) => data?.role === 'instructor' && refresh());
+        socket.on('admin:user_updated', (data) => data?.role === 'instructor' && refresh());
+        socket.on('admin:user_toggled', (data) => data?.role === 'instructor' && refresh());
+        socket.on('admin:user_deleted', (data) => data?.role === 'instructor' && refresh());
 
         return () => {
-            socket.off('userCreated', handleUpdate);
-            socket.off('userVerified', handleUpdate);
+            socket.off('admin:user_created');
+            socket.off('admin:user_updated');
+            socket.off('admin:user_toggled');
+            socket.off('admin:user_deleted');
         };
     }, [socket, queryClient]);
 

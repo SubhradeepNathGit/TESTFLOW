@@ -29,6 +29,9 @@ class TestController {
                 message: "Test created and PDF parsed successfully",
                 data: result
             });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "test:created", result);
         } catch (err) {
             next(err);
         }
@@ -153,6 +156,9 @@ class TestController {
                 message: "Test created successfully",
                 data: test
             });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "test:created", test);
         } catch (err) {
             next(err);
         }
@@ -180,6 +186,9 @@ class TestController {
                 message: "Question added successfully",
                 data: question
             });
+
+            // Emit update to inform that test content changed
+            emitToInstitution(req.user.institutionId, "test:updated", { testId: req.params.id, reason: "QUESTION_ADDED" });
         } catch (err) {
             next(err);
         }
@@ -230,6 +239,9 @@ class TestController {
                 success: true,
                 message: "Test restored successfully"
             });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "test:restored", { testId: req.params.id });
         } catch (err) { next(err); }
     }
 
@@ -245,6 +257,9 @@ class TestController {
                 success: true,
                 message: "Test permanently deleted"
             });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "test:deleted", { testId: req.params.id });
         } catch (err) { next(err); }
     }
 

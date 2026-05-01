@@ -17,20 +17,18 @@ const StudentManagement = () => {
 
     useEffect(() => {
         if (!socket) return;
-
-        const handleUpdate = (data) => {
-            // Only refetch if it's a student
-            if (data?.role === 'student') {
-                queryClient.invalidateQueries({ queryKey: ['students'] });
-            }
-        };
-
-        socket.on('userCreated', handleUpdate);
-        socket.on('userVerified', handleUpdate);
+        const refresh = () => queryClient.invalidateQueries({ queryKey: ['students'] });
+        
+        socket.on('admin:user_created', (data) => data?.role === 'student' && refresh());
+        socket.on('admin:user_updated', (data) => data?.role === 'student' && refresh());
+        socket.on('admin:user_toggled', (data) => data?.role === 'student' && refresh());
+        socket.on('admin:user_deleted', (data) => data?.role === 'student' && refresh());
 
         return () => {
-            socket.off('userCreated', handleUpdate);
-            socket.off('userVerified', handleUpdate);
+            socket.off('admin:user_created');
+            socket.off('admin:user_updated');
+            socket.off('admin:user_toggled');
+            socket.off('admin:user_deleted');
         };
     }, [socket, queryClient]);
     const [showAddModal, setShowAddModal] = useState(false);

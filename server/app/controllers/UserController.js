@@ -1,6 +1,7 @@
 const userService = require("../services/user.service");
 const sendEmail = require("../utils/sendEmail");
 const { statusCodes } = require("../helper/statusCode");
+const { emitToInstitution } = require("../utils/socket");
 
 class UserController {
     /** GET /api/users/profile */
@@ -39,6 +40,11 @@ class UserController {
             }
             const user = await userService.updateUserProfile(req.user.id, fields);
             res.status(statusCodes.OK).json({ status: true, success: true, data: user });
+
+            // Emit update to institution if part of one
+            if (user.institutionId) {
+                emitToInstitution(user.institutionId, "admin:user_updated", { userId: user._id, role: user.role });
+            }
         } catch (err) { next(err); }
     }
 
@@ -93,6 +99,9 @@ class UserController {
                 message: `Student added! Credentials sent to ${student.email}`,
                 data: { name: student.name, email: student.email, studentId }
             });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "admin:user_created", { role: "student" });
         } catch (err) { next(err); }
     }
 
@@ -101,6 +110,9 @@ class UserController {
         try {
             const student = await userService.toggleStudentStatus(req.params.id, req.user.institutionId);
             res.status(statusCodes.OK).json({ status: true, success: true, message: `Student ${student.isActive ? 'activated' : 'deactivated'}`, data: student });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "admin:user_toggled", { userId: student._id, role: "student", isActive: student.isActive });
         } catch (err) { next(err); }
     }
 
@@ -109,6 +121,9 @@ class UserController {
         try {
             const result = await userService.deleteStudent(req.params.id, req.user.institutionId);
             res.status(statusCodes.OK).json({ status: true, success: true, message: result.message });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "admin:user_deleted", { userId: req.params.id, role: "student" });
         } catch (err) { next(err); }
     }
 
@@ -154,6 +169,9 @@ class UserController {
                 message: `Instructor added! Credentials sent to ${instructor.email}`,
                 data: { name: instructor.name, email: instructor.email, instructorId }
             });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "admin:user_created", { role: "instructor" });
         } catch (err) { next(err); }
     }
 
@@ -162,6 +180,9 @@ class UserController {
         try {
             const instructor = await userService.toggleInstructorStatus(req.params.id, req.user.institutionId);
             res.status(statusCodes.OK).json({ status: true, success: true, message: `Instructor ${instructor.isActive ? 'activated' : 'deactivated'}`, data: instructor });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "admin:user_toggled", { userId: instructor._id, role: "instructor", isActive: instructor.isActive });
         } catch (err) { next(err); }
     }
 
@@ -170,6 +191,9 @@ class UserController {
         try {
             const result = await userService.deleteInstructor(req.params.id, req.user.institutionId);
             res.status(statusCodes.OK).json({ status: true, success: true, message: result.message });
+
+            // Emit real-time update
+            emitToInstitution(req.user.institutionId, "admin:user_deleted", { userId: req.params.id, role: "instructor" });
         } catch (err) { next(err); }
     }
 }

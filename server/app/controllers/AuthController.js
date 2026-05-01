@@ -120,6 +120,7 @@ class AuthController {
     verifyEmail = async (req, res, next) => {
         try {
             const { email, otp } = req.body;
+            const user = await User.findOne({ email }); // Get user for role/institution info
             await authService.verifyEmail(email, otp);
 
             res.status(statusCodes.OK).json({
@@ -127,6 +128,15 @@ class AuthController {
                 success: true,
                 data: "Email verified successfully. Please login."
             });
+
+            // Emit real-time update
+            if (user) {
+                const { emitToInstitution } = require("../utils/socket");
+                if (user.role === 'owner') {
+                    emitToInstitution(null, "admin:institution_created", { name: user.name });
+                }
+                emitToInstitution(user.institutionId, "admin:user_created", { role: user.role });
+            }
         } catch (err) {
             next(err);
         }
