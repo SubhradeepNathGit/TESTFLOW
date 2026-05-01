@@ -316,7 +316,12 @@ const InstructorDashboard = () => {
 
                                 <button type="submit" disabled={isUploading}
                                     className="w-full bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-black font-black py-4 rounded-2xl transition-all shadow-none dark:shadow-none flex items-center justify-center gap-2 mt-2">
-                                    {isUploading ? 'Processing...' : (
+                                    {isUploading ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-slate-400 dark:border-slate-900 border-t-white dark:border-t-black rounded-full animate-spin" />
+                                            Processing
+                                        </>
+                                    ) : (
                                         creationMode === 'pdf' ? <><FiUploadCloud size={18} /> GENERATE FROM PDF</> : <><FiUploadCloud size={18}/> INITIALIZE TEST</>
                                     )}
                                 </button>
