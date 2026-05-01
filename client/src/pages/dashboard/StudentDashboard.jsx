@@ -271,14 +271,14 @@ const StudentDashboard = () => {
                                             disabled={isDone}
                                             onClick={(e) => { e.stopPropagation(); if (!isDone) navigate(`/test/${test._id}`); }}
                                             className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs shrink-0 active:scale-95 ${isDone
-                                                    ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                                                    ? 'bg-slate-50 dark:bg-white/[0.03] backdrop-blur-md text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/[0.06] cursor-default'
                                                     : isInProgress
-                                                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-md'
-                                                        : 'bg-slate-900 text-white hover:bg-indigo-600 shadow-md'
+                                                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-md shadow-amber-500/20'
+                                                        : 'bg-slate-900 dark:bg-indigo-600 text-white hover:bg-indigo-600 dark:hover:bg-indigo-700 shadow-md shadow-indigo-500/20'
                                                 }`}
                                         >
                                             {isDone
-                                                ? <><FiLock size={11} /> Done</>
+                                                ? <><FiCheckCircle size={12} /> Submitted</>
                                                 : isInProgress
                                                     ? <><FiClock size={11} /> Resume</>
                                                     : <><FiLogIn size={11} /> Start</>
