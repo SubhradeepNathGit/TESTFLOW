@@ -65,17 +65,23 @@ const StudentDashboard = () => {
             refetchAttempts();
         };
 
+        socket.on('test:created', handleUpdate);
         socket.on('test:published', handleUpdate);
         socket.on('test:updated', handleUpdate);
         socket.on('test:archived', handleUpdate);
+        socket.on('test:restored', handleUpdate);
+        socket.on('test:deleted', handleUpdate);
         socket.on('test:attempt_reset', handleUpdate);
         socket.on('test:attempt_submitted', handleUpdate);
         socket.on('leaderboard:update', handleUpdate);
 
         return () => {
+            socket.off('test:created', handleUpdate);
             socket.off('test:published', handleUpdate);
             socket.off('test:updated', handleUpdate);
             socket.off('test:archived', handleUpdate);
+            socket.off('test:restored', handleUpdate);
+            socket.off('test:deleted', handleUpdate);
             socket.off('test:attempt_reset', handleUpdate);
             socket.off('test:attempt_submitted', handleUpdate);
             socket.off('leaderboard:update', handleUpdate);

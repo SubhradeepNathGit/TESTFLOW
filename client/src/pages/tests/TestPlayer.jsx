@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { saveAnswer, submitAttempt, startAttempt } from '../../api/attemptApi';
 import { getTest } from '../../api/testApi';
 import Skeleton, { CardSkeleton } from '../../components/common/Skeleton';
+import { useSocket } from '../../context/SocketContext';
 
 // Submit confirmation modal
 const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total }) => {
@@ -108,6 +109,7 @@ const TestPlayer = () => {
     const [attemptId, setAttemptId] = useState(null);
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const socket = useSocket();
 
 
     const fetchTestData = async () => {
@@ -182,6 +184,31 @@ const TestPlayer = () => {
     // Fetch test data on mount
     useEffect(() => {
         fetchTestData();
+
+        if (socket) {
+            const handleReset = (data) => {
+                if (data.attemptId === attemptId) {
+                    toast.error('This attempt has been reset by the instructor.');
+                    navigate('/student-dashboard');
+                }
+            };
+
+            const handleArchive = (data) => {
+                if (data.testId === id) {
+                    toast.error('This assessment is no longer available.');
+                    navigate('/student-dashboard');
+                }
+            };
+
+            socket.on('test:attempt_reset', handleReset);
+            socket.on('test:archived', handleArchive);
+
+            return () => {
+                socket.off('test:attempt_reset', handleReset);
+                socket.off('test:archived', handleArchive);
+            };
+        }
+
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 toast.warning('Warning: Do not switch tabs during the exam.', { toastId: 'tab-switch' });
@@ -190,7 +217,7 @@ const TestPlayer = () => {
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+    }, [id, socket, attemptId]);
 
     // Mark current question as visited
     useEffect(() => {
