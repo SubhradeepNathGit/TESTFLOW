@@ -127,6 +127,31 @@ class UserController {
         } catch (err) { next(err); }
     }
 
+    /** GET /api/users/students/archived */
+    async getArchivedStudents(req, res, next) {
+        try {
+            const students = await userService.getArchivedStudents(req.user.institutionId);
+            res.status(statusCodes.OK).json({ status: true, success: true, data: students });
+        } catch (err) { next(err); }
+    }
+
+    /** PATCH /api/users/students/:id/restore */
+    async restoreStudent(req, res, next) {
+        try {
+            const result = await userService.restoreStudent(req.params.id, req.user.institutionId);
+            res.status(statusCodes.OK).json({ status: true, success: true, message: result.message });
+            emitToInstitution(req.user.institutionId, "admin:user_created", { role: "student" });
+        } catch (err) { next(err); }
+    }
+
+    /** DELETE /api/users/students/:id/permanent */
+    async permanentDeleteStudent(req, res, next) {
+        try {
+            const result = await userService.permanentDeleteStudent(req.params.id, req.user.institutionId);
+            res.status(statusCodes.OK).json({ status: true, success: true, message: result.message });
+        } catch (err) { next(err); }
+    }
+
     /** GET /api/users/instructors - Institution Admin */
     async getInstructors(req, res, next) {
         try {
@@ -194,6 +219,31 @@ class UserController {
 
             // Emit real-time update
             emitToInstitution(req.user.institutionId, "admin:user_deleted", { userId: req.params.id, role: "instructor" });
+        } catch (err) { next(err); }
+    }
+
+    /** GET /api/users/instructors/archived */
+    async getArchivedInstructors(req, res, next) {
+        try {
+            const instructors = await userService.getArchivedInstructors(req.user.institutionId);
+            res.status(statusCodes.OK).json({ status: true, success: true, data: instructors });
+        } catch (err) { next(err); }
+    }
+
+    /** PATCH /api/users/instructors/:id/restore */
+    async restoreInstructor(req, res, next) {
+        try {
+            const result = await userService.restoreInstructor(req.params.id, req.user.institutionId);
+            res.status(statusCodes.OK).json({ status: true, success: true, message: result.message });
+            emitToInstitution(req.user.institutionId, "admin:user_created", { role: "instructor" });
+        } catch (err) { next(err); }
+    }
+
+    /** DELETE /api/users/instructors/:id/permanent */
+    async permanentDeleteInstructor(req, res, next) {
+        try {
+            const result = await userService.permanentDeleteInstructor(req.params.id, req.user.institutionId);
+            res.status(statusCodes.OK).json({ status: true, success: true, message: result.message });
         } catch (err) { next(err); }
     }
 }

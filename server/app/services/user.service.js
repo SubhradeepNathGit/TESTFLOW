@@ -99,6 +99,9 @@ exports.toggleStudentStatus = async (studentId, institutionId) => {
 /**
  * Delete an inactive student
  */
+/**
+ * Delete an inactive student (Move to archive)
+ */
 exports.deleteStudent = async (studentId, institutionId) => {
     const student = await User.findOne({ _id: studentId, institutionId, role: "student" });
     if (!student) throw new ErrorResponse("Student not found", 404);
@@ -109,6 +112,43 @@ exports.deleteStudent = async (studentId, institutionId) => {
     await student.save();
     
     return { message: "Student moved to archive successfully" };
+};
+
+/**
+ * Get all archived students
+ */
+exports.getArchivedStudents = async (institutionId) => {
+    return await User.find({ institutionId, role: "student", isArchived: true })
+        .select("-password -refreshToken -otp -otpExpire")
+        .sort({ updatedAt: -1 });
+};
+
+/**
+ * Restore an archived student
+ */
+exports.restoreStudent = async (studentId, institutionId) => {
+    const student = await User.findOne({ _id: studentId, institutionId, role: "student", isArchived: true });
+    if (!student) throw new ErrorResponse("Archived student not found", 404);
+    
+    student.isArchived = false;
+    student.isActive = true;
+    await student.save();
+    
+    return { message: "Student restored successfully" };
+};
+
+/**
+ * Permanently delete a student
+ */
+exports.permanentDeleteStudent = async (studentId, institutionId) => {
+    const student = await User.findOne({ _id: studentId, institutionId, role: "student", isArchived: true });
+    if (!student) throw new ErrorResponse("Archived student not found", 404);
+    
+    // Cleanup attempts
+    await require("../models/Attempt").deleteMany({ studentId });
+    await student.deleteOne();
+    
+    return { message: "Student and their data permanently removed" };
 };
 
 /**
@@ -195,4 +235,41 @@ exports.deleteInstructor = async (instructorId, institutionId) => {
     await instructor.save();
     
     return { message: "Instructor moved to archive successfully" };
+};
+
+/**
+ * Get all archived instructors
+ */
+exports.getArchivedInstructors = async (institutionId) => {
+    return await User.find({ institutionId, role: "instructor", isArchived: true })
+        .select("-password -refreshToken -otp -otpExpire")
+        .sort({ updatedAt: -1 });
+};
+
+/**
+ * Restore an archived instructor
+ */
+exports.restoreInstructor = async (instructorId, institutionId) => {
+    const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor", isArchived: true });
+    if (!instructor) throw new ErrorResponse("Archived instructor not found", 404);
+    
+    instructor.isArchived = false;
+    instructor.isActive = true;
+    await instructor.save();
+    
+    return { message: "Instructor restored successfully" };
+};
+
+/**
+ * Permanently delete an instructor
+ */
+exports.permanentDeleteInstructor = async (instructorId, institutionId) => {
+    const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor", isArchived: true });
+    if (!instructor) throw new ErrorResponse("Archived instructor not found", 404);
+    
+    // Delete tests they created (or reassign? for now cascade delete)
+    // await require("../models/Test").deleteMany({ createdBy: instructorId });
+    await instructor.deleteOne();
+    
+    return { message: "Instructor permanently removed" };
 };

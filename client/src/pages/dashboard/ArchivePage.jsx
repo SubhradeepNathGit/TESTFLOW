@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
-import { getArchivedTests, restoreTest, permanentDeleteTest } from '../../api/testApi';
-import { getArchivedAnswerKeys, restoreAnswerKey, permanentDeleteAnswerKey } from '../../api/answerKeyApi';
-import { FiRotateCcw, FiTrash2, FiInbox, FiClock, FiFileText, FiBookmark, FiKey } from 'react-icons/fi';
-import ConfirmationModal from '../../components/modals/ConfirmationModal';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CardSkeleton } from '../../components/common/Skeleton';
 import { useSocket } from '../../context/SocketContext';
+import AuthContext from '../../context/AuthContext';
+import { useContext } from 'react';
+import { FiUser, FiBriefcase, FiTrash2, FiRotateCcw, FiInbox, FiClock, FiFileText, FiBookmark, FiKey } from 'react-icons/fi';
+import api from '../../api/axiosInstance';
 
 const cardVariants = {
     hidden: { opacity: 0, y: 16 },
@@ -15,9 +10,11 @@ const cardVariants = {
 };
 
 const ArchivePage = () => {
+    const { user } = useContext(AuthContext);
     const queryClient = useQueryClient();
     const socket = useSocket();
-    const [activeTab, setActiveTab] = useState('tests'); // 'tests' or 'keys'
+    const [activeTab, setActiveTab] = useState('tests'); // 'tests', 'keys', 'students', 'instructors'
+    const isAdmin = user?.role === 'owner';
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         title: '',
@@ -38,6 +35,18 @@ const ArchivePage = () => {
         queryKey: ['archived-keys'],
         queryFn: () => getArchivedAnswerKeys().then(r => r.data.data),
         onError: () => toast.error("Failed to fetch archived answer keys"),
+    });
+
+    const { data: archivedStudents = [], isLoading: loadingStudents } = useQuery({
+        queryKey: ['archived-students'],
+        queryFn: () => api.get('/users/students/archived').then(r => r.data.data),
+        enabled: isAdmin,
+    });
+
+    const { data: archivedInstructors = [], isLoading: loadingInstructors } = useQuery({
+        queryKey: ['archived-instructors'],
+        queryFn: () => api.get('/users/instructors/archived').then(r => r.data.data),
+        enabled: isAdmin,
     });
 
     useEffect(() => {
@@ -129,8 +138,53 @@ const ArchivePage = () => {
         });
     };
 
-    const loading = activeTab === 'tests' ? loadingTests : loadingKeys;
-    const currentItems = activeTab === 'tests' ? archivedTests : archivedKeys;
+    const handleRestoreUser = async (id, role) => {
+        try {
+            const type = role === 'student' ? 'students' : 'instructors';
+            await api.patch(`/users/${type}/${id}/restore`);
+            toast.success(`${role.charAt(0).toUpperCase() + role.slice(1)} restored successfully`);
+            queryClient.invalidateQueries({ queryKey: [`archived-${role}s`] });
+            queryClient.invalidateQueries({ queryKey: [`${role}s`] });
+        } catch { toast.error("Failed to restore user"); }
+    };
+
+    const handlePermanentDeleteUser = (id, role, name) => {
+        setConfirmModal({
+            isOpen: true,
+            title: `Permanent Delete ${role}`,
+            message: `CRITICAL: This will permanently remove "${name}" and all their associated data from the system. This cannot be undone. Proceed?`,
+            confirmText: "Delete Permanently",
+            type: "danger",
+            onConfirm: async () => {
+                setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                try {
+                    const type = role === 'student' ? 'students' : 'instructors';
+                    await api.delete(`/users/${type}/${id}/permanent`);
+                    toast.success("User permanently deleted");
+                    queryClient.invalidateQueries({ queryKey: [`archived-${role}s`] });
+                } catch { toast.error("Failed to delete user"); }
+            }
+        });
+    };
+
+    const getLoadingState = () => {
+        if (activeTab === 'tests') return loadingTests;
+        if (activeTab === 'keys') return loadingKeys;
+        if (activeTab === 'students') return loadingStudents;
+        if (activeTab === 'instructors') return loadingInstructors;
+        return false;
+    };
+
+    const getCurrentItems = () => {
+        if (activeTab === 'tests') return archivedTests;
+        if (activeTab === 'keys') return archivedKeys;
+        if (activeTab === 'students') return archivedStudents;
+        if (activeTab === 'instructors') return archivedInstructors;
+        return [];
+    };
+
+    const loading = getLoadingState();
+    const currentItems = getCurrentItems();
 
     return (
         <div className="min-h-screen bg-[#FDFDFD] dark:bg-black p-4 sm:p-6 lg:p-10 transition-colors duration-500">
@@ -166,11 +220,27 @@ const ArchivePage = () => {
                         >
                             <FiKey size={14} /> Answer Keys ({archivedKeys.length})
                         </button>
+                        {isAdmin && (
+                            <>
+                                <button 
+                                    onClick={() => setActiveTab('instructors')}
+                                    className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === 'instructors' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                                >
+                                    <FiBriefcase size={14} /> Instructors ({archivedInstructors.length})
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('students')}
+                                    className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${activeTab === 'students' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                                >
+                                    <FiUser size={14} /> Students ({archivedStudents.length})
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mb-10 max-w-2xl">
-                    Restore soft-deleted {activeTab === 'tests' ? 'assessments' : 'answer keys'} to the dashboard, or permanently purge them from the system.
+                    Restore soft-deleted {activeTab} to the dashboard, or permanently purge them from the system.
                 </p>
 
                 {/* Content */}
@@ -183,9 +253,9 @@ const ArchivePage = () => {
                         <div className="w-20 h-20 bg-slate-50 dark:bg-black rounded-3xl flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-white/5 group-hover:scale-110 transition-transform duration-500">
                             <FiInbox size={32} className="text-slate-300 dark:text-slate-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">No Archived {activeTab === 'tests' ? 'Tests' : 'Keys'}</h3>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">No Archived {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h3>
                         <p className="text-slate-400 dark:text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed">
-                            Deleted {activeTab === 'tests' ? 'assessments' : 'documents'} will appear here for final review before permanent removal.
+                            Deleted {activeTab} will appear here for final review before permanent removal.
                         </p>
                     </div>
                 ) : (
@@ -206,19 +276,35 @@ const ArchivePage = () => {
                                 >
                                     {/* Card Top */}
                                     <div className="flex items-start justify-between mb-8">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${activeTab === 'tests' ? 'bg-indigo-50 text-indigo-500' : 'bg-rose-50 text-rose-500'}`}>
-                                            {activeTab === 'tests' ? <FiFileText size={24} /> : <FiKey size={24} />}
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${
+                                            activeTab === 'tests' ? 'bg-indigo-50 text-indigo-500' : 
+                                            activeTab === 'keys' ? 'bg-rose-50 text-rose-500' :
+                                            activeTab === 'instructors' ? 'bg-amber-50 text-amber-500' :
+                                            'bg-emerald-50 text-emerald-500'
+                                        }`}>
+                                            {activeTab === 'tests' ? <FiFileText size={24} /> : 
+                                             activeTab === 'keys' ? <FiKey size={24} /> :
+                                             activeTab === 'instructors' ? <FiBriefcase size={24} /> :
+                                             <FiUser size={24} />}
                                         </div>
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={() => activeTab === 'tests' ? handleRestoreTest(item._id) : handleRestoreKey(item._id)}
+                                                onClick={() => {
+                                                    if (activeTab === 'tests') handleRestoreTest(item._id);
+                                                    else if (activeTab === 'keys') handleRestoreKey(item._id);
+                                                    else handleRestoreUser(item._id, activeTab.slice(0, -1));
+                                                }}
                                                 className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl transition-all border border-emerald-100/50"
                                                 title="Restore"
                                             >
                                                 <FiRotateCcw size={16} />
                                             </button>
                                             <button
-                                                onClick={() => activeTab === 'tests' ? handlePermanentDeleteTest(item._id) : handlePermanentDeleteKey(item._id)}
+                                                onClick={() => {
+                                                    if (activeTab === 'tests') handlePermanentDeleteTest(item._id);
+                                                    else if (activeTab === 'keys') handlePermanentDeleteKey(item._id);
+                                                    else handlePermanentDeleteUser(item._id, activeTab.slice(0, -1), item.name);
+                                                }}
                                                 className="p-3 bg-rose-50 text-rose-500 hover:bg-rose-600 hover:text-white rounded-xl transition-all border border-rose-100/50"
                                                 title="Delete Permanently"
                                             >
@@ -228,9 +314,11 @@ const ArchivePage = () => {
                                     </div>
 
                                     {/* Info */}
-                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-2 truncate leading-snug">{item.title}</h3>
+                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 mb-2 truncate leading-snug">
+                                        {activeTab === 'students' || activeTab === 'instructors' ? item.name : item.title}
+                                    </h3>
                                     <p className="text-xs text-slate-400 dark:text-slate-500 font-medium mb-6 line-clamp-2 leading-relaxed">
-                                        {item.description || "No description provided."}
+                                        {activeTab === 'students' || activeTab === 'instructors' ? item.email : (item.description || "No description provided.")}
                                     </p>
 
                                     {/* Meta */}
@@ -239,6 +327,14 @@ const ArchivePage = () => {
                                             <FiClock size={12} className="shrink-0" />
                                             <span>Archived {new Date(item.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                         </div>
+                                        
+                                        {(activeTab === 'students' || activeTab === 'instructors') && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="px-3 py-1 bg-slate-50 dark:bg-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                                                    ID: {item.studentId || item.instructorId || item._id.slice(-8).toUpperCase()}
+                                                </span>
+                                            </div>
+                                        )}
                                         
                                         {activeTab === 'tests' && (
                                             <div className="flex items-center gap-2">
