@@ -528,7 +528,7 @@ const TestPlayer = () => {
                             </div>
 
                             {/* Submit CTA */}
-                            <div className="p-5 border-t border-slate-50 dark:border-white/[0.06]">
+                            <div className="p-5 pb-10 border-t border-slate-50 dark:border-white/[0.06]">
                                 <button
                                     onClick={handleSubmit}
                                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-bold text-sm transition-all shadow-lg dark:shadow-none flex items-center justify-center gap-2 active:scale-95"
