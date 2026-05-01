@@ -224,7 +224,7 @@ const TestPlayer = () => {
                 </header>
                 <main className="flex-1 p-6 lg:p-10 flex flex-col">
                     <div className="max-w-3xl w-full mx-auto my-auto">
-                        <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl space-y-6">
+                        <div className="bg-white dark:bg-transparent space-y-6">
                             <Skeleton className="w-32 h-4 mb-4" />
                             <Skeleton className="w-full h-8 mb-6" />
                             <div className="space-y-3">
@@ -335,7 +335,7 @@ const TestPlayer = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -24 }}
                                     transition={{ duration: 0.18, ease: 'easeOut' }}
-                                    className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl"
+                                    className="bg-white dark:bg-transparent"
                                 >
                                     {/* Question header */}
                                     <div className="flex items-center justify-between mb-7">
