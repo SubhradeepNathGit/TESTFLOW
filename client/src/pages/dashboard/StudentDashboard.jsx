@@ -82,8 +82,20 @@ const StudentDashboard = () => {
         };
     }, [socket, refetchTests, refetchAttempts]);
 
-    const getAttemptForTest = (testId) =>
-        attempts.find(a => a.testId?._id === testId || a.testId === testId);
+    const getAttemptForTest = (testId) => {
+        if (!attempts || attempts.length === 0) return null;
+        const testAttempts = attempts.filter(a => (a.testId?._id === testId || a.testId === testId));
+        if (testAttempts.length === 0) return null;
+
+        // Prioritize SUBMITTED or AUTO_SUBMITTED attempts over IN_PROGRESS
+        const completedAttempts = testAttempts.filter(a => a.status !== 'IN_PROGRESS');
+        if (completedAttempts.length > 0) {
+            return completedAttempts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+        }
+
+        // Fallback to the latest IN_PROGRESS attempt
+        return testAttempts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+    };
 
     if (loading) return (
         <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">
