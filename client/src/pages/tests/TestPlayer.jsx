@@ -184,8 +184,11 @@ const TestPlayer = () => {
     // Fetch test data on mount
     useEffect(() => {
         fetchTestData();
+    }, [id]);
 
-        if (socket) {
+    // Handle real-time interruptions
+    useEffect(() => {
+        if (socket && attemptId) {
             const handleReset = (data) => {
                 if (data.attemptId === attemptId) {
                     toast.error('This attempt has been reset by the instructor.');
@@ -208,7 +211,9 @@ const TestPlayer = () => {
                 socket.off('test:archived', handleArchive);
             };
         }
+    }, [id, socket, attemptId, navigate]);
 
+    useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 toast.warning('Warning: Do not switch tabs during the exam.', { toastId: 'tab-switch' });
@@ -216,8 +221,7 @@ const TestPlayer = () => {
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, socket, attemptId]);
+    }, []);
 
     // Mark current question as visited
     useEffect(() => {
