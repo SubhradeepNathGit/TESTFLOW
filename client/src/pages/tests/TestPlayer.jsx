@@ -463,7 +463,7 @@ const TestPlayer = () => {
                             {/* Palette Header */}
                             <div className="px-5 pt-6 pb-4 border-b border-slate-100 dark:border-white/[0.06]">
                                 <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.1em]">Question Palette</h3>
+                                    <h3 className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.1em]">Question Palette</h3>
                                     <button
                                         onClick={() => setIsSidebarOpen(false)}
                                         className="p-2 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl text-slate-400 lg:hidden transition-all"
@@ -473,7 +473,7 @@ const TestPlayer = () => {
                                 </div>
 
                                 {/* Progress bar */}
-                                <div className="flex items-center gap-3 mb-6">
+                                <div className="flex items-center gap-3 -mt-2 mb-6">
                                     <div className="flex-1 h-2 bg-slate-50 dark:bg-white/[0.04] rounded-full overflow-hidden border border-slate-100 dark:border-white/[0.06]">
                                         <motion.div
                                             className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full shadow-none dark:shadow-none"
@@ -528,7 +528,7 @@ const TestPlayer = () => {
                             </div>
 
                             {/* Submit CTA */}
-                            <div className="p-5 pb-10 border-t border-slate-50 dark:border-white/[0.06]">
+                            <div className="pl-5 pr-5 pt-2.5 mb-10 border-t border-slate-50 dark:border-white/[0.06]">
                                 <button
                                     onClick={handleSubmit}
                                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-2xl font-bold text-sm transition-all shadow-lg dark:shadow-none flex items-center justify-center gap-2 active:scale-95"
