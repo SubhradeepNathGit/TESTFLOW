@@ -225,31 +225,32 @@ const StudentManagement = () => {
 
             {/* Add Student Modal */}
             {showAddModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-white/5 border-white/10 shadow-none">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300">
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-all duration-300" onClick={() => setShowAddModal(false)} />
+                    <div className="relative w-full max-w-md bg-white dark:bg-white/5 dark:backdrop-blur-xl rounded-[32px] border border-slate-100 dark:border-white/10 shadow-none overflow-hidden transition-all duration-500 p-8">
                         <div className="flex items-center justify-between mb-8">
                             <div>
                                 <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Add Student</h2>
-                                <p className="text-sm text-slate-400 mt-1">Credentials auto-generated and emailed</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Credentials auto-generated and emailed</p>
                             </div>
-                            <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400">
-                                <X size={20} />
+                            <button onClick={() => setShowAddModal(false)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-all">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         <form onSubmit={handleAddStudent} className="space-y-5">
                             <div>
-                                <label className="block text-xs font-black text-slate-600 uppercase tracking-widest mb-2">Full Name</label>
+                                <label className="block text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
                                 <input
                                     type="text" required
                                     value={newStudent.name}
                                     onChange={e => setNewStudent({ ...newStudent, name: e.target.value })}
                                     placeholder="e.g. John Doe"
-                                    className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 transition-all"
+                                    className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-black text-slate-600 uppercase tracking-widest mb-2">Email Address</label>
+                                <label className="block text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <input
@@ -257,29 +258,33 @@ const StudentManagement = () => {
                                         value={newStudent.email}
                                         onChange={e => setNewStudent({ ...newStudent, email: e.target.value })}
                                         placeholder="student@email.com"
-                                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 transition-all"
+                                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl focus:ring-4 focus:ring-indigo-500/10 dark:focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none text-sm font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all"
                                     />
                                 </div>
                             </div>
 
-                            <div className="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100/50 flex gap-3.5 items-start shadow-sm">
-                                <div className="mt-0.5 w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-indigo-100 shadow-inner text-indigo-600">
+                            <div className="bg-indigo-50/70 dark:bg-indigo-500/10 p-4 rounded-xl border border-indigo-100/50 dark:border-indigo-500/20 flex gap-3.5 items-start shadow-none">
+                                <div className="mt-0.5 w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
-                                <p className="text-[13px] text-indigo-700 font-medium leading-relaxed">
-                                    <strong className="block text-indigo-900 font-bold mb-0.5 tracking-tight">Automated Provisioning</strong>
+                                <p className="text-[13px] text-indigo-700 dark:text-indigo-300 font-medium leading-relaxed">
+                                    <strong className="block text-indigo-900 dark:text-indigo-200 font-bold mb-0.5 tracking-tight">Automated Provisioning</strong>
                                     A secure temporary password and unique Student ID will be automatically generated and privately dispatched to the candidate's email address.
                                 </p>
                             </div>
 
                             <div className="flex gap-3 pt-2">
                                 <button type="button" onClick={() => setShowAddModal(false)}
-                                    className="flex-1 py-3.5 border border-slate-200 text-slate-700 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all">
+                                    className="flex-1 px-6 py-3.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-widest transition-all active:scale-95">
                                     Cancel
                                 </button>
                                 <button type="submit" disabled={submitting}
-                                    className="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all disabled:opacity-50 active:scale-95">
-                                    {submitting ? 'Adding...' : 'Add Student'}
+                                    className="flex-1 px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white/10 dark:hover:bg-white/20 dark:text-slate-100 rounded-xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70">
+                                    {submitting ? (
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        'Add Student'
+                                    )}
                                 </button>
                             </div>
                         </form>
