@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
 import AuthContext from "../../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
@@ -20,7 +21,12 @@ const Login = () => {
 
     return (
         <AuthLayout>
-            <div className="w-full max-w-md px-6 sm:px-10 py-8 relative">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-md px-6 sm:px-10 py-8 relative"
+            >
                 <div className="mb-8 text-left">
                     <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight sm:whitespace-nowrap">
                         Welcome to TESTFLOW
@@ -90,7 +96,7 @@ const Login = () => {
                         </Link>
                     </p>
                 </div>
-            </div>
+            </motion.div>
         </AuthLayout>
     );
 };

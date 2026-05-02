@@ -90,8 +90,10 @@ const AuthLayout = ({ children }) => {
             </div>
 
             {/* Right panel — Form Content */}
-            <div className="w-full lg:w-1/2 h-full flex items-center justify-center relative overflow-hidden bg-white dark:bg-black">
-                {children}
+            <div className="w-full lg:w-1/2 h-full overflow-y-auto bg-white dark:bg-black">
+                <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6">
+                    {children}
+                </div>
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
+import { motion, AnimatePresence } from "framer-motion";
 import AuthContext from "../../context/AuthContext";
 import { Eye, EyeOff, ChevronDown, Check, ShieldCheck, Users, X } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
@@ -62,7 +63,12 @@ const Register = () => {
 
     return (
         <AuthLayout>
-            <div className="w-full max-w-md px-6 sm:px-10 py-8 relative">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-md px-6 sm:px-10 py-8 relative"
+            >
                 <div className="mb-8 text-left">
                     <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
                         Create Account
@@ -176,42 +182,53 @@ const Register = () => {
                                 </button>
                             </div>
 
-                            {/* Strength bar */}
-                            {passwordValue.length > 0 && (
-                                <div className="mt-2.5 space-y-2">
-                                    <div className="flex gap-1">
-                                        {[0,1,2,3,4].map(i => (
-                                            <div key={i} className="flex-1 h-1 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
-                                                <div
-                                                    className={`h-full rounded-full transition-all duration-300 ${i < strength ? strengthColors[strength - 1] : ''}`}
-                                                    style={{ width: i < strength ? '100%' : '0%' }}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <p className={`text-[11px] font-bold ${strengthColors[strength-1]?.replace('bg-','text-') || 'text-slate-400'}`}>
-                                        {passwordValue.length > 0 ? strengthLabels[strength - 1] || 'Very Weak' : ''}
-                                    </p>
-                                </div>
-                            )}
+                            {/* Strength bar & Checklist */}
+                            <AnimatePresence>
+                                {passwordValue.length > 0 && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="mt-2.5 space-y-2 overflow-hidden"
+                                    >
+                                        <div className="flex gap-1">
+                                            {[0,1,2,3,4].map(i => (
+                                                <div key={i} className="flex-1 h-1 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
+                                                    <div
+                                                        className={`h-full rounded-full transition-all duration-300 ${i < strength ? strengthColors[strength - 1] : ''}`}
+                                                        style={{ width: i < strength ? '100%' : '0%' }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <p className={`text-[11px] font-bold ${strengthColors[strength-1]?.replace('bg-','text-') || 'text-slate-400'}`}>
+                                            {passwordValue.length > 0 ? strengthLabels[strength - 1] || 'Very Weak' : ''}
+                                        </p>
+                                    </motion.div>
+                                )}
 
-                            {/* Live checklist */}
-                            {(passwordFocused || passwordValue.length > 0) && (
-                                <ul className="mt-2 space-y-1">
-                                    {passwordRules.map(rule => {
-                                        const passed = rule.test(passwordValue);
-                                        return (
-                                            <li key={rule.id} className={`flex items-center gap-2 text-[11px] font-semibold transition-colors ${passed ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`}>
-                                                {passed
-                                                    ? <Check size={11} className="shrink-0" />
-                                                    : <X size={11} className="shrink-0" />
-                                                }
-                                                {rule.label}
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            )}
+                                {(passwordFocused || passwordValue.length > 0) && (
+                                    <motion.ul 
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="mt-2 space-y-1 overflow-hidden"
+                                    >
+                                        {passwordRules.map(rule => {
+                                            const passed = rule.test(passwordValue);
+                                            return (
+                                                <li key={rule.id} className={`flex items-center gap-2 text-[11px] font-semibold transition-colors ${passed ? 'text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                                                    {passed
+                                                        ? <Check size={11} className="shrink-0" />
+                                                        : <X size={11} className="shrink-0" />
+                                                    }
+                                                    {rule.label}
+                                                </li>
+                                            );
+                                        })}
+                                    </motion.ul>
+                                )}
+                            </AnimatePresence>
 
                             {errors.password && <p className="mt-1.5 text-xs font-bold text-red-500">{errors.password.message}</p>}
                         </div>
@@ -239,7 +256,7 @@ const Register = () => {
                         </Link>
                     </p>
                 </div>
-            </div>
+            </motion.div>
         </AuthLayout>
     );
 };
