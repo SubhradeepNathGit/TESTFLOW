@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
-		"name": "TESTFLOW API (Production)",
-		"description": "Production-ready Postman collection for the TESTFLOW Online Assessment Platform. Includes endpoints for Auth, User Management, Assessments, and Attempts.",
+		"name": "TESTFLOW API (Full Export)",
+		"description": "Complete Postman collection for TESTFLOW, containing every endpoint defined in the server routes.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -44,7 +44,7 @@
 								"exec": [
 									"var jsonData = pm.response.json();",
 									"if (jsonData.token) {",
-									"    pm.environment.set(\"accessToken\", jsonData.token);",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.token);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -107,44 +107,164 @@
 			]
 		},
 		{
-			"name": "User Management",
+			"name": "User Profile",
 			"item": [
 				{
-					"name": "Get Students",
+					"name": "Get Own Profile",
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": { "raw": "{{baseUrl}}/users/students", "host": ["{{baseUrl}}"], "path": ["users", "students"] }
+						"url": { "raw": "{{baseUrl}}/users/profile", "host": ["{{baseUrl}}"], "path": ["users", "profile"] }
 					}
 				},
 				{
-					"name": "Create Student",
+					"name": "Update Profile",
 					"request": {
-						"method": "POST",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "John Updated", "type": "text" },
+								{ "key": "profileImage", "type": "file", "src": [] }
+							]
+						},
+						"url": { "raw": "{{baseUrl}}/users/profile", "host": ["{{baseUrl}}"], "path": ["users", "profile"] }
+					}
+				},
+				{
+					"name": "Update Password",
+					"request": {
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Student One\",\n  \"email\": \"student1@example.com\",\n  \"password\": \"Pass123\",\n  \"studentRoll\": \"ROLL001\"\n}",
+							"raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword123!\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
-						"url": { "raw": "{{baseUrl}}/users/students", "host": ["{{baseUrl}}"], "path": ["users", "students"] }
+						"url": { "raw": "{{baseUrl}}/users/update-password", "host": ["{{baseUrl}}"], "path": ["users", "update-password"] }
 					}
+				}
+			]
+		},
+		{
+			"name": "Member Management",
+			"item": [
+				{
+					"name": "Students",
+					"item": [
+						{
+							"name": "Get Students",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/students", "host": ["{{baseUrl}}"], "path": ["users", "students"] }
+							}
+						},
+						{
+							"name": "Create Student",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Student X\",\n  \"email\": \"studentx@example.com\",\n  \"password\": \"Pass123\",\n  \"studentRoll\": \"SR-001\"\n}",
+									"options": { "raw": { "language": "json" } }
+								},
+								"url": { "raw": "{{baseUrl}}/users/students", "host": ["{{baseUrl}}"], "path": ["users", "students"] }
+							}
+						},
+						{
+							"name": "Toggle Student Status",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/students/:id/toggle", "host": ["{{baseUrl}}"], "path": ["users", "students", ":id", "toggle"], "variable": [{ "key": "id", "value": "" }] }
+							}
+						},
+						{
+							"name": "Archive Student",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/students/:id", "host": ["{{baseUrl}}"], "path": ["users", "students", ":id"], "variable": [{ "key": "id", "value": "" }] }
+							}
+						},
+						{
+							"name": "Get Archived Students",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/students/archived", "host": ["{{baseUrl}}"], "path": ["users", "students", "archived"] }
+							}
+						},
+						{
+							"name": "Restore Student",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/students/:id/restore", "host": ["{{baseUrl}}"], "path": ["users", "students", ":id", "restore"], "variable": [{ "key": "id", "value": "" }] }
+							}
+						},
+						{
+							"name": "Permanent Delete Student",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/students/:id/permanent", "host": ["{{baseUrl}}"], "path": ["users", "students", ":id", "permanent"], "variable": [{ "key": "id", "value": "" }] }
+							}
+						}
+					]
 				},
 				{
-					"name": "Get Instructors",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": { "raw": "{{baseUrl}}/users/instructors", "host": ["{{baseUrl}}"], "path": ["users", "instructors"] }
-					}
-				},
-				{
-					"name": "Get Archived Students",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": { "raw": "{{baseUrl}}/users/students/archived", "host": ["{{baseUrl}}"], "path": ["users", "students", "archived"] }
-					}
+					"name": "Instructors",
+					"item": [
+						{
+							"name": "Get Instructors",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/instructors", "host": ["{{baseUrl}}"], "path": ["users", "instructors"] }
+							}
+						},
+						{
+							"name": "Create Instructor",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Prof X\",\n  \"email\": \"profx@example.com\",\n  \"password\": \"Pass123\"\n}",
+									"options": { "raw": { "language": "json" } }
+								},
+								"url": { "raw": "{{baseUrl}}/users/instructors", "host": ["{{baseUrl}}"], "path": ["users", "instructors"] }
+							}
+						},
+						{
+							"name": "Toggle Instructor Status",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/instructors/:id/toggle", "host": ["{{baseUrl}}"], "path": ["users", "instructors", ":id", "toggle"], "variable": [{ "key": "id", "value": "" }] }
+							}
+						},
+						{
+							"name": "Archive Instructor",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/instructors/:id", "host": ["{{baseUrl}}"], "path": ["users", "instructors", ":id"], "variable": [{ "key": "id", "value": "" }] }
+							}
+						},
+						{
+							"name": "Get Archived Instructors",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": { "raw": "{{baseUrl}}/users/instructors/archived", "host": ["{{baseUrl}}"], "path": ["users", "instructors", "archived"] }
+							}
+						}
+					]
 				}
 			]
 		},
@@ -160,13 +280,29 @@
 					}
 				},
 				{
-					"name": "Create Test Manual",
+					"name": "Leaderboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/tests/leaderboard", "host": ["{{baseUrl}}"], "path": ["tests", "leaderboard"] }
+					}
+				},
+				{
+					"name": "Get Specific Test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/tests/:id", "host": ["{{baseUrl}}"], "path": ["tests", ":id"], "variable": [{ "key": "id", "value": "" }] }
+					}
+				},
+				{
+					"name": "Create Test (Manual)",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Advanced Physics\",\n  \"description\": \"Final exam for semester 2\",\n  \"duration\": 90\n}",
+							"raw": "{\n  \"title\": \"Physics Final\",\n  \"description\": \"Quantum Mechanics focus\",\n  \"duration\": 120\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": { "raw": "{{baseUrl}}/tests", "host": ["{{baseUrl}}"], "path": ["tests"] }
@@ -181,19 +317,24 @@
 							"mode": "formdata",
 							"formdata": [
 								{ "key": "pdfFile", "type": "file", "src": [] },
-								{ "key": "title", "value": "History Quiz", "type": "text" },
-								{ "key": "duration", "value": "30", "type": "text" }
+								{ "key": "title", "value": "Chemistry MCQ", "type": "text" },
+								{ "key": "duration", "value": "60", "type": "text" }
 							]
 						},
 						"url": { "raw": "{{baseUrl}}/tests/upload-pdf", "host": ["{{baseUrl}}"], "path": ["tests", "upload-pdf"] }
 					}
 				},
 				{
-					"name": "Get Test Details",
+					"name": "Add Question",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
-						"url": { "raw": "{{baseUrl}}/tests/:id", "host": ["{{baseUrl}}"], "path": ["tests", ":id"], "variable": [{ "key": "id", "value": "" }] }
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"questionText\": \"What is 2+2?\",\n  \"options\": [\"2\", \"3\", \"4\", \"5\"],\n  \"correctAnswer\": \"4\",\n  \"marks\": 1\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{baseUrl}}/tests/:id/questions", "host": ["{{baseUrl}}"], "path": ["tests", ":id", "questions"], "variable": [{ "key": "id", "value": "" }] }
 					}
 				},
 				{
@@ -205,15 +346,15 @@
 					}
 				},
 				{
-					"name": "Archive Test",
+					"name": "Get Test Stats",
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [],
-						"url": { "raw": "{{baseUrl}}/tests/:id", "host": ["{{baseUrl}}"], "path": ["tests", ":id"], "variable": [{ "key": "id", "value": "" }] }
+						"url": { "raw": "{{baseUrl}}/tests/:id/stats", "host": ["{{baseUrl}}"], "path": ["tests", ":id", "stats"], "variable": [{ "key": "id", "value": "" }] }
 					}
 				},
 				{
-					"name": "Get Archived Tests",
+					"name": "Get All Archived Tests",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -229,17 +370,46 @@
 					}
 				},
 				{
-					"name": "Leaderboard",
+					"name": "Permanent Delete Test",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
-						"url": { "raw": "{{baseUrl}}/tests/leaderboard", "host": ["{{baseUrl}}"], "path": ["tests", "leaderboard"] }
+						"url": { "raw": "{{baseUrl}}/tests/:id/permanent", "host": ["{{baseUrl}}"], "path": ["tests", ":id", "permanent"], "variable": [{ "key": "id", "value": "" }] }
+					}
+				},
+				{
+					"name": "Archive Test (Soft)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/tests/:id", "host": ["{{baseUrl}}"], "path": ["tests", ":id"], "variable": [{ "key": "id", "value": "" }] }
+					}
+				},
+				{
+					"name": "Update Specific Question",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"questionText\": \"Updated Question?\",\n  \"marks\": 2\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{baseUrl}}/tests/questions/:questionId", "host": ["{{baseUrl}}"], "path": ["tests", "questions", ":questionId"], "variable": [{ "key": "questionId", "value": "" }] }
+					}
+				},
+				{
+					"name": "Delete Specific Question",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/tests/questions/:questionId", "host": ["{{baseUrl}}"], "path": ["tests", "questions", ":questionId"], "variable": [{ "key": "questionId", "value": "" }] }
 					}
 				}
 			]
 		},
 		{
-			"name": "Attempts",
+			"name": "Attempts & Exam Play",
 			"item": [
 				{
 					"name": "Start Attempt",
@@ -248,7 +418,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"testId\": \"TEST_ID_HERE\"\n}",
+							"raw": "{\n  \"testId\": \"TEST_ID\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": { "raw": "{{baseUrl}}/attempts/start", "host": ["{{baseUrl}}"], "path": ["attempts", "start"] }
@@ -261,23 +431,31 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"attemptId\": \"ATTEMPT_ID_HERE\",\n  \"questionId\": \"QUESTION_ID_HERE\",\n  \"selectedOption\": \"A\"\n}",
+							"raw": "{\n  \"attemptId\": \"ATTEMPT_ID\",\n  \"questionId\": \"QUESTION_ID\",\n  \"selectedOption\": \"B\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": { "raw": "{{baseUrl}}/attempts/save-answer", "host": ["{{baseUrl}}"], "path": ["attempts", "save-answer"] }
 					}
 				},
 				{
-					"name": "Submit Attempt",
+					"name": "Submit Test",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"attemptId\": \"ATTEMPT_ID_HERE\"\n}",
+							"raw": "{\n  \"attemptId\": \"ATTEMPT_ID\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": { "raw": "{{baseUrl}}/attempts/submit", "host": ["{{baseUrl}}"], "path": ["attempts", "submit"] }
+					}
+				},
+				{
+					"name": "Reset Attempt (Admin/Inst)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/attempts/:id/reset", "host": ["{{baseUrl}}"], "path": ["attempts", ":id", "reset"], "variable": [{ "key": "id", "value": "" }] }
 					}
 				},
 				{
@@ -294,7 +472,7 @@
 			"name": "Answer Keys",
 			"item": [
 				{
-					"name": "Get Keys",
+					"name": "Get All Keys",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -302,7 +480,15 @@
 					}
 				},
 				{
-					"name": "Upload Key",
+					"name": "Get Archived Keys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/answer-keys/archived", "host": ["{{baseUrl}}"], "path": ["answer-keys", "archived"] }
+					}
+				},
+				{
+					"name": "Upload Key PDF",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -315,6 +501,51 @@
 						},
 						"url": { "raw": "{{baseUrl}}/answer-keys", "host": ["{{baseUrl}}"], "path": ["answer-keys"] }
 					}
+				},
+				{
+					"name": "Restore Key",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/answer-keys/:id/restore", "host": ["{{baseUrl}}"], "path": ["answer-keys", ":id", "restore"], "variable": [{ "key": "id", "value": "" }] }
+					}
+				},
+				{
+					"name": "Archive Key (Soft)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/answer-keys/:id", "host": ["{{baseUrl}}"], "path": ["answer-keys", ":id"], "variable": [{ "key": "id", "value": "" }] }
+					}
+				},
+				{
+					"name": "Permanent Delete Key",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/answer-keys/:id/permanent", "host": ["{{baseUrl}}"], "path": ["answer-keys", ":id", "permanent"], "variable": [{ "key": "id", "value": "" }] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Super Admin",
+			"item": [
+				{
+					"name": "Get Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/admin/metrics", "host": ["{{baseUrl}}"], "path": ["admin", "metrics"] }
+					}
+				},
+				{
+					"name": "Get Institutions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/admin/institutions", "host": ["{{baseUrl}}"], "path": ["admin", "institutions"] }
+					}
 				}
 			]
 		}
@@ -325,6 +556,16 @@
 			{ "key": "token", "value": "{{accessToken}}", "type": "string" }
 		]
 	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": { "type": "text/javascript", "exec": [""] }
+		},
+		{
+			"listen": "test",
+			"script": { "type": "text/javascript", "exec": [""] }
+		}
+	],
 	"variable": [
 		{ "key": "baseUrl", "value": "https://testflow-api.duckdns.org/api", "type": "string" },
 		{ "key": "accessToken", "value": "", "type": "string" },
