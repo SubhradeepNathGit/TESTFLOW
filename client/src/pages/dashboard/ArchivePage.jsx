@@ -37,6 +37,7 @@ const ArchivePage = () => {
         queryKey: ['archived-tests'],
         queryFn: () => getArchivedTests().then(r => r.data.data),
         onError: () => toast.error("Failed to fetch archived tests"),
+        staleTime: 0,
     });
 
     const { data: archivedKeys = [], isLoading: loadingKeys } = useQuery({
@@ -61,19 +62,20 @@ const ArchivePage = () => {
         if (!socket) return;
 
         const refreshTests = () => {
-            queryClient.invalidateQueries({ queryKey: ['archived-tests'] });
-            queryClient.invalidateQueries({ queryKey: ['instructor-tests'] });
+            queryClient.refetchQueries({ queryKey: ['archived-tests'] });
+            queryClient.refetchQueries({ queryKey: ['instructor-tests'] });
         };
 
         const refreshKeys = () => {
-            queryClient.invalidateQueries({ queryKey: ['archived-keys'] });
-            queryClient.invalidateQueries({ queryKey: ['answer-keys'] });
+            queryClient.refetchQueries({ queryKey: ['archived-keys'] });
+            queryClient.refetchQueries({ queryKey: ['answer-keys'] });
         };
 
         socket.on('test:archived', refreshTests);
         socket.on('test:published', refreshTests);
         socket.on('test:restored', refreshTests);
         socket.on('test:deleted', refreshTests);
+        socket.on('test:updated', refreshTests);
         
         socket.on('answerKey:archived', refreshKeys);
         socket.on('answerKey:restored', refreshKeys);
@@ -85,6 +87,7 @@ const ArchivePage = () => {
             socket.off('test:published', refreshTests);
             socket.off('test:restored', refreshTests);
             socket.off('test:deleted', refreshTests);
+            socket.off('test:updated', refreshTests);
             socket.off('answerKey:archived', refreshKeys);
             socket.off('answerKey:restored', refreshKeys);
             socket.off('answerKey:deleted', refreshKeys);

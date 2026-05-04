@@ -42,10 +42,16 @@ const InstructorDashboard = () => {
         queryKey: ['instructor-tests'],
         queryFn: () => getTests().then(r => r.data.data),
         onError: () => toast.error("Failed to load assessments"),
+        staleTime: 0,
     });
 
     useEffect(() => {
         if (!socket) return;
+
+        const refreshAll = () => {
+            queryClient.refetchQueries({ queryKey: ['instructor-tests'] });
+            queryClient.refetchQueries({ queryKey: ['archived-tests'] });
+        };
 
         const handleAttemptStarted = (data) => {
             if (selectedTestId === data.testId) {
@@ -57,11 +63,11 @@ const InstructorDashboard = () => {
             if (selectedTestId === data.testId) {
                 fetchFullTestDetails(data.testId);
             }
-            refetchTests();
+            refreshAll();
         };
 
         const handleTestUpdated = (data) => {
-            refetchTests();
+            refreshAll();
             if (selectedTestId === data.testId || data.testId === "REFRESH") {
                 fetchFullTestDetails(selectedTestId);
             }
@@ -70,21 +76,21 @@ const InstructorDashboard = () => {
         socket.on('test:attempt_started', handleAttemptStarted);
         socket.on('test:attempt_submitted', handleAttemptSubmitted);
         socket.on('test:updated', handleTestUpdated);
-        socket.on('test:published', refetchTests);
-        socket.on('test:archived', refetchTests);
-        socket.on('test:restored', refetchTests);
-        socket.on('test:deleted', refetchTests);
+        socket.on('test:published', refreshAll);
+        socket.on('test:archived', refreshAll);
+        socket.on('test:restored', refreshAll);
+        socket.on('test:deleted', refreshAll);
 
         return () => {
             socket.off('test:attempt_started', handleAttemptStarted);
             socket.off('test:attempt_submitted', handleAttemptSubmitted);
             socket.off('test:updated', handleTestUpdated);
-            socket.off('test:published', refetchTests);
-            socket.off('test:archived', refetchTests);
-            socket.off('test:restored', refetchTests);
-            socket.off('test:deleted', refetchTests);
+            socket.off('test:published', refreshAll);
+            socket.off('test:archived', refreshAll);
+            socket.off('test:restored', refreshAll);
+            socket.off('test:deleted', refreshAll);
         };
-    }, [socket, selectedTestId, refetchTests]);
+    }, [socket, selectedTestId, queryClient]);
 
     const handleCreateTest = async (e) => {
         e.preventDefault();
