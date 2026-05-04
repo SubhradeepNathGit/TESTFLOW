@@ -36,7 +36,7 @@ import AdminArchive from '../pages/admin/AdminArchive';
 
 import PrivateRoute from '../components/auth/PrivateRoute';
 
-/** Smart home redirect based on role */
+// Role-based redirect
 const HomeRedirect = () => {
     const { user } = useContext(AuthContext);
     if (!user) return <Navigate to="/login" />;

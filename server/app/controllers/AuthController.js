@@ -11,7 +11,7 @@ class AuthController {
         const accessToken = user.getSignedJwtToken();
         const refreshToken = user.getRefreshToken();
 
-        // Consolidated update: save refresh token, joinedAt, and reset loginAttempts in one go
+        // Save refresh token and institution info
         user.refreshToken = refreshToken;
         await user.save();
 
@@ -113,10 +113,7 @@ class AuthController {
         }
     }
 
-
-    
-    
-    
+    // Verify Email
     verifyEmail = async (req, res, next) => {
         try {
             const { email, otp } = req.body;
@@ -142,9 +139,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Resend OTP
     resendOtp = async (req, res, next) => {
         try {
             const { email } = req.body;
@@ -198,10 +193,11 @@ class AuthController {
     
     
     
+    // Login logic
     login = async (req, res, next) => {
         try {
             const { email, password } = req.body;
-            console.log(`🔑 Login Attempt: Email=[${email}], PasswordLength=${password?.length}`);
+            console.log(`Login Attempt: ${email}`);
             
             const user = await authService.login(email, password);
 
@@ -235,9 +231,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Logout
     logout = async (req, res, next) => {
         try {
             await authService.logout(req.user.id);
@@ -247,9 +241,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Get current user
     getMe = async (req, res, next) => {
         try {
             const user = await User.findById(req.user.id)
@@ -275,9 +267,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Refresh Token
     refreshToken = async (req, res, next) => {
         const { refreshToken } = req.body;
         if (!refreshToken) {
@@ -325,9 +315,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Forgot Password
     forgotPassword = async (req, res, next) => {
         try {
             const { email } = req.body;
@@ -383,9 +371,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Reset Password
     resetPassword = async (req, res, next) => {
         try {
             const { password } = req.body;
@@ -400,9 +386,7 @@ class AuthController {
         }
     }
 
-    
-    
-    
+    // Update Password
     updatePassword = async (req, res, next) => {
         try {
             const { currentPassword, newPassword } = req.body;

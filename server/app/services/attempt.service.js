@@ -4,20 +4,18 @@ const Question = require("../models/Question");
 const ErrorResponse = require("../utils/errorResponse");
 const { scheduleAutoSubmit, cancelAutoSubmit } = require("../config/redis");
 
-/**
- * Start a new test attempt
- */
+// Start attempt
 exports.startAttempt = async (testId, studentId, institutionId) => {
     const test = await Test.findById(testId);
     if (!test || test.status !== "Published") {
-        throw new ErrorResponse("Test is not available", 404);
+        throw new ErrorResponse("Test not available", 404);
     }
 
-    // Check if attempt already exists
+    // Check existing
     let attempt = await Attempt.findOne({ testId, studentId });
     if (attempt) {
         if (attempt.status === "IN_PROGRESS") return attempt;
-        throw new ErrorResponse("You have already completed this test.", 403);
+        throw new ErrorResponse("Test already completed", 403);
     }
 
     const expiresAt = new Date(Date.now() + test.duration * 60 * 1000);
@@ -29,22 +27,20 @@ exports.startAttempt = async (testId, studentId, institutionId) => {
         expiresAt
     });
 
-    // Schedule auto-submission
+    // Queue auto-submit
     const delay = test.duration * 60 * 1000;
     await scheduleAutoSubmit(attempt._id, delay);
 
     return attempt;
 };
 
-/**
- * Save an answer during the test
- */
+// Save answer
 exports.saveAnswer = async (attemptId, studentId, questionId, selectedOption) => {
     const attempt = await Attempt.findOne({ _id: attemptId, studentId, status: "IN_PROGRESS" });
-    if (!attempt) throw new ErrorResponse("Attempt not found or already submitted", 404);
+    if (!attempt) throw new ErrorResponse("Attempt not found", 404);
 
     if (new Date() > attempt.expiresAt) {
-        throw new ErrorResponse("Time has expired. Please submit.", 403);
+        throw new ErrorResponse("Time expired", 403);
     }
 
     const answerIndex = attempt.answers.findIndex(a => a.questionId.toString() === questionId);
@@ -58,12 +54,10 @@ exports.saveAnswer = async (attemptId, studentId, questionId, selectedOption) =>
     return attempt;
 };
 
-/**
- * Manually submit a test
- */
+// Manual submit
 exports.submitAttempt = async (attemptId, studentId) => {
     const attempt = await Attempt.findOne({ _id: attemptId, studentId, status: "IN_PROGRESS" });
-    if (!attempt) throw new ErrorResponse("Attempt not found or already submitted", 404);
+    if (!attempt) throw new ErrorResponse("Attempt not found", 404);
 
     const questions = await Question.find({ testId: attempt.testId });
     
@@ -80,31 +74,28 @@ exports.submitAttempt = async (attemptId, studentId) => {
     attempt.submittedAt = new Date();
     await attempt.save();
 
-    // Cancel the scheduled auto-submission
+    // Clear queue
     await cancelAutoSubmit(attempt._id);
 
     return attempt;
 };
 
-/**
- * Reset a student's attempt (Instructor Only)
- */
+// Reset attempt (Instructor Only)
 exports.resetAttempt = async (attemptId, instructorId) => {
-    // Audit logging could be added here
     const attempt = await Attempt.findById(attemptId);
     if (!attempt) throw new ErrorResponse("Attempt not found", 404);
 
-    // Ensure instructor belongs to the same institution
+    // Auth check
     const instructor = await require("../models/User").findById(instructorId);
     if (attempt.institutionId.toString() !== instructor.institutionId.toString()) {
-        throw new ErrorResponse("Not authorized to reset this attempt", 403);
+        throw new ErrorResponse("Unauthorized", 403);
     }
 
-    // Remove from Redis queue if pending
+    // Clean up queue
     await cancelAutoSubmit(attempt._id);
     
-    // Delete the attempt
+    // Delete
     await Attempt.findByIdAndDelete(attemptId);
 
-    return { message: "Attempt reset successfully. Student can retake the test." };
+    return { message: "Attempt reset" };
 };

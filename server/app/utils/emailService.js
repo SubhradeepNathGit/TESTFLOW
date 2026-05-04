@@ -1,13 +1,6 @@
 const sendEmail = require('./sendEmail');
 
-/**
- * Send student welcome email with credentials
- * @param {Object} params - Email parameters
- * @param {string} params.to - Recipient email
- * @param {string} params.name - Student name
- * @param {string} params.studentId - Generated student ID
- * @param {string} params.password - Generated password
- */
+// Student welcome email
 const sendStudentWelcomeEmail = async ({ to, name, studentId, password }) => {
   const message = `
     <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 40px auto; padding: 40px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; color: #1a202c;">
@@ -65,13 +58,7 @@ const sendStudentWelcomeEmail = async ({ to, name, studentId, password }) => {
   }
 };
 
-/**
- * Send password reset notification email
- * @param {Object} params - Email parameters
- * @param {string} params.to - Recipient email
- * @param {string} params.name - Employee name
- * @param {string} params.password - New password
- */
+// Password reset notification
 const sendPasswordResetEmail = async ({ to, name, password }) => {
   const message = `
     <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 40px auto; padding: 40px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; color: #1a202c;">
@@ -121,15 +108,7 @@ const sendPasswordResetEmail = async ({ to, name, password }) => {
   }
 };
 
-/**
- * Send task assignment notification email
- * @param {Object} params - Email parameters
- * @param {string} params.to - Recipient email
- * @param {string} params.userName - Recipient name
- * @param {string} params.taskTitle - Task title
- * @param {string} params.dueDate - Task due date
- * @param {string} params.assignedBy - Name of the assigner
- */
+// Task assignment notification
 const sendTaskAssignedEmail = async ({ to, userName, taskTitle, dueDate, assignedBy }) => {
   const formattedDate = new Date(dueDate).toLocaleDateString('en-IN', {
     weekday: 'short',

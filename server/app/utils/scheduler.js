@@ -2,19 +2,17 @@ const cron = require("node-cron");
 const Task = require("../models/Task");
 const { sendTaskReminderEmail } = require("./emailService");
 
-/**
- * Initialize all scheduled tasks
- */
+// Init schedulers
 const initSchedulers = () => {
-    
+    // Task reminders at 9 AM daily
     cron.schedule("0 9 * * *", async () => {
-        console.log("Running Task Reminder Scheduler...");
+        console.log("Running Task Reminders...");
         
         try {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             
-            
+            // Tasks due within 24h
             const tasksDueSoon = await Task.find({
                 status: { $ne: "Completed" },
                 isDeleted: false,
@@ -24,25 +22,24 @@ const initSchedulers = () => {
                 }
             }).populate("assignedTo", "name email");
 
-            console.log(`Found ${tasksDueSoon.length} tasks due soon.`);
+            console.log(`Found ${tasksDueSoon.length} tasks.`);
 
             for (const task of tasksDueSoon) {
-                if (task.assignedTo && task.assignedTo.email) {
+                if (task.assignedTo?.email) {
                     await sendTaskReminderEmail({
                         to: task.assignedTo.email,
                         userName: task.assignedTo.name,
                         taskTitle: task.title,
                         dueDate: task.dueDate
                     });
-                    console.log(`Reminder sent to ${task.assignedTo.email} for task: ${task.title}`);
                 }
             }
         } catch (err) {
-            console.error("Error in Task Reminder Scheduler:", err);
+            console.error("Scheduler error:", err);
         }
     });
 
-    console.log("Schedulers initialized.");
+    console.log("Schedulers started.");
 };
 
 module.exports = { initSchedulers };

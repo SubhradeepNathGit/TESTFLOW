@@ -12,7 +12,7 @@ exports.getUserProfile = async (userId) => {
     return user;
 };
 
-/** Update user profile */
+// Update profile
 exports.updateUserProfile = async (userId, updateData) => {
     const user = await User.findByIdAndUpdate(userId, updateData, {
         new: true,
@@ -22,7 +22,7 @@ exports.updateUserProfile = async (userId, updateData) => {
     return user;
 };
 
-/** Update password */
+// Update password
 exports.updatePassword = async (userId, currentPassword, newPassword) => {
     const user = await User.findById(userId).select("+password");
     if (!user) throw new ErrorResponse("User not found", 404);
@@ -34,9 +34,7 @@ exports.updatePassword = async (userId, currentPassword, newPassword) => {
     return user;
 };
 
-/**
- * Get all students in an institution (for admin/instructor)
- */
+// Get students
 exports.getStudents = async (institutionId, search = "") => {
     const query = { institutionId: institutionId?.toString(), role: "student", isArchived: { $ne: true } };
     if (search) {
@@ -52,10 +50,7 @@ exports.getStudents = async (institutionId, search = "") => {
         .sort({ createdAt: -1 });
 };
 
-/**
- * Add a student to the institution (Institution Admin only)
- * Auto-generates a password and sends credentials via email
- */
+// Create student
 exports.createStudent = async (institutionId, adminId, { name, email }) => {
     const existing = await User.findOne({ email });
     if (existing) throw new ErrorResponse("Email already registered", 400);
@@ -85,9 +80,7 @@ exports.createStudent = async (institutionId, adminId, { name, email }) => {
     return { student, password, studentId };
 };
 
-/**
- * Toggle student active/inactive
- */
+// Toggle status
 exports.toggleStudentStatus = async (studentId, institutionId) => {
     const student = await User.findOne({ _id: studentId, institutionId, role: "student" });
     if (!student) throw new ErrorResponse("Student not found", 404);
@@ -96,12 +89,7 @@ exports.toggleStudentStatus = async (studentId, institutionId) => {
     return student;
 };
 
-/**
- * Delete an inactive student
- */
-/**
- * Delete an inactive student (Move to archive)
- */
+// Archive student
 exports.deleteStudent = async (studentId, institutionId) => {
     const student = await User.findOne({ _id: studentId, institutionId, role: "student" });
     if (!student) throw new ErrorResponse("Student not found", 404);
@@ -114,18 +102,14 @@ exports.deleteStudent = async (studentId, institutionId) => {
     return { message: "Student moved to archive successfully" };
 };
 
-/**
- * Get all archived students
- */
+// Get archived
 exports.getArchivedStudents = async (institutionId) => {
     return await User.find({ institutionId, role: "student", isArchived: true })
         .select("-password -refreshToken -otp -otpExpire")
         .sort({ updatedAt: -1 });
 };
 
-/**
- * Restore an archived student
- */
+// Restore student
 exports.restoreStudent = async (studentId, institutionId) => {
     const student = await User.findOne({ _id: studentId, institutionId, role: "student", isArchived: true });
     if (!student) throw new ErrorResponse("Archived student not found", 404);
@@ -137,9 +121,7 @@ exports.restoreStudent = async (studentId, institutionId) => {
     return { message: "Student restored successfully" };
 };
 
-/**
- * Permanently delete a student
- */
+// Delete student
 exports.permanentDeleteStudent = async (studentId, institutionId) => {
     const student = await User.findOne({ _id: studentId, institutionId, role: "student", isArchived: true });
     if (!student) throw new ErrorResponse("Archived student not found", 404);
@@ -151,9 +133,7 @@ exports.permanentDeleteStudent = async (studentId, institutionId) => {
     return { message: "Student and their data permanently removed" };
 };
 
-/**
- * Get all instructors in an institution and their published tests/questions overview
- */
+// Instructors overview
 exports.getInstructorsOverview = async (institutionId, search = "") => {
     const query = { institutionId: institutionId?.toString(), role: "instructor", isArchived: { $ne: true } };
     if (search) {
@@ -179,10 +159,7 @@ exports.getInstructorsOverview = async (institutionId, search = "") => {
     return instructors;
 };
 
-/**
- * Add an Instructor to the institution (Institution Admin only)
- * Auto-generates a password and sends credentials via email
- */
+// Create instructor
 exports.createInstructor = async (institutionId, adminId, { name, email }) => {
     const existing = await User.findOne({ email });
     if (existing) throw new ErrorResponse("Email already registered", 400);
@@ -211,9 +188,7 @@ exports.createInstructor = async (institutionId, adminId, { name, email }) => {
     return { instructor, password, instructorId };
 };
 
-/**
- * Toggle instructor active/inactive
- */
+// Toggle status
 exports.toggleInstructorStatus = async (instructorId, institutionId) => {
     const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor" });
     if (!instructor) throw new ErrorResponse("Instructor not found", 404);
@@ -222,9 +197,7 @@ exports.toggleInstructorStatus = async (instructorId, institutionId) => {
     return instructor;
 };
 
-/**
- * Delete an instructor
- */
+// Archive instructor
 exports.deleteInstructor = async (instructorId, institutionId) => {
     const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor" });
     if (!instructor) throw new ErrorResponse("Instructor not found", 404);
@@ -237,18 +210,14 @@ exports.deleteInstructor = async (instructorId, institutionId) => {
     return { message: "Instructor moved to archive successfully" };
 };
 
-/**
- * Get all archived instructors
- */
+// Get archived
 exports.getArchivedInstructors = async (institutionId) => {
     return await User.find({ institutionId, role: "instructor", isArchived: true })
         .select("-password -refreshToken -otp -otpExpire")
         .sort({ updatedAt: -1 });
 };
 
-/**
- * Restore an archived instructor
- */
+// Restore instructor
 exports.restoreInstructor = async (instructorId, institutionId) => {
     const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor", isArchived: true });
     if (!instructor) throw new ErrorResponse("Archived instructor not found", 404);
@@ -260,9 +229,7 @@ exports.restoreInstructor = async (instructorId, institutionId) => {
     return { message: "Instructor restored successfully" };
 };
 
-/**
- * Permanently delete an instructor
- */
+// Delete instructor
 exports.permanentDeleteInstructor = async (instructorId, institutionId) => {
     const instructor = await User.findOne({ _id: instructorId, institutionId, role: "instructor", isArchived: true });
     if (!instructor) throw new ErrorResponse("Archived instructor not found", 404);

@@ -3,10 +3,7 @@ const { statusCodes } = require("../helper/statusCode");
 const { emitToInstitution } = require("../utils/socket");
 
 class AttemptController {
-    /**
-     * @desc Start a test attempt
-     * @route POST /api/attempts/start
-     */
+    // Start test attempt
     async startAttempt(req, res, next) {
         try {
             const result = await attemptService.startAttempt(
@@ -20,7 +17,7 @@ class AttemptController {
                 data: result
             });
 
-            // Emit real-time update
+            // Emit live update
             emitToInstitution(req.user.institutionId, "test:attempt_started", { 
                 testId: req.body.testId,
                 studentId: req.user.id,
@@ -31,10 +28,7 @@ class AttemptController {
         }
     }
 
-    /**
-     * @desc Save an answer
-     * @route POST /api/attempts/save-answer
-     */
+    // Save answer
     async saveAnswer(req, res, next) {
         try {
             const { attemptId, questionId, selectedOption } = req.body;
@@ -54,10 +48,7 @@ class AttemptController {
         }
     }
 
-    /**
-     * @desc Submit test attempt
-     * @route POST /api/attempts/submit
-     */
+    // Submit test
     async submitAttempt(req, res, next) {
         try {
             const result = await attemptService.submitAttempt(
@@ -71,24 +62,20 @@ class AttemptController {
                 data: result
             });
 
-            // Emit real-time update
+            // Emit live updates
             emitToInstitution(req.user.institutionId, "test:attempt_submitted", { 
                 testId: result.testId,
                 attemptId: result._id,
                 studentId: req.user.id,
                 score: result.score 
             });
-            // Update leaderboard
             emitToInstitution(req.user.institutionId, "leaderboard:update");
         } catch (err) {
             next(err);
         }
     }
 
-    /**
-     * @desc Reset test attempt (Instructor Only)
-     * @route DELETE /api/attempts/:id/reset
-     */
+    // Reset attempt
     async resetAttempt(req, res, next) {
         try {
             const result = await attemptService.resetAttempt(
@@ -101,17 +88,13 @@ class AttemptController {
                 message: result.message
             });
 
-            // Emit real-time update (inform student or sync list)
             emitToInstitution(req.user.institutionId, "test:attempt_reset", { attemptId: req.params.id });
         } catch (err) {
             next(err);
         }
     }
 
-    /**
-     * @desc Get own attempts (Student)
-     * @route GET /api/attempts/me
-     */
+    // Get my attempts
     async getMyAttempts(req, res, next) {
         try {
             const Attempt = require("../models/Attempt");

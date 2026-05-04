@@ -72,6 +72,8 @@ const InstructorDashboard = () => {
         socket.on('test:updated', handleTestUpdated);
         socket.on('test:published', refetchTests);
         socket.on('test:archived', refetchTests);
+        socket.on('test:restored', refetchTests);
+        socket.on('test:deleted', refetchTests);
 
         return () => {
             socket.off('test:attempt_started', handleAttemptStarted);
@@ -79,6 +81,8 @@ const InstructorDashboard = () => {
             socket.off('test:updated', handleTestUpdated);
             socket.off('test:published', refetchTests);
             socket.off('test:archived', refetchTests);
+            socket.off('test:restored', refetchTests);
+            socket.off('test:deleted', refetchTests);
         };
     }, [socket, selectedTestId, refetchTests]);
 

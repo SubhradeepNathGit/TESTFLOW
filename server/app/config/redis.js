@@ -1,26 +1,23 @@
 const { Queue, Worker, QueueEvents } = require("bullmq");
 const IORedis = require("ioredis");
 
-// Configure Redis Connection
+// Redis config
 const redisConnection = new IORedis(process.env.REDIS_URL || "redis://127.0.0.1:6379", {
     maxRetriesPerRequest: null,
-    enableOfflineQueue: false, // Don't queue commands if Redis is down
-    connectTimeout: 500,       // Fail fast if not found locally
+    enableOfflineQueue: false, // Don't queue if Redis is down
+    connectTimeout: 500,       // Fail fast
     retryStrategy(times) {
-        if (times > 1) {       // Reduce retries for local dev
-            console.warn("⚠️ Redis not found. Auto-submit feature is disabled.");
+        if (times > 1) {
+            console.warn("Redis not found. Auto-submit disabled.");
             return null;
         }
         return 100;
     }
 });
 
-redisConnection.on('error', () => {
-    // Suppress connection spam
-});
+redisConnection.on('error', () => {}); // Suppress errors
 
-
-// Create Submission Queue
+// Submission queue
 const submissionQueue = new Queue("test-submission", {
     connection: redisConnection,
     defaultJobOptions: {
@@ -29,14 +26,9 @@ const submissionQueue = new Queue("test-submission", {
     }
 });
 
-submissionQueue.on('error', () => {
-    // Suppress connection spam
-});
+submissionQueue.on('error', () => {});
 
-/**
-
- * Schedule an auto-submission job
- */
+// Schedule auto-submit
 const scheduleAutoSubmit = async (attemptId, delay) => {
     await submissionQueue.add(
         "auto-submit",
@@ -45,9 +37,7 @@ const scheduleAutoSubmit = async (attemptId, delay) => {
     );
 };
 
-/**
- * Remove a scheduled auto-submission if user submits early
- */
+// Cancel auto-submit
 const cancelAutoSubmit = async (attemptId) => {
     const job = await submissionQueue.getJob(`submit-${attemptId}`);
     if (job) await job.remove();

@@ -4,17 +4,17 @@ const { parseMCQFromPDF } = require("../utils/pdfParser");
 const fs = require("fs");
 const ErrorResponse = require("../utils/errorResponse");
 
-// Create test from PDF
+// From PDF
 exports.createTestFromPDF = async (testData, pdfPath, userId) => {
     try {
         const buffer = fs.readFileSync(pdfPath);
         const parsedQuestions = await parseMCQFromPDF(buffer);
 
         if (!parsedQuestions || parsedQuestions.length === 0) {
-            throw new ErrorResponse("No questions found in the PDF. Please check the format (e.g. 1. Question... A) Option... Answer: A)", 400);
+            throw new ErrorResponse("No questions found in PDF", 400);
         }
 
-        // Sum up each question's actual marks (accounts for 1/2/5 mark questions)
+        // Calc total marks
         const totalMarks = parsedQuestions.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
 
         const test = await Test.create({
@@ -30,17 +30,13 @@ exports.createTestFromPDF = async (testData, pdfPath, userId) => {
 
         await Question.insertMany(questions);
         
-        // Clean up file
         if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
 
         return { test, questionCount: questions.length };
     } catch (err) {
-        // Ensure file is deleted even if error occurs
         if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
-        
-        // Propagate error
         if (err instanceof ErrorResponse) throw err;
-        throw new ErrorResponse(`Error processing PDF: ${err.message}`, 400);
+        throw new ErrorResponse(`PDF Error: ${err.message}`, 400);
     }
 };
 
@@ -53,18 +49,18 @@ exports.createTest = async (testData, userId) => {
     });
 };
 
-// Add question to test
+// Add question
 exports.addQuestion = async (testId, questionData) => {
     const test = await Test.findById(testId);
     if (!test) throw new ErrorResponse("Test not found", 404);
-    if (test.status === "Published") throw new ErrorResponse("Cannot modify a published test", 403);
+    if (test.status === "Published") throw new ErrorResponse("Cannot modify published test", 403);
 
     const question = await Question.create({
         ...questionData,
         testId: test._id
     });
 
-    // Update total marks with numerical safety
+    // Update marks
     test.totalMarks = (test.totalMarks || 0) + (Number(question.marks) || 0);
     await test.save();
 
@@ -80,14 +76,14 @@ exports.getTestsByInstitution = async (institutionId, userRole) => {
     return await Test.find(query).sort({ createdAt: -1 });
 };
 
-// Get test details
+// Test details
 exports.getTestDetails = async (testId, institutionId) => {
     const test = await Test.findOne({ _id: testId, institutionId, isDeleted: false });
     if (!test) throw new ErrorResponse("Test not found", 404);
 
     const questions = await Question.find({ testId: test._id });
     
-    // Auto-calculate total marks to ensure consistency (repairs old data)
+    // Auto-fix marks
     const actualTotalMarks = questions.reduce((sum, q) => sum + (Number(q.marks) || 0), 0);
     if (test.totalMarks !== actualTotalMarks) {
         test.totalMarks = actualTotalMarks;
@@ -183,7 +179,7 @@ exports.getTestStats = async (testId, institutionId) => {
                     { $sort: { "_id": 1 } },
                     { $limit: 30 }
                 ],
-                // Status breakdown
+                // Status
                 "statusBreakdown": [
                     { $group: { _id: "$status", count: { $sum: 1 } } }
                 ],
@@ -238,7 +234,7 @@ exports.getTestStats = async (testId, institutionId) => {
                     },
                     { $sort: { accuracyRate: 1 } } // hardest first
                 ],
-                // Student details with rank
+                // Results
                 "studentDetails": [
                     { $sort: { score: -1, submittedAt: -1 } },
                     {
@@ -426,25 +422,21 @@ exports.permanentDeleteTest = async (testId, institutionId) => {
     return true;
 };
 
-/**
- * Get all archived tests
- */
+// Get archived
 exports.getArchivedTests = async (institutionId) => {
     return await Test.find({ institutionId, isDeleted: true }).sort({ updatedAt: -1 });
 };
 
-/**
- * Update a question's details
- */
+// Update question
 exports.updateQuestion = async (questionId, questionData) => {
     const question = await Question.findById(questionId);
     if (!question) throw new ErrorResponse("Question not found", 404);
 
     const test = await Test.findById(question.testId);
-    if (!test) throw new ErrorResponse("Parent test not found", 404);
-    if (test.status === "Published") throw new ErrorResponse("Cannot modify a published test", 403);
+    if (!test) throw new ErrorResponse("Test not found", 404);
+    if (test.status === "Published") throw new ErrorResponse("Cannot modify published test", 403);
 
-    // Marks difference adjustment with numerical safety
+    // Adjust marks
     if (questionData.marks !== undefined) {
         test.totalMarks = (test.totalMarks || 0) - (Number(question.marks) || 0) + (Number(questionData.marks) || 0);
         await test.save();
@@ -456,15 +448,13 @@ exports.updateQuestion = async (questionId, questionData) => {
     return question;
 };
 
-/**
- * Delete a question from a test
- */
+// Delete question
 exports.deleteQuestion = async (questionId) => {
     const question = await Question.findById(questionId);
     if (!question) throw new ErrorResponse("Question not found", 404);
 
     const test = await Test.findById(question.testId);
-    if (test && test.status === "Published") throw new ErrorResponse("Cannot modify a published test", 403);
+    if (test && test.status === "Published") throw new ErrorResponse("Cannot modify published test", 403);
     if (test) {
         test.totalMarks = Math.max(0, (test.totalMarks || 0) - (Number(question.marks) || 0));
         await test.save();

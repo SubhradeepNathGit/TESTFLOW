@@ -1,48 +1,48 @@
 import api from './axiosInstance';
 
-/** Get all tests for the institution (filters by Published for students) */
+// Get all tests
 export const getTests = () => api.get('/tests');
 
-/** Get single test with questions */
+// Get test details
 export const getTest = (id) => api.get(`/tests/${id}`);
 
-/** Upload PDF to create a test */
+// Upload PDF
 export const uploadPdfTest = (formData) =>
     api.post('/tests/upload-pdf', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
 
-/** Create test manually (metadata only) */
+// Create test
 export const createTest = (testData) => api.post('/tests', testData);
 
-/** Add a question manually to a test */
+// Add question
 export const addQuestion = (id, questionData) => api.post(`/tests/${id}/questions`, questionData);
 
-/** Publish a test */
+// Publish test
 export const publishTest = (id) => api.patch(`/tests/${id}/publish`);
 
-/** Get test stats for instructor */
+// Test stats
 export const getTestStats = (id) => api.get(`/tests/${id}/stats`);
 
-/** Get global leaderboard */
+// Global leaderboard
 export const getLeaderboard = () => api.get('/tests/leaderboard');
 
-/** Get archived tests */
+// Get archived
 export const getArchivedTests = () => api.get('/tests/archived/all');
 
-/** Archive a test */
+// Archive test
 export const archiveTest = (id) => api.delete(`/tests/${id}`);
 
-/** Restore a test */
+// Restore test
 export const restoreTest = (id) => api.patch(`/tests/${id}/restore`);
 
-/** Permanently delete test */
+// Permanent delete
 export const permanentDeleteTest = (id) => api.delete(`/tests/${id}/permanent`);
 
-/** Update a question */
+// Update question
 export const updateQuestion = (questionId, questionData) => 
     api.patch(`/tests/questions/${questionId}`, questionData);
 
-/** Delete a question */
+// Delete question
 export const deleteQuestion = (questionId) => 
     api.delete(`/tests/questions/${questionId}`);

@@ -205,10 +205,12 @@ const TestPlayer = () => {
 
             socket.on('test:attempt_reset', handleReset);
             socket.on('test:archived', handleArchive);
+            socket.on('test:deleted', handleArchive);
 
             return () => {
                 socket.off('test:attempt_reset', handleReset);
                 socket.off('test:archived', handleArchive);
+                socket.off('test:deleted', handleArchive);
             };
         }
     }, [id, socket, attemptId, navigate]);

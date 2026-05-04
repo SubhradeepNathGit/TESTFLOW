@@ -14,7 +14,7 @@
 
 <br />
 
-## 📖 Overview
+## Overview
 
 **TESTFLOW** is a highly scalable, multi-tenant assessment platform engineered to handle massive concurrent traffic for educational institutions and corporate environments. It transcends traditional CRUD applications by implementing complex distributed systems patterns, real-time bidirectional communication, and automated background processing.
 
@@ -22,7 +22,7 @@ Whether it's parsing unstructured PDFs into structured MCQs using AI/Regex or ma
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TB
@@ -35,7 +35,7 @@ flowchart TB
     classDef queue fill:#7c2d12,stroke:#fb923c,color:#e2e8f0,stroke-width:2px
     classDef infra fill:#1c1917,stroke:#a8a29e,color:#e2e8f0,stroke-width:1px
 
-    subgraph BROWSER["🌐  Browser  (React 19 + Vite + Tailwind CSS)"]
+    subgraph BROWSER["Browser  (React 19 + Vite + Tailwind CSS)"]
         direction TB
         TQ["TanStack Query\nServer-State Cache"]:::client
         ZS["Zustand\nUI State Store"]:::client
@@ -46,7 +46,7 @@ flowchart TB
         TQ --> AX
     end
 
-    subgraph SERVER["⚙️  Express API Server  (Node.js 18 + Express 5)"]
+    subgraph SERVER["Express API Server  (Node.js 18 + Express 5)"]
         direction TB
 
         subgraph MIDDLEWARES["Security Layer"]
@@ -90,7 +90,7 @@ flowchart TB
         SERVICES --> UTILS
     end
 
-    subgraph DATAPLANE["🗄️  Data & Infrastructure Plane"]
+    subgraph DATAPLANE["Data & Infrastructure Plane"]
         direction TB
 
         subgraph MONGODB["MongoDB Atlas  (7 Collections)"]
@@ -130,7 +130,7 @@ flowchart TB
 
 ---
 
-## ⚙️ Core Workflows & Engineering Optimizations
+## Core Workflows & Engineering Optimizations
 
 ### 1. Resilient Test Auto-Submission (Distributed Queues)
 **The Problem:** If a student's internet drops or they close their browser, their test timer expires, but the server never receives a "submit" request, leaving the test in a hanging state.
@@ -155,7 +155,7 @@ flowchart TB
 
 ---
 
-## 🛡️ Security & RBAC Implementation
+## Security & RBAC Implementation
 
 Security is handled at both the gateway and controller levels.
 
@@ -169,7 +169,7 @@ Security is handled at both the gateway and controller levels.
 
 ---
 
-## 📂 Detailed Codebase Topography
+## Detailed Codebase Topography
 
 <details>
 <summary><b>Frontend Structure (React/Vite)</b></summary>
@@ -209,7 +209,7 @@ server/app/
 
 ---
 
-## 💻 Technical Stack
+## Technical Stack
 
 | Domain | Technology | Justification |
 | :--- | :--- | :--- |
@@ -223,7 +223,7 @@ server/app/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these instructions to spin up the entire architecture locally.
 
@@ -266,15 +266,15 @@ JWT_REFRESH_SECRET=your_refresh_secret
 
 ---
 
-## 📖 API Documentation (Swagger)
+## API Documentation (Swagger)
 
 The backend exposes an interactive **Swagger UI** containing schemas, endpoints, and authentication flows.
 With the server running, access the docs at:  
-👉 **[http://localhost:3006/api-docs](http://localhost:3006/api-docs)**
+**[http://localhost:3006/api-docs](http://localhost:3006/api-docs)**
 
 ---
 
-## 📄 License & Contact
+## License & Contact
 
 This project is licensed under the ISC License.
 
