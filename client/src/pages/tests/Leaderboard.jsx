@@ -7,7 +7,7 @@ import {
 import { BarChart2 } from 'lucide-react';
 import api from '../../api/axiosInstance';
 import { toast } from 'react-toastify';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from '../../hooks/useSocket';
 import { useQuery } from '@tanstack/react-query';
 import Skeleton, { CardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 
@@ -285,7 +285,7 @@ const Leaderboard = () => {
     // Podium visual order: 2nd (left), 1st (centre), 3rd (right)
     const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
     const podiumRanks = [1, 0, 2];
-    const rest = leaderboard.slice(3);
+
 
     return (
         <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">

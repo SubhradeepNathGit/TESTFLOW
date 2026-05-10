@@ -1,6 +1,6 @@
-import { useState, useContext, useEffect } from "react";
-import { useSocket } from "../../context/SocketContext";
-import AuthContext from "../../context/AuthContext";
+import { useState, useEffect, useCallback } from "react";
+import { useSocket } from "../../hooks/useSocket";
+import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
@@ -21,7 +21,7 @@ const EmptyState = ({ icon: Icon, title, desc }) => (
 );
 
 const AdminArchive = () => {
-    const { user, loading: authLoading } = useContext(AuthContext);
+    const { user, loading: authLoading } = useAuth();
     const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState("institutions");
     const [search, setSearch] = useState("");
@@ -35,7 +35,7 @@ const AdminArchive = () => {
         placeholderData: keepPreviousData,
     });
 
-    const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-archive'] });
+    const refresh = useCallback(() => queryClient.invalidateQueries({ queryKey: ['admin-archive'] }), [queryClient]);
 
     useEffect(() => {
         if (!socket) return;
@@ -45,7 +45,7 @@ const AdminArchive = () => {
         ];
         events.forEach(ev => socket.on(ev, refresh));
         return () => events.forEach(ev => socket.off(ev, refresh));
-    }, [socket]);
+    }, [socket, refresh]);
 
     const handleRestore = async (type, id) => {
         const ok = await confirm({

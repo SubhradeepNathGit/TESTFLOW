@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getArchivedTests, restoreTest, permanentDeleteTest } from '../../api/testApi';
@@ -7,8 +7,8 @@ import { FiUser, FiBriefcase, FiTrash2, FiRotateCcw, FiInbox, FiClock, FiFileTex
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CardSkeleton } from '../../components/common/Skeleton';
-import { useSocket } from '../../context/SocketContext';
-import AuthContext from '../../context/AuthContext';
+import { useSocket } from '../../hooks/useSocket';
+import { useAuth } from '../../hooks/useAuth';
 import api from '../../api/axiosInstance';
 import { getAssetUrl } from '../../utils/assets';
 
@@ -18,7 +18,7 @@ const cardVariants = {
 };
 
 const ArchivePage = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const socket = useSocket();
     const [activeTab, setActiveTab] = useState('tests'); // 'tests', 'keys', 'students', 'instructors'

@@ -104,7 +104,6 @@ const ResultsPage = () => {
     const passed = pct >= 0.5;
     const gradeInfo = getGrade(pct);
     const testTitle = lastAttempt?.testId?.title || 'Assessment';
-    const duration = lastAttempt?.testId?.duration;
 
     const stats = [
         {

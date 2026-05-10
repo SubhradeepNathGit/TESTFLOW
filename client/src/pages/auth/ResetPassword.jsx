@@ -1,13 +1,13 @@
-import { useState, useContext } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { useParams, Link } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 
 const ResetPassword = () => {
     const { resetToken } = useParams();
-    const { resetPassword } = useContext(AuthContext);
+    const { resetPassword } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -15,15 +15,17 @@ const ResetPassword = () => {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-        watch
+        control
     } = useForm();
 
-    const passwordValue = watch('password');
+    const passwordValue = useWatch({ control, name: 'password', defaultValue: '' });
 
     const onSubmit = async (data) => {
         try {
             await resetPassword(resetToken, data.password);
-        } catch { }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (

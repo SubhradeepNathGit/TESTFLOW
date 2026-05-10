@@ -1,7 +1,7 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import AuthContext from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import Logo from '../common/Logo';
 import ProfileModal from '../modals/ProfileModal';
 import useSidebarStore from '../../store/useSidebarStore';
@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 const Sidebar = () => {
-    const { user, logout } = useContext(AuthContext);
+    const { user, logout } = useAuth();
     const { isOpen, toggleSidebar } = useSidebarStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);

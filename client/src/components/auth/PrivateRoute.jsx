@@ -1,11 +1,10 @@
-import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import Sidebar from "../layout/Sidebar";
 import useSidebarStore from "../../store/useSidebarStore";
 
 const PrivateRoute = ({ children }) => {
-    const { user, loading } = useContext(AuthContext);
+    const { user, loading } = useAuth();
     const { isOpen } = useSidebarStore();
 
     if (loading) return null;

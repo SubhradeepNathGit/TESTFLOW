@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
     X,
     Camera,
@@ -13,12 +13,12 @@ import {
     EyeOff,
     Pencil
 } from "lucide-react";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
 
 const ProfileModal = ({ isOpen, onClose }) => {
-    const { user, updatePassword, setUser } = useContext(AuthContext);
+    const { user, updatePassword, setUser } = useAuth();
 
     const [activeTab, setActiveTab] = useState("info");
 

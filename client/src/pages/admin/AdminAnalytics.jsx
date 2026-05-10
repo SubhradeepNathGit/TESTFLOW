@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from '../../hooks/useSocket';
 import api from '../../api/axiosInstance';
-import AuthContext from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip,
@@ -16,7 +16,6 @@ import {
     Target, ShieldCheck, Building2, GraduationCap, Briefcase, Award,
     Globe, Zap, Clock, CheckCircle2
 } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { cn } from '../../utils/cn';
 
 const PALETTE = {
@@ -76,7 +75,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color, delay = 0 }) => (
 );
 
 /* ─── Chart card ─── */
-const ChartCard = ({ title, subtitle, icon: Icon, iconColor = 'text-indigo-500', glow, children, className = '', delay = 0, span2 = false }) => (
+const ChartCard = ({ title, subtitle, icon: Icon, iconColor = 'text-indigo-500', children, className = '', delay = 0, span2 = false }) => (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, type: 'spring', stiffness: 180 }}
         className={cn('relative overflow-hidden rounded-3xl bg-white dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 p-7 shadow-xl shadow-slate-100/40 dark:shadow-none min-w-0 flex flex-col', span2 && 'lg:col-span-2', className)}>
 
@@ -107,7 +106,7 @@ const LegendRow = ({ items }) => (
 
 /* ══════════════════════ MAIN ══════════════════════ */
 const AdminAnalytics = () => {
-    const { user, loading: authLoading } = useContext(AuthContext);
+    const { user, loading: authLoading } = useAuth();
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const [range] = useState('6m');
@@ -165,7 +164,6 @@ const AdminAnalytics = () => {
     const totalGrowthTests = platformGrowth.reduce((s, x) => s + x.tests, 0);
 
     const radarData = scoreDistribution.map(d => ({ subject: d.range, value: d.count }));
-    const axisColor = isDark ? '#334155' : '#e2e8f0';
     const tickColor = isDark ? '#64748b' : '#94a3b8';
     const gridColor = isDark ? '#1e293b' : '#f1f5f9';
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useContext } from 'react';
-import AuthContext from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 // Auth Pages (keep same structure, just renamed branding)
 import Login from '../pages/auth/Login';
@@ -38,7 +37,7 @@ import PrivateRoute from '../components/auth/PrivateRoute';
 
 // Role-based redirect
 const HomeRedirect = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     if (!user) return <Navigate to="/login" />;
     if (user.role === 'super_admin') return <Navigate to="/admin/dashboard" />;
     if (user.role === 'instructor') return <Navigate to="/instructor-dashboard" />;

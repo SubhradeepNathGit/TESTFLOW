@@ -8,8 +8,8 @@ import {
 } from 'chart.js';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 import { getTests, getTestStats } from '../../api/testApi';
-import { useSocket } from '../../context/SocketContext';
-import { useTheme } from '../../context/ThemeContext';
+import { useSocket } from '../../hooks/useSocket';
+import { useTheme } from '../../hooks/useTheme';
 import {
     FiBarChart2, FiUsers, FiAward, FiTrendingUp,
     FiPieChart, FiTarget, FiActivity, FiCheckCircle,
@@ -28,7 +28,6 @@ ChartJS.register(
 
 // Chart defaults
 const chartFont = { family: "'Inter', system-ui, sans-serif", weight: '700' };
-const gridColor = 'rgba(148,163,184,0.08)';
 const baseLineOptions = (isDark) => ({
     responsive: true, maintainAspectRatio: false,
     plugins: {
@@ -116,7 +115,7 @@ const AnalyticsDashboard = () => {
         if (testsData.length > 0 && !selectedTest) {
             handleTestSelect(testsData[0]._id);
         }
-    }, [testsData]);
+    }, [testsData, selectedTest]);
 
     useEffect(() => {
         if (!socket) return;
@@ -173,55 +172,7 @@ const AnalyticsDashboard = () => {
         </div>
     );
 
-    // Chart data builders
-    const distributionChart = stats ? {
-        labels: ['Below 40%', '40–60%', '60–80%', '80–100%'],
-        datasets: [{
-            data: [0, 40, 60, 80].map(b => {
-                const found = stats.scoreDistribution?.find(d => d._id === b);
-                return found ? found.count : 0;
-            }),
-            backgroundColor: ['#f43f5e', '#f59e0b', '#6366f1', '#10b981'],
-            borderWidth: 0,
-            hoverOffset: 8,
-        }]
-    } : null;
 
-    const timelineChart = stats?.scoreTimeline?.length > 0 ? {
-        labels: stats.scoreTimeline.map(d => d._id),
-        datasets: [{
-            label: 'Avg Score',
-            data: stats.scoreTimeline.map(d => d.avgScore?.toFixed(1)),
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99,102,241,0.06)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#6366f1',
-            pointRadius: 4,
-            pointHoverRadius: 7,
-        }]
-    } : null;
-
-    const difficultyChart = stats?.questionDifficulty?.length > 0 ? {
-        labels: stats.questionDifficulty.map((q, i) => `Q${i + 1}`),
-        datasets: [{
-            label: 'Accuracy %',
-            data: stats.questionDifficulty.map(q => q.accuracyRate),
-            backgroundColor: stats.questionDifficulty.map(q =>
-                q.accuracyRate >= 70 ? 'rgba(16,185,129,0.8)' :
-                    q.accuracyRate >= 40 ? 'rgba(245,158,11,0.8)' : 'rgba(244,63,94,0.8)'
-            ),
-            borderRadius: 8,
-            borderSkipped: false,
-        }]
-    } : null;
-
-    const kpis = stats ? [
-        { label: 'Avg Score', value: `${stats.averageScore}`, sub: `/ ${stats.totalMarks} pts`, icon: FiTrendingUp, gradient: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)', shadow: 'dark:shadow-none' },
-        { label: 'Pass Rate', value: `${stats.passRate}%`, sub: `${stats.totalAttempts} attempts`, icon: FiCheckCircle, gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', shadow: 'dark:shadow-none' },
-        { label: 'Completion', value: `${stats.completionRate}%`, sub: `${stats.enrolledStudents} enrolled`, icon: FiUsers, gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', shadow: 'dark:shadow-none' },
-        { label: 'Top Score', value: stats.maxScore, sub: `Std Dev: ${stats.stdDev}`, icon: FiAward, gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)', shadow: 'dark:shadow-none' },
-    ] : [];
 
     return (
         <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10">

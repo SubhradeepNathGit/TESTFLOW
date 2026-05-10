@@ -1,12 +1,12 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 
 const VerifyOTP = () => {
-    const { verifyOtp, resendOtp } = useContext(AuthContext);
+    const { verifyOtp, resendOtp } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const email = location.state?.email;
@@ -39,7 +39,7 @@ const VerifyOTP = () => {
     };
 
     const handleResend = async () => {
-        try { await resendOtp(email); setTimeLeft(60); setCanResend(false); } catch { }
+        try { await resendOtp(email); setTimeLeft(60); setCanResend(false); } catch (err) { console.error(err); }
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

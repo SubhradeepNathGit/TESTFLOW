@@ -1,8 +1,8 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { Eye, EyeOff, ChevronDown, Check, ShieldCheck, Users, X } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 
@@ -19,7 +19,7 @@ const strengthColors = ['bg-red-500','bg-red-400','bg-orange-400','bg-amber-400'
 const strengthLabels = ['Very Weak','Weak','Fair','Good','Strong'];
 
 const Register = () => {
-    const { register: registerUser } = useContext(AuthContext);
+    const { register: registerUser } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [isRoleOpen, setIsRoleOpen] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
@@ -29,13 +29,12 @@ const Register = () => {
         handleSubmit,
         setValue,
         control,
-        watch,
         formState: { errors, isSubmitting },
     } = useForm({
         defaultValues: { role: "owner" }
     });
 
-    const passwordValue = watch("password", "");
+    const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
     const strength = getStrength(passwordValue);
 
     const navigate = useNavigate();

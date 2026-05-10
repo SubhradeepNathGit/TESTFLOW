@@ -1,12 +1,12 @@
-import { useContext } from "react";
+
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { ArrowLeft } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 
 const ForgotPassword = () => {
-    const { forgotPassword } = useContext(AuthContext);
+    const { forgotPassword } = useAuth();
     const navigate = useNavigate();
     const {
         register,
@@ -18,7 +18,9 @@ const ForgotPassword = () => {
         try {
             await forgotPassword(data.email);
             navigate("/email-sent", { state: { email: data.email } });
-        } catch { }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (

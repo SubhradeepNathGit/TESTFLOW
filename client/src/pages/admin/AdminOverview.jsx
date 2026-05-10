@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
-import { useSocket } from "../../context/SocketContext";
+import { useEffect, useCallback } from "react";
+import { useSocket } from "../../hooks/useSocket";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from "../../hooks/useTheme";
 import api from "../../api/axiosInstance";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CardSkeleton } from "../../components/common/Skeleton";
@@ -62,7 +62,7 @@ const EmptyChart = () => (
 );
 
 const AdminOverview = () => {
-    const { user, loading: authLoading } = useContext(AuthContext);
+    const { user, loading: authLoading } = useAuth();
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const navigate = useNavigate();
@@ -75,7 +75,7 @@ const AdminOverview = () => {
         enabled: !authLoading && user?.role === "super_admin",
     });
 
-    const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-metrics'] });
+    const refresh = useCallback(() => queryClient.invalidateQueries({ queryKey: ['admin-metrics'] }), [queryClient]);
 
     useEffect(() => {
         if (!socket) return;
@@ -90,7 +90,7 @@ const AdminOverview = () => {
         ];
         events.forEach(ev => socket.on(ev, refresh));
         return () => events.forEach(ev => socket.off(ev, refresh));
-    }, [socket]);
+    }, [socket, refresh]);
 
     const trajectoryChart = metrics?.trajectory ? {
         labels: metrics.trajectory.map(d => d._id),

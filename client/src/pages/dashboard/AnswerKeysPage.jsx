@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFileText, FiUploadCloud, FiTrash2, FiExternalLink, FiX, FiCheckCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-import AuthContext from '../../context/AuthContext';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from '../../hooks/useSocket';
+import { useAuth } from '../../hooks/useAuth';
 import { getAnswerKeys, uploadAnswerKey, deleteAnswerKey } from '../../api/answerKeyApi';
 import { getAssetUrl } from '../../utils/assets';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
@@ -132,7 +132,7 @@ const UploadModal = ({ isOpen, onClose, onUploaded }) => {
 
 // Main Component
 const AnswerKeysPage = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const socket = useSocket();
     const queryClient = useQueryClient();
     const [modalOpen, setModalOpen] = useState(false);

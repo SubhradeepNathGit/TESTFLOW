@@ -1,15 +1,15 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     FiBook, FiClock, FiStar, FiAward, FiTrendingUp,
     FiLogIn, FiCheckCircle, FiLock
 } from 'react-icons/fi';
-import { toast } from 'react-toastify';
+
 import { getTests } from '../../api/testApi';
 import { getMyAttempts } from '../../api/attemptApi';
-import AuthContext from '../../context/AuthContext';
-import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useSocket } from '../../hooks/useSocket';
 import { useQuery } from '@tanstack/react-query';
 import Skeleton, { CardSkeleton } from '../../components/common/Skeleton';
 
@@ -38,7 +38,7 @@ const ScoreBar = ({ score, total }) => {
 };
 
 const StudentDashboard = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const socket = useSocket();
     const navigate = useNavigate();
 
@@ -137,9 +137,7 @@ const StudentDashboard = () => {
     }, []);
 
     const completedCount = validAttempts.filter(a => a.status !== 'IN_PROGRESS').length;
-    const avgScore = validAttempts.length > 0
-        ? (validAttempts.reduce((sum, a) => sum + (a.score || 0), 0) / validAttempts.length).toFixed(1)
-        : '—';
+
     const highestScore = validAttempts.length > 0
         ? Math.max(...validAttempts.map(a => a.score || 0))
         : '—';

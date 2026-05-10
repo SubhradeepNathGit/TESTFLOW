@@ -1,8 +1,8 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
-import { useSocket } from "../../context/SocketContext";
+import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from "../../hooks/useTheme";
+import { useSocket } from "../../hooks/useSocket";
 import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -84,7 +84,7 @@ const TableAction = ({ onClick, color, icon: Icon, title }) => (
 // SuperAdmin Dashboard
 
 const SuperAdminDashboard = () => {
-    const { user, loading: authLoading } = useContext(AuthContext);
+    const { user, loading: authLoading } = useAuth();
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const navigate = useNavigate();

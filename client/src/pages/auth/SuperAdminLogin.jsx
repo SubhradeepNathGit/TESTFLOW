@@ -1,12 +1,11 @@
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../../context/AuthContext";
+import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import { ShieldCheck, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 
 const SuperAdminLogin = () => {
-    const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
+    const { login } = useAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +20,7 @@ const SuperAdminLogin = () => {
             setSuccess(true);
             // Redirection happens in context
         } catch (err) {
+            console.error(err);
             // Error handled by context
         } finally {
             setLoading(false);

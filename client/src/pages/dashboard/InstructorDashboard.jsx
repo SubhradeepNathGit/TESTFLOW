@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { 
-    getTests, uploadPdfTest, publishTest, getTestStats, createTest, addQuestion, getTest,
-    archiveTest, deleteQuestion, updateQuestion 
+    getTests, uploadPdfTest, publishTest, getTestStats, createTest, getTest,
+    archiveTest, deleteQuestion 
 } from '../../api/testApi';
 import { resetAttempt } from '../../api/attemptApi';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from '../../hooks/useSocket';
 import { FiUploadCloud, FiPlus, FiTrendingUp, FiUsers, FiFileText, FiActivity, FiCheckCircle, FiRefreshCw, FiList, FiEdit3, FiSave, FiX, FiCheck } from 'react-icons/fi';
 import { Send, Trash2, Edit, Trash, Loader2 } from 'lucide-react';
 import QuestionModal from '../../components/modals/QuestionModal';
@@ -17,7 +17,7 @@ import Skeleton, { CardSkeleton, TableSkeleton } from '../../components/common/S
 const InstructorDashboard = () => {
     const socket = useSocket();
     const queryClient = useQueryClient();
-    const [loading, setLoading] = useState(false); // kept for upload/create spinner
+
     const [isUploading, setIsUploading] = useState(false);
     const [stats, setStats] = useState(null);
     const [selectedTestId, setSelectedTestId] = useState(null);
@@ -517,8 +517,7 @@ const InstructorDashboard = () => {
                                                     opt === q.correctAnswer || 
                                                     String.fromCharCode(65 + i) === q?.correctAnswer?.trim()?.toUpperCase()
                                                 );
-                                                const correctLabel = correctIdx >= 0 ? String.fromCharCode(65 + correctIdx) : '?';
-                                                const correctText = correctIdx >= 0 ? q.options[correctIdx] : q.correctAnswer;
+
                                                 return (
                                                 <div key={idx} className="group bg-white dark:bg-white/[0.03] p-7 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300">
                                                     {/* Question header row */}

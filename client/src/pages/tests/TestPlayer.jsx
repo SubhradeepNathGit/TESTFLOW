@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { saveAnswer, submitAttempt, startAttempt } from '../../api/attemptApi';
 import { getTest } from '../../api/testApi';
 import Skeleton, { CardSkeleton } from '../../components/common/Skeleton';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from '../../hooks/useSocket';
 
 // Submit confirmation modal
 const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total }) => {
@@ -112,7 +112,7 @@ const TestPlayer = () => {
     const socket = useSocket();
 
 
-    const fetchTestData = async () => {
+    const fetchTestData = useCallback(async () => {
         try {
             const { data: attemptData } = await startAttempt(id);
             setAttemptId(attemptData.data._id);
@@ -134,7 +134,7 @@ const TestPlayer = () => {
             toast.error('Failed to load test. It may not be available.');
             navigate('/student-dashboard');
         }
-    };
+    }, [id, navigate]);
 
     const handleSaveAnswer = async (questionId, option) => {
         setAnswers(prev => ({ ...prev, [questionId]: option }));
@@ -184,7 +184,7 @@ const TestPlayer = () => {
     // Fetch test data on mount
     useEffect(() => {
         fetchTestData();
-    }, [id]);
+    }, [fetchTestData]);
 
     // Handle real-time interruptions
     useEffect(() => {

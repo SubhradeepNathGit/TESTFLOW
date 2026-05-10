@@ -1,13 +1,13 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 
 const Login = () => {
-    const { login } = useContext(AuthContext);
+    const { login } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const {
         register,

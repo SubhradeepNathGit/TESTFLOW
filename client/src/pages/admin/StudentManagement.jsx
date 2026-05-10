@@ -1,16 +1,16 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, UserPlus, Mail, Search, X, Eye, ToggleLeft, ToggleRight, Trash2, Ban } from 'lucide-react';
-import AuthContext from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosInstance';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
 import { useConfirm } from '../../hooks/useConfirm';
-import { useSocket } from '../../context/SocketContext';
+import { useSocket } from '../../hooks/useSocket';
 
 const StudentManagement = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);

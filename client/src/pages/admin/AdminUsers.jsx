@@ -1,6 +1,6 @@
-import { useState, useContext, useEffect } from "react";
-import { useSocket } from "../../context/SocketContext";
-import AuthContext from "../../context/AuthContext";
+    import { useState, useEffect, useCallback } from "react";
+import { useSocket } from "../../hooks/useSocket";
+import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ const EmptyState = ({ icon: Icon, title, desc }) => (
 );
 
 const AdminUsers = ({ role }) => {
-    const { user, loading: authLoading } = useContext(AuthContext);
+    const { user, loading: authLoading } = useAuth();
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 300);
@@ -32,7 +32,7 @@ const AdminUsers = ({ role }) => {
     const isStudent = role === "student";
     const Icon = isStudent ? GraduationCap : Briefcase;
     const accentColor = isStudent ? "bg-emerald-600" : "bg-violet-600";
-    const accentLight = isStudent ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400" : "bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400";
+
 
     const { data: users = [], isLoading } = useQuery({
         queryKey: ['admin-users', role, debouncedSearch],
@@ -41,7 +41,7 @@ const AdminUsers = ({ role }) => {
         placeholderData: keepPreviousData,
     });
 
-    const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-users', role, debouncedSearch] });
+    const refresh = useCallback(() => queryClient.invalidateQueries({ queryKey: ['admin-users', role, debouncedSearch] }), [queryClient, role, debouncedSearch]);
 
     useEffect(() => {
         if (!socket) return;
@@ -61,7 +61,7 @@ const AdminUsers = ({ role }) => {
             socket.off("admin:user_deleted", refresh);
             socket.off("admin:user_toggled", refresh);
         };
-    }, [socket]);
+    }, [socket, refresh]);
 
     const handleToggle = async (id) => {
         try {

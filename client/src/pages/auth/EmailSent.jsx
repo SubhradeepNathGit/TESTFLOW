@@ -1,13 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MailCheck } from "lucide-react";
-import AuthContext from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import AuthLayout from "../../components/auth/AuthLayout";
 
 const EmailSent = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const { forgotPassword } = useContext(AuthContext);
+    const { forgotPassword } = useAuth();
     const [sending, setSending] = useState(false);
     const email = state?.email;
 
