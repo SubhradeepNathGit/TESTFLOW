@@ -1,9 +1,8 @@
 /**
- * useAuth — Drop-in replacement for useContext(AuthContext).
+
  *
- * Exposes the EXACT same shape as the old AuthContext so every consumer only
- * needs to change its import line; no logic inside the component changes.
- *
+
+ 
  * Usage (same as before):
  *   import { useAuth } from '../../hooks/useAuth';
  *   const { user, login, logout, hasPermission, ... } = useAuth();
@@ -66,6 +65,7 @@ export const useAuth = () => {
 
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
         dispatch(clearCredentials());
         navigate('/login');
         toast.info('Logged out');
@@ -79,6 +79,7 @@ export const useAuth = () => {
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('user', JSON.stringify(userData));
             dispatch(setCredentials({ user: userData, token: accessToken }));
 
             if (userData.role === 'super_admin') {
@@ -166,6 +167,7 @@ export const useAuth = () => {
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
             dispatch(setCredentials({ user: updatedUser, token: accessToken }));
 
             toast.success('Password updated successfully!');
@@ -178,6 +180,7 @@ export const useAuth = () => {
 
     // ─── setUser (used in ProfileModal) ──────────────────────────────────────
     const setUser = (userData) => {
+        localStorage.setItem('user', JSON.stringify(userData));
         dispatch(setUserAction(userData));
     };
 

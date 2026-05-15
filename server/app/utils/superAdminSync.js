@@ -36,9 +36,13 @@ const syncSuperAdmin = async () => {
                 
                 if (isEmailDifferent) admin.email = adminEmail;
                 if (isPasswordDifferent) admin.password = adminPassword;
+                
+                // Always ensure super admin is verified and active
+                admin.isVerified = true;
+                admin.isActive = true;
 
                 await admin.save();
-                console.log("Super Admin synced.");
+                console.log("Super Admin synced and verified.");
             }
         }
     } catch (err) {

@@ -3,7 +3,14 @@ import { createSlice } from '@reduxjs/toolkit';
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        user: null,
+        user: (() => {
+            try {
+                const savedUser = localStorage.getItem('user');
+                return savedUser ? JSON.parse(savedUser) : null;
+            } catch (error) {
+                return null;
+            }
+        })(),
         token: localStorage.getItem('accessToken') || null,
         loading: true,
     },
