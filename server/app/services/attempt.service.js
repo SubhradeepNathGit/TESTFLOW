@@ -87,8 +87,15 @@ exports.resetAttempt = async (attemptId, instructorId) => {
 
     // Auth check
     const instructor = await require("../models/User").findById(instructorId);
-    if (attempt.institutionId.toString() !== instructor.institutionId.toString()) {
-        throw new ErrorResponse("Unauthorized", 403);
+    if (!instructor) throw new ErrorResponse("Instructor not found", 404);
+    
+    if (instructor.role !== "super_admin") {
+        const attemptInstId = attempt.institutionId ? attempt.institutionId.toString() : null;
+        const instructorInstId = instructor.institutionId ? instructor.institutionId.toString() : null;
+
+        if (!attemptInstId || !instructorInstId || attemptInstId !== instructorInstId) {
+            throw new ErrorResponse("Unauthorized", 403);
+        }
     }
 
     // Clean up queue
