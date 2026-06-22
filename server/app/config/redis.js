@@ -30,17 +30,25 @@ submissionQueue.on('error', () => {});
 
 // Schedule auto-submit
 const scheduleAutoSubmit = async (attemptId, delay) => {
-    await submissionQueue.add(
-        "auto-submit",
-        { attemptId },
-        { delay, jobId: `submit-${attemptId}` }
-    );
+    try {
+        await submissionQueue.add(
+            "auto-submit",
+            { attemptId },
+            { delay, jobId: `submit-${attemptId}` }
+        );
+    } catch (err) {
+        console.error("Failed to schedule auto-submit job:", err.message);
+    }
 };
 
 // Cancel auto-submit
 const cancelAutoSubmit = async (attemptId) => {
-    const job = await submissionQueue.getJob(`submit-${attemptId}`);
-    if (job) await job.remove();
+    try {
+        const job = await submissionQueue.getJob(`submit-${attemptId}`);
+        if (job) await job.remove();
+    } catch (err) {
+        console.error("Failed to cancel auto-submit job:", err.message);
+    }
 };
 
 module.exports = { submissionQueue, redisConnection, scheduleAutoSubmit, cancelAutoSubmit };
