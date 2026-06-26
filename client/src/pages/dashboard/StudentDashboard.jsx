@@ -364,7 +364,7 @@ const StudentDashboard = () => {
                                 >
                                     <Award size={15} strokeWidth={1.8} className="text-slate-500 dark:text-slate-400" />
                                     View Leaderboard
-                                    <ChevronRight size={14} strokeWidth={2} className="ml-auto text-slate-400 dark:text-slate-500" />
+                                    <ChevronRight size={14} strokeWidth={2} className="text-slate-400 dark:text-slate-500" />
                                 </button>
                             </div>
                         </div>

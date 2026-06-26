@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import {
     X,
     Camera,
-    Package,
     User,
     Mail,
     Save,
@@ -16,19 +15,16 @@ import {
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axiosInstance";
 import { toast } from "react-toastify";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ProfileModal = ({ isOpen, onClose }) => {
     const { user, updatePassword, setUser } = useAuth();
-
     const [activeTab, setActiveTab] = useState("info");
-
-
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState(user?.name || "");
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-
 
     const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -61,8 +57,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
             setIsUpdatingPassword(false);
         }
     };
-
-    // Handle profile updates instead
 
     useEffect(() => {
         if (isOpen && user) {
@@ -109,7 +103,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 setIsEditing(false);
                 setSelectedFile(null);
                 setPreviewUrl(null);
-                onClose();
             }
         } catch (error) {
             console.error(error);
@@ -127,199 +120,208 @@ const ProfileModal = ({ isOpen, onClose }) => {
             ? user.profileImage.startsWith("http")
                 ? user.profileImage
                 : `http://localhost:3006/${user.profileImage}`
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=0f172a&color=fff&size=200`);
+            : null);
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            { }
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-md"
+                        onClick={onClose}
+                    />
 
-            { }
-            <div className="relative w-full max-w-5xl bg-white dark:bg-black rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-full max-h-[100dvh] md:h-[85vh] md:min-h-[500px]">
-                { }
-                <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50">
-                    <div className="flex items-center gap-3 md:gap-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-slate-900 flex items-center justify-center shrink-0">
-                            <User className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                        </div>
-                        <div>
-                            <h2 className="text-lg md:text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">My Profile</h2>
-                            <p className="text-[9px] md:text-xs font-semibold text-slate-400 uppercase tracking-widest line-clamp-1">
-                                Manage account configuration
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {activeTab === "info" && !isEditing && (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="p-3 bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none border border-slate-100 dark:border-white/5 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
-                                title="Edit Profile"
-                            >
-                                <Pencil className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                            </button>
-                        )}
-                        <button
-                            onClick={onClose}
-                            className="p-3 hover:bg-white dark:hover:bg-slate-800 rounded-2xl transition-all group shadow-sm hover:shadow-md border border-transparent hover:border-slate-100 dark:hover:border-slate-700"
-                        >
-                            <X className="w-5 h-5 text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:rotate-90 transition-all" />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    { }
-                    <div className="w-full md:w-72 bg-slate-50/30 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/30 border-b md:border-b-0 md:border-r border-slate-100 dark:border-white/5 p-4 md:p-6 shrink-0 flex flex-row md:flex-col overflow-x-auto gap-2 md:gap-2 no-scrollbar">
-                        <button
-                            onClick={() => setActiveTab("info")}
-                            className={`flex items-center gap-2 md:gap-3 px-4 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all font-bold text-[10px] md:text-xs uppercase tracking-wider whitespace-nowrap ${activeTab === "info"
-                                ? "bg-slate-900 text-white shadow-xl shadow-slate-200 dark:shadow-none"
-                                : "text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm"
-                                }`}
-                        >
-                            <User className="w-4 h-4 shrink-0" />
-                            <span className="flex-1 text-left">Personal Info</span>
-                            {activeTab === "info" && (
-                                <ChevronRight className="w-4 h-4 hidden md:block" />
-                            )}
-                        </button>
-
-
-                        {user?.role === 'student' && (
-                            <button
-                                onClick={() => setActiveTab("security")}
-                                className={`flex items-center gap-2 md:gap-3 px-4 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all font-bold text-[10px] md:text-xs uppercase tracking-wider whitespace-nowrap ${activeTab === "security"
-                                    ? "bg-slate-900 text-white shadow-xl shadow-slate-200 dark:shadow-none"
-                                    : "text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 hover:shadow-sm"
-                                    }`}
-                            >
-                                <Lock className="w-4 h-4 shrink-0" />
-                                <span className="flex-1 text-left">Security</span>
-                                {activeTab === "security" && (
-                                    <ChevronRight className="w-4 h-4 hidden md:block" />
+                    {/* Modal Container */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className="relative w-full max-w-5xl bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-3xl rounded-[28px] border border-slate-200/60 dark:border-white/[0.08] shadow-2xl dark:shadow-none overflow-hidden flex flex-col h-[85vh] md:min-h-[500px]"
+                    >
+                        {/* Header (No divider) */}
+                        <div className="flex items-center justify-between px-6 py-5 md:px-8 md:py-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.06] flex items-center justify-center shrink-0">
+                                    <User className="w-5 h-5 text-slate-600 dark:text-slate-300" strokeWidth={1.5} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">My Profile</h2>
+                                    <p className="text-[10px] md:text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">
+                                        Account settings
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {activeTab === "info" && !isEditing && (
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="p-3 bg-white dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.06] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all"
+                                        title="Edit Profile"
+                                    >
+                                        <Pencil className="w-4 h-4" strokeWidth={1.5} />
+                                    </button>
                                 )}
-                            </button>
-                        )}
-                    </div>
+                                <button
+                                    onClick={onClose}
+                                    className="p-3 bg-transparent hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all"
+                                >
+                                    <X className="w-5 h-5" strokeWidth={1.5} />
+                                </button>
+                            </div>
+                        </div>
 
+                        <div className="flex flex-col md:flex-row flex-1 overflow-hidden px-2 md:px-4 pb-4 md:pb-6 gap-6">
+                            {/* Sidebar (No divider) */}
+                            <div className="w-full md:w-64 px-4 md:px-0 shrink-0 flex flex-row md:flex-col overflow-x-auto gap-2 no-scrollbar">
+                                <button
+                                    onClick={() => setActiveTab("info")}
+                                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all font-semibold text-xs uppercase tracking-wider whitespace-nowrap ${activeTab === "info"
+                                        ? "bg-slate-900 dark:bg-white/[0.06] text-white dark:text-white"
+                                        : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/[0.02] hover:text-slate-800 dark:hover:text-slate-300"
+                                        }`}
+                                >
+                                    <User className="w-4 h-4 shrink-0" strokeWidth={1.8} />
+                                    <span className="flex-1 text-left">Personal Info</span>
+                                    {activeTab === "info" && (
+                                        <ChevronRight className="w-4 h-4 hidden md:block opacity-50" strokeWidth={2} />
+                                    )}
+                                </button>
 
-                    { }
-                    <div className="flex-1 overflow-y-auto bg-white/50 dark:bg-black/50">
-                        { }
-                        {activeTab === "info" && (
-                            <div className="p-5 md:p-12">
-                                <div className="max-w-2xl mx-auto space-y-6 md:space-y-10">
-                                    <div className="flex flex-col items-center text-center pb-6 md:pb-10">
-                                        <div className="relative group mb-6 md:mb-8">
-                                            <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 md:border-8 border-white dark:border-white/5 ring-1 ring-slate-100 dark:ring-white/10 shadow-none dark:shadow-none">
-                                                <img
-                                                    src={profileImageUrl}
-                                                    alt={user?.name}
-                                                    className="w-full h-full object-cover rounded-full"
+                                {user?.role === 'student' && (
+                                    <button
+                                        onClick={() => setActiveTab("security")}
+                                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all font-semibold text-xs uppercase tracking-wider whitespace-nowrap ${activeTab === "security"
+                                            ? "bg-slate-900 dark:bg-white/[0.06] text-white dark:text-white"
+                                            : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/[0.02] hover:text-slate-800 dark:hover:text-slate-300"
+                                            }`}
+                                    >
+                                        <Lock className="w-4 h-4 shrink-0" strokeWidth={1.8} />
+                                        <span className="flex-1 text-left">Security</span>
+                                        {activeTab === "security" && (
+                                            <ChevronRight className="w-4 h-4 hidden md:block opacity-50" strokeWidth={2} />
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Main Content */}
+                            <div className="flex-1 overflow-y-auto px-4 md:px-8">
+                                {activeTab === "info" && (
+                                    <div className="max-w-xl mx-auto py-8">
+                                        <div className="flex flex-col items-center text-center">
+                                            {/* Avatar */}
+                                            <div className="relative mb-8">
+                                                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.08] flex items-center justify-center">
+                                                    {profileImageUrl ? (
+                                                        <img
+                                                            src={profileImageUrl}
+                                                            alt={user?.name}
+                                                            className="w-full h-full object-cover rounded-full"
+                                                        />
+                                                    ) : (
+                                                        <User className="w-12 h-12 text-slate-300 dark:text-slate-600" strokeWidth={1} />
+                                                    )}
+                                                </div>
+
+                                                {isEditing && (
+                                                    <button
+                                                        onClick={() => fileInputRef.current.click()}
+                                                        className="absolute bottom-0 right-0 p-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full hover:scale-105 active:scale-95 transition-all z-10 border border-slate-800 dark:border-white/20"
+                                                    >
+                                                        <Camera className="w-5 h-5" strokeWidth={1.5} />
+                                                    </button>
+                                                )}
+
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    hidden
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
                                                 />
                                             </div>
 
-                                            {isEditing && (
-                                                <button
-                                                    onClick={() => fileInputRef.current.click()}
-                                                    className="absolute bottom-1 right-1 p-2.5 bg-slate-800 text-white rounded-full border-2 border-white shadow-2xl hover:scale-110 hover:bg-slate-900 transition-all z-10"
-                                                >
-                                                    <Camera className="w-5 h-5" />
-                                                </button>
+                                            {!isEditing ? (
+                                                <>
+                                                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                                                        {user?.name}
+                                                    </h3>
+                                                    <div className="flex flex-col items-center gap-1.5 mb-8">
+                                                        <p className="text-[10px] md:text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                                            {user?.role === 'owner' ? 'Institution Admin' : user?.role === 'instructor' ? 'Instructor' : user?.role === 'student' ? 'Student' : user?.role === 'super_admin' ? 'Platform Admin' : 'User'}
+                                                        </p>
+                                                        <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                                            {user?.institutionName || "TESTFLOW"}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] text-slate-600 dark:text-slate-300 text-sm font-medium">
+                                                        <Mail className="w-4 h-4 text-slate-400" strokeWidth={1.5} />
+                                                        {user?.email}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="w-full space-y-6 bg-slate-50/50 dark:bg-white/[0.02] p-6 md:p-8 rounded-[24px] border border-slate-200/60 dark:border-white/[0.06]">
+                                                    <div className="space-y-2 text-left">
+                                                        <label className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                                                        <input
+                                                            value={editName}
+                                                            onChange={(e) => setEditName(e.target.value)}
+                                                            className="w-full px-5 py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] focus:border-slate-400 dark:focus:border-white/20 outline-none bg-white dark:bg-white/[0.02] text-slate-900 dark:text-white text-sm transition-all"
+                                                            placeholder="Enter your name"
+                                                        />
+                                                    </div>
+
+                                                    <div className="flex gap-3 pt-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setIsEditing(false);
+                                                                setEditName(user?.name);
+                                                                setSelectedFile(null);
+                                                                setPreviewUrl(null);
+                                                            }}
+                                                            className="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] text-slate-600 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-all"
+                                                        >
+                                                            Cancel
+                                                        </button>
+
+                                                        <button
+                                                            onClick={handleSaveProfile}
+                                                            disabled={isSaving}
+                                                            className="flex-1 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold text-xs uppercase tracking-wider hover:bg-slate-800 dark:hover:bg-slate-100 flex items-center justify-center gap-2 disabled:opacity-70 transition-all active:scale-[0.98]"
+                                                        >
+                                                            {isSaving ? (
+                                                                <Loader className="animate-spin w-4 h-4" />
+                                                            ) : (
+                                                                <Save className="w-4 h-4" strokeWidth={1.8} />
+                                                            )}
+                                                            Save Changes
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             )}
-
-                                            <input
-                                                type="file"
-                                                ref={fileInputRef}
-                                                hidden
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
                                         </div>
-
-                                        {!isEditing ? (
-                                            <>
-                                                <h3 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1 tracking-tight">
-                                                    {user?.name}
-                                                </h3>
-                                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                                                    {user?.role === 'owner' ? 'Institution Admin' : user?.role === 'instructor' ? 'Instructor' : user?.role === 'student' ? 'Student' : user?.role === 'super_admin' ? 'Platform Admin' : 'User'}
-                                                </p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                                    {user?.institutionName || "TESTFLOW"}
-                                                </p>
-                                                <p className="text-slate-400 font-medium flex items-center justify-center gap-2 mb-10">
-                                                    <Mail className="w-4 h-4 text-slate-300" />
-                                                    {user?.email}
-                                                </p>
-                                            </>
-                                        ) : (
-                                            <div className="w-full space-y-4 md:space-y-6 bg-slate-50/50 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none/50 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 dark:border-white/5">
-                                                <div className="space-y-2 text-left">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                                                    <input
-                                                        value={editName}
-                                                        onChange={(e) => setEditName(e.target.value)}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-white dark:bg-white/10 text-slate-900 dark:text-slate-100 font-medium transition-all"
-                                                        placeholder="Enter your name"
-                                                    />
-                                                </div>
-
-                                                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-4">
-                                                    <button
-                                                        onClick={() => {
-                                                            setIsEditing(false);
-                                                            setEditName(user?.name);
-                                                            setSelectedFile(null);
-                                                            setPreviewUrl(null);
-                                                        }}
-                                                        className="w-full sm:flex-1 py-3 md:py-4 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-xl md:rounded-2xl hover:bg-white dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-500 font-bold text-xs uppercase tracking-wider transition-all"
-                                                    >
-                                                        Cancel
-                                                    </button>
-
-                                                    <button
-                                                        onClick={handleSaveProfile}
-                                                        disabled={isSaving}
-                                                        className="flex-1 py-4 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl flex items-center justify-center gap-3 font-bold text-xs uppercase tracking-wider hover:bg-slate-900 dark:hover:bg-white disabled:opacity-70 shadow-lg shadow-slate-200 dark:shadow-none transition-all"
-                                                    >
-                                                        {isSaving ? (
-                                                            <Loader className="animate-spin w-5 h-5" />
-                                                        ) : (
-                                                            <Save className="w-5 h-5" />
-                                                        )}
-                                                        Save Changes
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
-                                </div>
-                            </div>
-                        )}
+                                )}
 
-                        { }
-                        {activeTab === "security" && (
-                            <div className="p-5 md:p-12">
-                                <div className="max-w-md mx-auto">
-                                    <div className="bg-white dark:bg-white/5 dark:backdrop-blur-xl border-white/10 shadow-none">
-                                        <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
-                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-50 flex items-center justify-center shrink-0">
-                                                <Lock className="w-5 h-5 md:w-6 md:h-6 text-slate-900" />
+                                {activeTab === "security" && (
+                                    <div className="max-w-md mx-auto py-8">
+                                        <div className="flex items-center gap-4 mb-8">
+                                            <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] flex items-center justify-center shrink-0">
+                                                <Lock className="w-5 h-5 text-slate-600 dark:text-slate-400" strokeWidth={1.5} />
                                             </div>
                                             <div>
-                                                <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-100">Security</h3>
-                                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update credentials</p>
+                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Security</h3>
+                                                <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Update credentials</p>
                                             </div>
                                         </div>
 
-                                        <form onSubmit={handlePasswordUpdate} className="space-y-6">
+                                        <form onSubmit={handlePasswordUpdate} className="space-y-5">
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
+                                                <label className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
                                                     Current Password
                                                 </label>
                                                 <div className="relative">
@@ -328,21 +330,21 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                         required
                                                         value={passwordData.current}
                                                         onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-slate-50/30 dark:bg-white/10/50 text-slate-900 dark:text-slate-100 font-medium transition-all pr-12"
+                                                        className="w-full px-5 py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] focus:border-slate-400 dark:focus:border-white/20 outline-none bg-slate-50/50 dark:bg-white/[0.02] text-slate-900 dark:text-white text-sm transition-all pr-12"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-900 transition-colors"
+                                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                                                     >
-                                                        {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                        {showCurrentPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                                                     </button>
                                                 </div>
                                             </div>
 
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
+                                                <label className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
                                                     New Password
                                                 </label>
                                                 <div className="relative">
@@ -351,24 +353,24 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                         required
                                                         value={passwordData.new}
                                                         onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-slate-50/30 dark:bg-white/10/50 text-slate-900 dark:text-slate-100 font-medium transition-all pr-12"
+                                                        className="w-full px-5 py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] focus:border-slate-400 dark:focus:border-white/20 outline-none bg-slate-50/50 dark:bg-white/[0.02] text-slate-900 dark:text-white text-sm transition-all pr-12"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowNewPassword(!showNewPassword)}
-                                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-900 transition-colors"
+                                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                                                     >
-                                                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                        {showNewPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                                                     </button>
                                                 </div>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-2 ml-1">
-                                                    Min. 6 alphanumeric characters
+                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest mt-2 ml-1">
+                                                    Min. 6 characters
                                                 </p>
                                             </div>
 
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
+                                                <label className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
                                                     Confirm New Password
                                                 </label>
                                                 <div className="relative">
@@ -377,33 +379,33 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                                         required
                                                         value={passwordData.confirm}
                                                         onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
-                                                        className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-slate-100/10 focus:border-slate-900 dark:focus:border-slate-100 outline-none bg-slate-50/30 dark:bg-white/10/50 text-slate-900 dark:text-slate-100 font-medium transition-all pr-12"
+                                                        className="w-full px-5 py-3.5 rounded-xl border border-slate-200 dark:border-white/[0.06] focus:border-slate-400 dark:focus:border-white/20 outline-none bg-slate-50/50 dark:bg-white/[0.02] text-slate-900 dark:text-white text-sm transition-all pr-12"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-900 transition-colors"
+                                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                                                     >
-                                                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                        {showConfirmPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                                                     </button>
                                                 </div>
                                             </div>
 
-                                            <div className="pt-6">
+                                            <div className="pt-4">
                                                 <button
                                                     type="submit"
                                                     disabled={isUpdatingPassword}
-                                                    className="w-full py-5 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white flex items-center justify-center gap-3 disabled:opacity-70 shadow-xl shadow-slate-200 dark:shadow-none transition-all"
+                                                    className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-slate-100 flex items-center justify-center gap-2 disabled:opacity-70 transition-all active:scale-[0.98]"
                                                 >
                                                     {isUpdatingPassword ? (
                                                         <>
-                                                            <Loader className="animate-spin w-5 h-5" />
+                                                            <Loader className="animate-spin w-4 h-4" />
                                                             Processing...
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <Save className="w-4 h-4" />
+                                                            <Save className="w-4 h-4" strokeWidth={1.8} />
                                                             Update Password
                                                         </>
                                                     )}
@@ -411,13 +413,13 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                             </div>
                                         </form>
                                     </div>
-                                </div>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    </motion.div>
                 </div>
-            </div>
-        </div>
+            )}
+        </AnimatePresence>
     );
 };
 
