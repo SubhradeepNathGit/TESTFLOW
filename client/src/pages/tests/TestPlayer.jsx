@@ -11,6 +11,51 @@ import { getTest } from '../../api/testApi';
 import Skeleton, { CardSkeleton } from '../../components/common/Skeleton';
 import { useSocket } from '../../hooks/useSocket';
 
+// Disqualified Modal
+const DisqualifiedModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+                >
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"
+                    />
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0, y: 10 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                        className="relative w-full max-w-md bg-white dark:bg-[#0A0A0A] border border-slate-100 dark:border-white/[0.08] rounded-[2.5rem] shadow-2xl overflow-hidden text-center p-10"
+                    >
+                        <div className="w-20 h-20 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <FiAlertTriangle size={36} />
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-3 tracking-tight">Attempt Disqualified</h3>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-sm leading-relaxed mb-8">
+                            Your test attempt has been forcefully reset or disqualified by the instructor. Any unsaved progress has been discarded. Please contact your instructor for further details.
+                        </p>
+                        <button
+                            onClick={onClose}
+                            className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-slate-200 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                        >
+                            Return to Dashboard
+                        </button>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
+
 // Submit confirmation modal
 const SubmitModal = ({ isOpen, onClose, onConfirm, isSubmitting, answered, total }) => {
     if (!isOpen) return null;
@@ -109,6 +154,7 @@ const TestPlayer = () => {
     const [attemptId, setAttemptId] = useState(null);
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDisqualified, setIsDisqualified] = useState(false);
     const socket = useSocket();
 
 
@@ -191,8 +237,7 @@ const TestPlayer = () => {
         if (socket && attemptId) {
             const handleReset = (data) => {
                 if (data.attemptId === attemptId) {
-                    toast.error('This attempt has been reset by the instructor.');
-                    navigate('/student-dashboard');
+                    setIsDisqualified(true);
                 }
             };
 
@@ -293,15 +338,20 @@ const TestPlayer = () => {
     };
 
     const qStatusStyles = {
-        'answered':        'bg-emerald-500 text-white shadow-sm dark:shadow-none',
-        'marked':          'bg-amber-400 text-white shadow-sm dark:shadow-none',
-        'marked-answered': 'bg-violet-600 text-white shadow-sm dark:shadow-none',
-        'visited':         'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800',
-        'not-visited':     'bg-slate-100 dark:bg-white/5 text-slate-400 border border-transparent',
+        'answered':        'bg-emerald-500 text-white shadow-md dark:shadow-none border border-emerald-600 dark:border-emerald-400',
+        'marked':          'bg-amber-400 text-white shadow-md dark:shadow-none border border-amber-500 dark:border-amber-300',
+        'marked-answered': 'bg-violet-600 text-white shadow-md dark:shadow-none border border-violet-700 dark:border-violet-500',
+        'visited':         'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border border-purple-300 dark:border-purple-500/50 shadow-sm dark:shadow-none',
+        'not-visited':     'bg-slate-50 dark:bg-white/[0.02] text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/[0.05] shadow-sm dark:shadow-none',
     };
 
     return (
         <>
+            <DisqualifiedModal 
+                isOpen={isDisqualified} 
+                onClose={() => navigate('/student-dashboard')} 
+            />
+
             <SubmitModal
                 isOpen={showSubmitModal}
                 onClose={() => !isSubmitting && setShowSubmitModal(false)}
@@ -527,11 +577,11 @@ const TestPlayer = () => {
                                         return (
                                             <motion.button
                                                 key={idx}
-                                                whileHover={{ scale: 1.1, zIndex: 10 }}
-                                                whileTap={{ scale: 0.9 }}
+                                                whileHover={{ scale: 1.05, zIndex: 10 }}
+                                                whileTap={{ scale: 0.95 }}
                                                 onClick={() => setCurrentIdx(idx)}
-                                                className={`w-full aspect-square rounded-xl flex items-center justify-center text-[13px] font-black transition-all relative ${qStatusStyles[status]} ${
-                                                    isCurrent ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-white dark:ring-offset-black' : ''
+                                                className={`w-full aspect-square rounded-[14px] flex items-center justify-center text-[15px] font-black transition-all relative ${qStatusStyles[status]} ${
+                                                    isCurrent ? 'ring-[3px] ring-indigo-500 ring-offset-2 ring-offset-white dark:ring-offset-black scale-105 z-10' : ''
                                                 }`}
                                             >
                                                 {idx + 1}
@@ -547,10 +597,10 @@ const TestPlayer = () => {
                                 <div className="space-y-2.5">
                                     {[
                                         { color: 'bg-emerald-500', label: 'Answered' },
-                                        { color: 'bg-sky-100 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800', label: 'Visited', textColor: 'text-slate-500 dark:text-slate-400' },
+                                        { color: 'bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-500/50', label: 'Visited', textColor: 'text-slate-600 dark:text-slate-300' },
                                         { color: 'bg-amber-400', label: 'Marked for Review' },
                                         { color: 'bg-violet-600', label: 'Marked & Answered' },
-                                        { color: 'bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600', label: 'Not Visited', textColor: 'text-slate-500 dark:text-slate-400' },
+                                        { color: 'bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05]', label: 'Not Visited', textColor: 'text-slate-500 dark:text-slate-400' },
                                     ].map(({ color, label, textColor }) => (
                                         <div key={label} className="flex items-center gap-3">
                                             <span className={`w-5 h-5 rounded-lg shrink-0 ${color}`} />
