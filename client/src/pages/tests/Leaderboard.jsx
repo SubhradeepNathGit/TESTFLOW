@@ -175,14 +175,14 @@ const Leaderboard = () => {
         <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10 transition-colors duration-500">
             <div className="max-w-7xl mx-auto space-y-8">
                 <Skeleton className="w-1/3 h-10 mb-8" />
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-8">
+                <div className="bg-white dark:bg-black dark:backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-[32px] p-8">
                     <div className="flex items-end justify-center gap-6 lg:gap-10">
                         <Skeleton className="w-32 h-40 rounded-2xl" />
                         <Skeleton className="w-40 h-56 rounded-2xl" />
                         <Skeleton className="w-32 h-32 rounded-2xl" />
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-200 dark:border-slate-800 overflow-hidden p-6">
+                <div className="bg-white dark:bg-black dark:backdrop-blur-xl rounded-[32px] border border-slate-200 dark:border-white/5 overflow-hidden p-6">
                     <TableSkeleton rows={5} />
                 </div>
             </div>
@@ -206,7 +206,7 @@ const Leaderboard = () => {
                     className="mb-10"
                 >
                     <div className="flex items-center gap-4 mb-3">
-                        <div className="w-12 h-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center shadow-sm">
+                        <div className="w-12 h-12 bg-white dark:bg-black dark:backdrop-blur-xl border border-slate-200 dark:border-white/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center shadow-sm">
                             <Trophy size={24} strokeWidth={2} />
                         </div>
                         <div>
@@ -220,9 +220,9 @@ const Leaderboard = () => {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-200 dark:border-slate-800 p-16 text-center shadow-sm"
+                        className="bg-white dark:bg-black dark:backdrop-blur-xl rounded-[32px] border border-slate-200 dark:border-white/5 p-16 text-center shadow-sm"
                     >
-                        <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-slate-700/50">
+                        <div className="w-20 h-20 bg-slate-50 dark:bg-white/[0.04] rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100 dark:border-white/5">
                             <FiBarChart2 size={32} className="text-slate-400 dark:text-slate-500" />
                         </div>
                         <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 tracking-tight">No Rankings Yet</h3>
@@ -234,7 +234,7 @@ const Leaderboard = () => {
                     <>
                         {/* Podium Section */}
                         {top3.length >= 2 && (
-                            <div className="bg-white dark:bg-slate-900/50 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm p-8 lg:p-12 mb-8 relative overflow-hidden">
+                            <div className="bg-white dark:bg-black dark:backdrop-blur-xl rounded-[32px] border border-slate-200 dark:border-white/5 shadow-sm p-8 lg:p-12 mb-8 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none" />
                                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 blur-[120px] translate-y-1/2 -translate-x-1/4 pointer-events-none" />
                                 
@@ -261,25 +261,25 @@ const Leaderboard = () => {
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.45 }}
-                            className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-8"
+                            className="bg-white dark:bg-black dark:backdrop-blur-xl rounded-[32px] border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden mb-8"
                         >
-                            <div className="px-6 py-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
+                            <div className="px-6 py-5 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
                                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                     <FiTrendingUp size={18} className="text-indigo-500" />
                                     Full Rankings
                                 </h3>
-                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 border border-transparent dark:border-white/5 px-3 py-1.5 rounded-full uppercase tracking-widest">
                                     {leaderboard.length} Ranked
                                 </span>
                             </div>
 
                             {/* Column heads */}
-                            <div className="flex items-center justify-between px-6 py-3 bg-slate-50/80 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800/60">
+                            <div className="flex items-center justify-between px-6 py-3 bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
                                 <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Rank · Student</span>
                                 <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Score</span>
                             </div>
 
-                            <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                            <div className="divide-y divide-slate-100 dark:divide-white/5">
                                 {leaderboard.map((student, idx) => (
                                     <motion.div
                                         key={idx}
@@ -287,13 +287,13 @@ const Leaderboard = () => {
                                         variants={cardVariants}
                                         initial="hidden"
                                         animate="show"
-                                        className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group"
+                                        className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/80 dark:hover:bg-white/[0.04] transition-colors group"
                                     >
                                         <div className="flex items-center gap-4">
                                             {/* Rank badge */}
                                             <RankBadge rank={idx + 1} />
                                             {/* Avatar circle */}
-                                            <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:ring-2 group-hover:ring-indigo-500/20 transition-all overflow-hidden">
+                                            <div className="w-10 h-10 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full flex items-center justify-center text-slate-400 shrink-0 group-hover:ring-2 group-hover:ring-indigo-500/20 transition-all overflow-hidden">
                                                 {getProfileUrl(student.profileImage) ? (
                                                     <img src={getProfileUrl(student.profileImage)} alt={student.name} className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                                                 ) : (
@@ -323,7 +323,7 @@ const Leaderboard = () => {
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-[32px] flex items-center gap-6 shadow-sm relative overflow-hidden group"
+                            className="bg-white dark:bg-black dark:backdrop-blur-xl border border-slate-200 dark:border-white/5 p-6 sm:p-8 rounded-[32px] flex items-center gap-6 shadow-sm relative overflow-hidden group"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/50 to-transparent dark:from-indigo-500/5 pointer-events-none" />
                             <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-indigo-100 dark:border-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
