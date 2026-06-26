@@ -149,12 +149,12 @@ const StudentDashboard = () => {
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="relative bg-white dark:bg-[#0A0A0A] border border-slate-200/60 dark:border-white/[0.06] rounded-[28px] p-8 lg:p-10 mb-6 overflow-hidden"
+                    className="relative bg-white dark:bg-transparent rounded-[28px] border border-slate-200/60 dark:border-transparent p-8 lg:p-10 mb-6"
                 >
                     <div className="flex items-center gap-6 lg:gap-8">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-200/60 dark:border-white/[0.06] flex items-center justify-center bg-slate-50 dark:bg-white/[0.03] text-slate-700 dark:text-slate-300 text-3xl sm:text-4xl font-semibold shrink-0 overflow-hidden">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center bg-slate-100 dark:bg-white/[0.04] text-slate-600 dark:text-slate-400 text-3xl sm:text-4xl font-semibold shrink-0 overflow-hidden">
                             {user?.profileImage ? (
-                                <img src={user.profileImage.startsWith('http') ? user.profileImage : `http://localhost:3006/${user.profileImage}`} alt="Profile" className="w-full h-full object-cover rounded-2xl" loading="eager" fetchpriority="high" />
+                                <img src={user.profileImage.startsWith('http') ? user.profileImage : `http://localhost:3006/${user.profileImage}`} alt="Profile" className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                             ) : (
                                 user?.name?.charAt(0).toUpperCase() || 'S'
                             )}
@@ -360,11 +360,11 @@ const StudentDashboard = () => {
                             <div className="p-4 pt-2">
                                 <button
                                     onClick={() => navigate('/leaderboard')}
-                                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-black py-3 rounded-xl font-semibold text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 active:scale-[0.98]"
+                                    className="w-full bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] text-slate-800 dark:text-slate-200 py-3 rounded-xl font-semibold text-sm hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors flex items-center justify-center gap-2 active:scale-[0.98]"
                                 >
-                                    <Award size={15} strokeWidth={1.8} />
+                                    <Award size={15} strokeWidth={1.8} className="text-slate-500 dark:text-slate-400" />
                                     View Leaderboard
-                                    <ChevronRight size={14} strokeWidth={2} className="ml-auto" />
+                                    <ChevronRight size={14} strokeWidth={2} className="ml-auto text-slate-400 dark:text-slate-500" />
                                 </button>
                             </div>
                         </div>
