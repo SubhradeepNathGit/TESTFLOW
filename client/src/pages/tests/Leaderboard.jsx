@@ -74,20 +74,20 @@ const PodiumCard = ({ student, rank, delay }) => {
     // Premium elegant gradients and borders instead of primary vibrant ones
     const podiumStyles = [
         {
-            bg: 'bg-indigo-50/80 dark:bg-indigo-500/10',
-            border: 'border-indigo-100 dark:border-indigo-500/20',
+            bg: 'bg-indigo-100/70 dark:bg-indigo-500/10',
+            border: 'border-indigo-200 dark:border-indigo-500/20',
             text: 'text-indigo-600 dark:text-indigo-400',
             score: 'text-indigo-700 dark:text-indigo-300'
         },
         {
-            bg: 'bg-slate-50 dark:bg-slate-800/50',
-            border: 'border-slate-200 dark:border-slate-700',
+            bg: 'bg-slate-100/70 dark:bg-slate-800/50',
+            border: 'border-slate-300 dark:border-slate-700',
             text: 'text-slate-500 dark:text-slate-400',
             score: 'text-slate-700 dark:text-slate-300'
         },
         {
-            bg: 'bg-orange-50/80 dark:bg-orange-500/10',
-            border: 'border-orange-100 dark:border-orange-500/20',
+            bg: 'bg-orange-100/70 dark:bg-orange-500/10',
+            border: 'border-orange-200 dark:border-orange-500/20',
             text: 'text-orange-600 dark:text-orange-400',
             score: 'text-orange-700 dark:text-orange-300'
         }
@@ -172,8 +172,8 @@ const Leaderboard = () => {
     }, [socket, refetch]);
 
     if (loading) return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 sm:p-6 lg:p-10">
-            <div className="max-w-5xl mx-auto space-y-8">
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10 transition-colors duration-500">
+            <div className="max-w-7xl mx-auto space-y-8">
                 <Skeleton className="w-1/3 h-10 mb-8" />
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-8">
                     <div className="flex items-end justify-center gap-6 lg:gap-10">
@@ -195,8 +195,8 @@ const Leaderboard = () => {
     const podiumRanks = [1, 0, 2];
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 sm:p-6 lg:p-10 font-sans selection:bg-indigo-500/30">
-            <div className="max-w-5xl mx-auto">
+        <div className="min-h-screen bg-[#F8F9FD] dark:bg-black p-4 sm:p-6 lg:p-10 font-sans selection:bg-indigo-500/30 transition-colors duration-500">
+            <div className="max-w-7xl mx-auto">
 
                 {/* Page header */}
                 <motion.div
