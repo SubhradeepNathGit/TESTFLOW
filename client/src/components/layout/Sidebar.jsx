@@ -74,9 +74,9 @@ const Sidebar = () => {
 
     const navLinks = getNavLinks();
     const sidebarStyle = {
-        bg: isSuperAdmin ? 'bg-indigo-950 dark:bg-[#0A0A0A]' : 'bg-slate-900 dark:bg-[#0A0A0A]',
-        border: 'border-white/5 dark:border-white/[0.06]',
-        itemHover: 'hover:bg-black/40 dark:hover:bg-white/[0.02]',
+        bg: isSuperAdmin ? 'bg-indigo-950 dark:bg-black' : 'bg-slate-900 dark:bg-black',
+        border: 'border-white/5 dark:border-white/[0.04]',
+        itemHover: 'hover:bg-black/40 dark:hover:bg-white/[0.04]',
         itemActive: 'bg-white text-slate-900 dark:bg-white/[0.06] dark:text-white shadow-none',
         textMain: 'text-white',
         textSub: 'text-slate-400 dark:text-slate-500',
