@@ -253,7 +253,7 @@ const AnswerKeysPage = () => {
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="bg-white dark:bg-[#0A0A0A] p-6 rounded-[24px] border border-slate-200/60 dark:border-white/[0.06] flex flex-col hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors"
+                                className="bg-white dark:bg-[#0A0A0A] p-6 rounded-[24px] border border-slate-200/80 border-b-4 border-b-slate-200/80 dark:border-white/[0.06] dark:border-b-white/[0.06] shadow-sm hover:shadow-md dark:shadow-none flex flex-col hover:bg-slate-50/40 dark:hover:bg-white/[0.02] transition-all"
                             >
                                 <div className="flex items-start justify-between gap-4 mb-6">
                                     <div className="w-12 h-12 bg-slate-50 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06] text-slate-600 dark:text-slate-400 rounded-xl flex items-center justify-center shrink-0">
@@ -270,7 +270,7 @@ const AnswerKeysPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-auto pt-4 flex items-center justify-between gap-3">
+                                <div className="mt-auto pt-5 border-t border-slate-100 dark:border-white/[0.04] flex items-center justify-between gap-3">
                                     <a
                                         href={getAssetUrl(item.pdfUrl)}
                                         target="_blank"

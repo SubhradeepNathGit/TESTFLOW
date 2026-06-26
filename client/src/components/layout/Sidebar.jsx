@@ -74,12 +74,12 @@ const Sidebar = () => {
 
     const navLinks = getNavLinks();
     const sidebarStyle = {
-        bg: isSuperAdmin ? 'bg-indigo-950' : 'bg-slate-900',
-        border: 'border-white/5',
-        itemHover: 'hover:bg-black/40',
-        itemActive: 'bg-white text-slate-900 shadow-none',
+        bg: isSuperAdmin ? 'bg-indigo-950 dark:bg-[#0A0A0A]' : 'bg-slate-900 dark:bg-[#0A0A0A]',
+        border: 'border-white/5 dark:border-white/[0.06]',
+        itemHover: 'hover:bg-black/40 dark:hover:bg-white/[0.02]',
+        itemActive: 'bg-white text-slate-900 dark:bg-white/[0.06] dark:text-white shadow-none',
         textMain: 'text-white',
-        textSub: 'text-slate-400',
+        textSub: 'text-slate-400 dark:text-slate-500',
     };
 
     const isActive = (path) => location.pathname === path;
