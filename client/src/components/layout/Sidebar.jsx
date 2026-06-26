@@ -219,20 +219,21 @@ const Sidebar = () => {
                         </div>
                     </div>
 
-                    <div className="mt-1">
+                    <div className="mt-2">
                         <button
                             onClick={logout}
                             className={`
-                                flex items-center transition-all duration-200 rounded-xl group/logout
+                                flex items-center justify-center transition-all duration-200 rounded-xl group/logout
                                 text-slate-500 hover:text-rose-400
-                                hover:bg-rose-500/[0.08]
+                                border border-white/[0.06] hover:border-rose-500/20
+                                hover:bg-rose-500/[0.06]
                                 active:scale-[0.97]
-                                ${!isOpen ? 'w-12 h-11 justify-center mx-auto' : 'w-full py-2.5 px-3 justify-start'}
+                                ${!isOpen ? 'w-12 h-12 mx-auto' : 'w-full h-11'}
                             `}
                             title={!isOpen ? 'Sign Out' : ''}
                         >
-                            <LogOut className="w-[18px] h-[18px] flex-shrink-0 transition-transform duration-200 group-hover/logout:-translate-x-0.5" />
-                            <span className={`font-medium text-[13px] transition-all duration-300 ${isOpen ? 'opacity-100 ml-3 w-auto' : 'opacity-0 ml-0 w-0 overflow-hidden'}`}>
+                            <LogOut className="w-[16px] h-[16px] flex-shrink-0 transition-transform duration-200 group-hover/logout:-translate-x-0.5" />
+                            <span className={`font-medium text-[13px] transition-all duration-300 ${isOpen ? 'opacity-100 ml-2.5 w-auto' : 'opacity-0 ml-0 w-0 overflow-hidden'}`}>
                                 Sign Out
                             </span>
                         </button>

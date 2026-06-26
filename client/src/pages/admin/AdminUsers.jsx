@@ -1,4 +1,4 @@
-    import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSocket } from "../../hooks/useSocket";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axiosInstance";
@@ -25,7 +25,8 @@ const AdminUsers = ({ role }) => {
     const { user, loading: authLoading } = useAuth();
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
-    const debouncedSearch = useDebounce(search, 300);
+    const throttledSearch = useThrottle(search, 300);
+    const debouncedSearch = useDebounce(throttledSearch, 300);
     const { confirm, ConfirmModal } = useConfirm();
     const socket = useSocket();
 

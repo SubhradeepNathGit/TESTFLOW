@@ -20,6 +20,7 @@ const InstructorDashboard = () => {
 
     const [isUploading, setIsUploading] = useState(false);
     const [stats, setStats] = useState(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
     const [selectedTestId, setSelectedTestId] = useState(null);
     const [newTest, setNewTest] = useState({ title: '', description: '', duration: 60, pdfFile: null });
     const [creationMode, setCreationMode] = useState('pdf'); // 'pdf' or 'manual'
@@ -133,15 +134,17 @@ const InstructorDashboard = () => {
     };
 
     const fetchFullTestDetails = async (testId) => {
+        setSelectedTestId(testId);
+        setDetailsLoading(true);
         try {
             const { data: statsData } = await getTestStats(testId);
             setStats(statsData.data);
             
             const { data: testData } = await getTest(testId);
             setSelectedTestQuestions(testData.data.questions || []);
-            setSelectedTestId(testId);
             // Removed tab reset to stats to keep user focus
         } catch { toast.error("Failed to fetch details"); }
+        finally { setDetailsLoading(false); }
     };
 
     const handleArchiveTest = async (testId) => {
@@ -397,7 +400,29 @@ const InstructorDashboard = () => {
 
                     {/* Right Panel: Stats */}
                     <div className="lg:col-span-2">
-                        {selectedTestId ? (
+                        {selectedTestId && detailsLoading ? (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                                {/* Skeleton: Title + Tabs */}
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <Skeleton className="h-8 w-60" />
+                                    <div className="flex gap-2">
+                                        <Skeleton className="h-10 w-32 rounded-xl" />
+                                        <Skeleton className="h-10 w-40 rounded-xl" />
+                                    </div>
+                                </div>
+                                {/* Skeleton: KPI Cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                    {[1, 2, 3].map(i => (
+                                        <div key={i} className="bg-white dark:bg-white/[0.03] p-7 rounded-[28px] border border-slate-100 dark:border-white/5 space-y-4">
+                                            <Skeleton className="h-3 w-24" />
+                                            <Skeleton className="h-9 w-20" />
+                                        </div>
+                                    ))}
+                                </div>
+                                {/* Skeleton: Table */}
+                                <TableSkeleton rows={4} />
+                            </motion.div>
+                        ) : selectedTestId ? (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">{stats?.testTitle || "Test Details"}</h2>                                     <div className="flex bg-slate-100 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
@@ -475,7 +500,7 @@ const InstructorDashboard = () => {
                                                                 </td>
                                                                 <td className="px-7 py-5">
                                                                     <button onClick={() => handleResetAttempt(p.attemptId)}
-                                                                        className="p-2.5 bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400 hover:bg-rose-500 dark:hover:bg-rose-400 hover:text-white dark:hover:text-slate-900 transition-all shadow-none dark:shadow-none">
+                                                                        className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-white/[0.1] hover:text-slate-600 dark:hover:text-slate-300 transition-all border border-slate-200/60 dark:border-white/[0.06]">
                                                                         <FiRefreshCw size={14} />
                                                                     </button>
                                                                 </td>

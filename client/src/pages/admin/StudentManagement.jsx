@@ -6,6 +6,7 @@ import api from '../../api/axiosInstance';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import useDebounce from '../../hooks/useDebounce';
+import useThrottle from '../../hooks/useThrottle';
 import { useConfirm } from '../../hooks/useConfirm';
 import { useSocket } from '../../hooks/useSocket';
 
@@ -13,7 +14,8 @@ const StudentManagement = () => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
-    const debouncedSearchTerm = useDebounce(searchTerm, 300);
+    const throttledSearchTerm = useThrottle(searchTerm, 300);
+    const debouncedSearchTerm = useDebounce(throttledSearchTerm, 300);
     const { confirm, ConfirmModal } = useConfirm();
     const socket = useSocket();
 

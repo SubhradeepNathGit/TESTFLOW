@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSocket } from "../../hooks/useSocket";
 import { useAuth } from "../../hooks/useAuth";
 import api from "../../api/axiosInstance";
@@ -9,6 +9,8 @@ import { Library, RefreshCcw, Trash2, Building2, Users, GraduationCap, Briefcase
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../utils/cn";
 import { useConfirm } from "../../hooks/useConfirm.jsx";
+import useDebounce from "../../hooks/useDebounce";
+import useThrottle from "../../hooks/useThrottle";
 
 const EmptyState = ({ icon: Icon, title, desc }) => (
     <div className="py-24 text-center">
@@ -25,6 +27,11 @@ const AdminArchive = () => {
     const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState("institutions");
     const [search, setSearch] = useState("");
+    
+    // Apply both debounce (for pauses) and throttle (for continuous typing limits) to ensure max performance on large client-side arrays
+    const throttledSearch = useThrottle(search, 300);
+    const debouncedSearch = useDebounce(throttledSearch, 300);
+
     const { confirm, ConfirmModal } = useConfirm();
     const socket = useSocket();
 
@@ -84,14 +91,20 @@ const AdminArchive = () => {
         }
     };
 
-    const filteredInstitutions = archive.institutions.filter(inst => 
-        inst.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredInstitutions = useMemo(() => {
+        const query = debouncedSearch.toLowerCase();
+        return archive.institutions.filter(inst => 
+            inst.name.toLowerCase().includes(query)
+        );
+    }, [archive.institutions, debouncedSearch]);
 
-    const filteredUsers = archive.users.filter(u => 
-        u.name.toLowerCase().includes(search.toLowerCase()) || 
-        u.email.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredUsers = useMemo(() => {
+        const query = debouncedSearch.toLowerCase();
+        return archive.users.filter(u => 
+            u.name.toLowerCase().includes(query) || 
+            u.email.toLowerCase().includes(query)
+        );
+    }, [archive.users, debouncedSearch]);
 
     const tabs = [
         { id: "institutions", label: "Institutions", icon: Building2, count: filteredInstitutions.length },

@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import Skeleton, { CardSkeleton, TableSkeleton } from "../../components/common/Skeleton";
 import useDebounce from "../../hooks/useDebounce";
+import useThrottle from "../../hooks/useThrottle";
 import {
     Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, Filler
 } from 'chart.js';
@@ -93,7 +94,8 @@ const SuperAdminDashboard = () => {
 
     const [activeTab, setActiveTab] = useState("overview");
     const [searchTerm, setSearchTerm] = useState("");
-    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const throttledSearchTerm = useThrottle(searchTerm, 300);
+    const debouncedSearchTerm = useDebounce(throttledSearchTerm, 300);
 
     useEffect(() => {
         if (!authLoading && user?.role !== "super_admin") navigate("/");
