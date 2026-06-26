@@ -145,17 +145,17 @@ const StudentDashboard = () => {
     const kpis = [
         {
             label: 'Available Tests', value: tests.length,
-            icon: FiBook, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/30', ring: 'ring-indigo-100 dark:ring-indigo-500/10',
+            icon: FiBook, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-white/[0.04]',
             sub: 'Ready to attempt'
         },
         {
             label: 'Completed', value: completedCount,
-            icon: FiCheckCircle, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/30', ring: 'ring-emerald-100 dark:ring-emerald-500/10',
+            icon: FiCheckCircle, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-white/[0.04]',
             sub: 'Tests finished'
         },
         {
             label: 'Best Score', value: highestScore,
-            icon: FiAward, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/30', ring: 'ring-amber-100 dark:ring-amber-500/10',
+            icon: FiAward, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-white/[0.04]',
             sub: 'Personal best'
         },
     ];
@@ -169,11 +169,10 @@ const StudentDashboard = () => {
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="relative bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl border border-slate-100 dark:border-white/5 rounded-[32px] p-8 lg:p-10 mb-8 overflow-hidden shadow-none dark:shadow-none flex items-center justify-between group"
+                    className="relative bg-white dark:bg-[#080808] border border-slate-100 dark:border-white/5 rounded-[32px] p-8 lg:p-10 mb-8 overflow-hidden shadow-none flex items-center justify-between group transition-colors duration-500"
                 >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700" />
                     <div className="relative z-10 flex items-center gap-6 lg:gap-8">
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-slate-100 dark:border-white/10 shadow-none dark:shadow-none flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-5xl font-black shrink-0 overflow-hidden relative">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-slate-100 dark:border-white/5 shadow-none flex items-center justify-center bg-indigo-50 dark:bg-white/[0.03] text-indigo-600 dark:text-slate-200 text-5xl font-black shrink-0 overflow-hidden relative">
                             {user?.profileImage ? (
                                 <img src={user.profileImage.startsWith('http') ? user.profileImage : `http://localhost:3006/${user.profileImage}`} alt="Profile" className="w-full h-full object-cover rounded-full" loading="eager" fetchpriority="high" />
                             ) : (
@@ -181,7 +180,7 @@ const StudentDashboard = () => {
                             )}
                         </div>
                         <div>
-                            <p className="text-indigo-600 font-bold text-[10px] uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                            <p className="text-slate-500 dark:text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-2 flex items-center gap-1.5">
                                 Welcome back
                             </p>
                             <h1 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">
@@ -203,9 +202,9 @@ const StudentDashboard = () => {
                             variants={cardVariants}
                             initial="hidden"
                             animate="show"
-                            className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-5 rounded-[24px] border border-slate-100 dark:border-white/5 shadow-none flex items-center gap-4 group hover:border-indigo-500/30 transition-all duration-300"
+                            className="bg-white dark:bg-[#080808] p-5 rounded-[24px] border border-slate-100 dark:border-white/5 shadow-none flex items-center gap-4 group transition-colors duration-300"
                         >
-                            <div className={`p-3.5 ${kpi.bg} ${kpi.color} rounded-xl ring-4 ${kpi.ring} shrink-0`}>
+                            <div className={`p-3.5 ${kpi.bg} ${kpi.color} rounded-xl shrink-0`}>
                                 <kpi.icon size={20} />
                             </div>
                             <div>
@@ -225,13 +224,13 @@ const StudentDashboard = () => {
                         <div className="flex items-center gap-3 mb-5">
                             <span className="w-1 h-6 bg-indigo-600 rounded-full" />
                             <h2 className="text-base font-bold text-slate-800 dark:text-slate-200">Available Assessments</h2>
-                            <span className="ml-auto text-[10px] font-black text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                            <span className="ml-auto text-[10px] font-black text-slate-400 bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 px-3 py-1.5 rounded-full uppercase tracking-widest">
                                 {tests.length} total
                             </span>
                         </div>
                         <div className="grid gap-3">
                             {tests.length === 0 ? (
-                                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-10 rounded-[24px] border border-slate-100 dark:border-white/[0.06] text-center">
+                                <div className="bg-white dark:bg-[#080808] p-10 rounded-[24px] border border-slate-100 dark:border-white/5 text-center">
                                     <FiBook size={40} className="text-slate-200 dark:text-slate-700 mx-auto mb-4" />
                                     <p className="text-slate-400 font-semibold text-sm">No tests available yet</p>
                                     <p className="text-xs text-slate-300 dark:text-slate-600 mt-1">Your instructor hasn't published any tests.</p>
@@ -247,9 +246,9 @@ const StudentDashboard = () => {
                                         variants={cardVariants}
                                         initial="hidden"
                                         animate="show"
-                                        className={`bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-5 rounded-[22px] flex items-center justify-between gap-4 border transition-all duration-300 ${isDone
-                                                ? 'border-slate-100 dark:border-white/[0.06]'
-                                                : 'border-slate-100 dark:border-white/[0.06] hover:border-indigo-200 dark:hover:border-indigo-500/30 cursor-pointer'
+                                        className={`bg-white dark:bg-[#080808] p-5 rounded-[22px] flex items-center justify-between gap-4 border transition-colors duration-300 shadow-none ${isDone
+                                                ? 'border-slate-100 dark:border-white/5'
+                                                : 'border-slate-100 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 cursor-pointer'
                                             }`}
                                         onClick={() => !isDone && navigate(`/test/${test._id}`)}
                                     >
@@ -286,11 +285,11 @@ const StudentDashboard = () => {
                                         <button
                                             disabled={isDone}
                                             onClick={(e) => { e.stopPropagation(); if (!isDone) navigate(`/test/${test._id}`); }}
-                                            className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs shrink-0 active:scale-95 ${isDone
-                                                    ? 'bg-slate-50 dark:bg-white/[0.03] backdrop-blur-md text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/[0.06] cursor-default'
+                                            className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 transition-colors text-xs shrink-0 active:scale-95 ${isDone
+                                                    ? 'bg-slate-50 dark:bg-white/[0.03] text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/5 cursor-default'
                                                     : isInProgress
-                                                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-md shadow-amber-500/20'
-                                                        : 'bg-slate-900 dark:bg-indigo-600 text-white hover:bg-indigo-600 dark:hover:bg-indigo-700 shadow-md shadow-indigo-500/20'
+                                                        ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-none'
+                                                        : 'bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-800 dark:hover:bg-slate-200 shadow-none'
                                                 }`}
                                         >
                                             {isDone
@@ -319,7 +318,7 @@ const StudentDashboard = () => {
                         </div>
                         <div className="space-y-3">
                             {validAttempts.length === 0 ? (
-                                <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-10 rounded-[22px] border border-slate-100 dark:border-white/[0.06] text-center">
+                                <div className="bg-white dark:bg-[#080808] p-10 rounded-[22px] border border-slate-100 dark:border-white/5 text-center">
                                     <FiTrendingUp size={32} className="text-slate-200 dark:text-slate-700 mx-auto mb-3" />
                                     <p className="text-slate-400 font-semibold text-sm">No attempts yet</p>
                                     <p className="text-xs text-slate-300 dark:text-slate-600 mt-1">Start a test to see your results.</p>
@@ -335,7 +334,7 @@ const StudentDashboard = () => {
                                         variants={cardVariants}
                                         initial="hidden"
                                         animate="show"
-                                        className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-5 rounded-[22px] border border-slate-100 dark:border-white/[0.06]"
+                                        className="bg-white dark:bg-[#080808] p-5 rounded-[22px] border border-slate-100 dark:border-white/5 shadow-none"
                                     >
                                         <div className="flex items-start justify-between gap-2 mb-2">
                                             <p className="font-bold text-slate-800 dark:text-slate-200 text-sm leading-tight truncate">{a.testId?.title || 'Test'}</p>
@@ -362,7 +361,7 @@ const StudentDashboard = () => {
                             {/* Leaderboard CTA */}
                             <button
                                 onClick={() => navigate('/leaderboard')}
-                                className="w-full bg-indigo-600 text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 mt-4 shadow-lg dark:shadow-none active:scale-95"
+                                className="w-full bg-slate-900 dark:bg-white text-white dark:text-black py-3.5 rounded-2xl font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors flex items-center justify-center gap-2 mt-4 shadow-none active:scale-95"
                             >
                                 <FiAward size={15} />
                                 View Full Leaderboard

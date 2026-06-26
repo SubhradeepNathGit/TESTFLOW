@@ -146,9 +146,9 @@ const Sidebar = () => {
                     <button
                         onClick={toggleSidebar}
                         className={`
-                            hidden lg:flex items-center justify-center w-8 h-8 rounded-full transition-all duration-500
-                            bg-white/[0.03] hover:bg-white/[0.08] text-slate-500 hover:text-indigo-400 border border-white/5 hover:border-indigo-500/20
-                            backdrop-blur-xl shadow-xl group active:scale-90
+                            hidden lg:flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
+                            bg-white/[0.03] hover:bg-white/[0.08] text-slate-500 hover:text-slate-300 border border-white/5
+                            group active:scale-90
                         `}
                     >
                         <ChevronLeft className={`w-4 h-4 transition-all duration-500 ${isOpen ? 'rotate-0' : 'rotate-180'} group-hover:scale-110`} />
