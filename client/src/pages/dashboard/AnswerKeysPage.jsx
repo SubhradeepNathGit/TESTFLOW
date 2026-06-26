@@ -270,7 +270,7 @@ const AnswerKeysPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-auto pt-5 border-t border-slate-100 dark:border-white/[0.04] flex items-center justify-between gap-3">
+                                <div className="mt-auto pt-4 flex items-center justify-between gap-3">
                                     <a
                                         href={getAssetUrl(item.pdfUrl)}
                                         target="_blank"

@@ -5,9 +5,10 @@ const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
 
-    
     if (err.statusCode >= 500 || !err.statusCode) {
         logger.error(`${req.method} ${req.originalUrl} - ${err.message}`, { stack: err.stack });
+        const fs = require('fs');
+        fs.appendFileSync('error.log', new Date().toISOString() + '\\n' + err.stack + '\\n\\n');
     } else {
         logger.warn(`${req.method} ${req.originalUrl} - ${err.message}`);
     }
