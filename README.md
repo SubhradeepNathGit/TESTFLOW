@@ -47,8 +47,8 @@
   <img src="client/public/Banner21.png" width="32%" />
 </p>
 <p align="center">
-  <img src="client/public/Banner22.png" width="49%" />
-  <img src="client/public/Banner23.png" width="49%" />
+  <img src="client/public/Banner22.png" width="400" height="500" />
+  <img src="client/public/Banner23.png" width="400" height="500" />
 </p>
 
 **TESTFLOW** is a highly scalable, production-ready Online Test Portal Engine designed to automate and streamline the assessment process. Built on a robust MERN (MongoDB, Express, React, Node.js) stack, it handles large-scale concurrent users, asynchronous jobs via Redis and BullMQ, and features an intelligent PDF Parsing Engine equipped with OCR capabilities.
