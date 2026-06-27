@@ -255,7 +255,7 @@ const AdminAnalytics = () => {
                                 {roleDistribution.map((r, i) => (
                                     <div key={i} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
                                         <span className="w-3 h-3 rounded-full" style={{ background: ROLE_COLORS[i % ROLE_COLORS.length] }} />
-                                        {r.name} <span className="font-black text-slate-700 dark:text-slate-200">({r.value})</span>
+                                        {r.name} <span className="font-black text-slate-700 dark:text-slate-200">{r.value}</span>
                                     </div>
                                 ))}
                             </div>
