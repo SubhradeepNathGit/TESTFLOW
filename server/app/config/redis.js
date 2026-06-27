@@ -8,7 +8,7 @@ const redisConnection = new IORedis(process.env.REDIS_URL || "redis://127.0.0.1:
     connectTimeout: 500,       // Fail fast
     retryStrategy(times) {
         if (times > 1) {
-            console.warn("Redis not found. Auto-submit disabled.");
+            console.log("Local Mode: Running without Redis (Background timers disabled).");
             return null;
         }
         return 100;

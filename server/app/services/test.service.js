@@ -5,36 +5,80 @@ const fs = require("fs");
 const ErrorResponse = require("../utils/errorResponse");
 
 // From PDF
-exports.createTestFromPDF = async (testData, pdfPath, userId) => {
+exports.createTestFromPDF = async (testData, pdfFiles, userId, uiSections = []) => {
     try {
-        const buffer = fs.readFileSync(pdfPath);
-        const parsedQuestions = await parseMCQFromPDF(buffer);
+        let allQuestions = [];
+        let isStrictSectionMode = false;
+        let sectionDurations = [];
 
-        if (!parsedQuestions || parsedQuestions.length === 0) {
-            throw new ErrorResponse("No questions found in PDF", 400);
+        if (testData.testType === 'multi') {
+            isStrictSectionMode = true;
+            sectionDurations = uiSections;
+            
+            for (let i = 0; i < uiSections.length; i++) {
+                const file = pdfFiles[i];
+                if (!file) throw new ErrorResponse(`Missing PDF for section: ${uiSections[i].name}`, 400);
+                
+                const buffer = fs.readFileSync(file.path);
+                // For multi-section, we parse the whole file as one section, bypassing the strict regex logic
+                // But parseMCQFromPDF currently accepts (buffer, uiSections).
+                // Let's pass a dummy uiSections with just this one section, then force the section name.
+                const { questions: parsedQuestions } = await parseMCQFromPDF(buffer, [uiSections[i]]);
+                
+                if (parsedQuestions && parsedQuestions.length > 0) {
+                    const sectionQuestions = parsedQuestions.map(q => ({
+                        ...q,
+                        section: uiSections[i].name // Override to ensure all questions map to this section
+                    }));
+                    allQuestions.push(...sectionQuestions);
+                }
+                
+                // Cleanup temp file
+                if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+            }
+        } else {
+            // Single PDF
+            const file = pdfFiles[0];
+            const buffer = fs.readFileSync(file.path);
+            const { questions: parsedQuestions, isStrictSectionMode: parsedStrict, sectionDurations: parsedDurations } = await parseMCQFromPDF(buffer, uiSections);
+            
+            allQuestions = parsedQuestions || [];
+            isStrictSectionMode = parsedStrict;
+            sectionDurations = parsedDurations;
+
+            // Cleanup temp file
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        }
+
+        if (!allQuestions || allQuestions.length === 0) {
+            throw new ErrorResponse("No questions found in uploaded PDFs", 400);
         }
 
         // Calc total marks
-        const totalMarks = parsedQuestions.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
+        const totalMarks = allQuestions.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
 
         const test = await Test.create({
             ...testData,
             createdBy: userId,
-            totalMarks
+            totalMarks,
+            isStrictSectionMode,
+            sectionDurations
         });
 
-        const questions = parsedQuestions.map(q => ({
+        const questions = allQuestions.map(q => ({
             ...q,
             testId: test._id
         }));
 
         await Question.insertMany(questions);
-        
-        if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
 
         return { test, questionCount: questions.length };
     } catch (err) {
-        if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
+        if (pdfFiles && pdfFiles.length > 0) {
+            pdfFiles.forEach(f => {
+                if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
+            });
+        }
         if (err instanceof ErrorResponse) throw err;
         throw new ErrorResponse(`PDF Error: ${err.message}`, 400);
     }

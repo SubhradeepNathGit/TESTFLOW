@@ -10,18 +10,28 @@ class TestController {
      */
     async uploadPdfTest(req, res, next) {
         try {
-            if (!req.file) {
-                return next(new ErrorResponse("Please upload a PDF file", 400));
+            if (!req.files || req.files.length === 0) {
+                return next(new ErrorResponse("Please upload at least one PDF file", 400));
             }
 
             const testData = {
                 title: req.body.title,
                 description: req.body.description,
                 duration: req.body.duration,
-                institutionId: req.user.institutionId
+                institutionId: req.user.institutionId,
+                testType: req.body.testType
             };
 
-            const result = await testService.createTestFromPDF(testData, req.file.path, req.user.id);
+            let sections = [];
+            if (req.body.sections) {
+                try {
+                    sections = JSON.parse(req.body.sections);
+                } catch (e) {
+                    console.error("Failed to parse sections", e);
+                }
+            }
+
+            const result = await testService.createTestFromPDF(testData, req.files, req.user.id, sections);
 
             res.status(statusCodes.CREATED).json({
                 status: true,
@@ -145,8 +155,14 @@ class TestController {
                 title: req.body.title,
                 description: req.body.description,
                 duration: req.body.duration,
-                institutionId: req.user.institutionId
+                institutionId: req.user.institutionId,
+                testType: req.body.testType
             };
+
+            if (req.body.testType === 'multi' && req.body.sections) {
+                testData.isStrictSectionMode = true;
+                testData.sectionDurations = req.body.sections;
+            }
 
             const test = await testService.createTest(testData, req.user.id);
 

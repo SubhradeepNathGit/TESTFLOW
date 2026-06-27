@@ -19,17 +19,28 @@ exports.startAttempt = async (testId, studentId, institutionId) => {
     }
 
     const expiresAt = new Date(Date.now() + test.duration * 60 * 1000);
-
-    attempt = await Attempt.create({
+    
+    const attemptData = {
         testId,
         studentId,
         institutionId,
-        expiresAt
-    });
+        expiresAt // Global fallback
+    };
 
-    // Queue auto-submit
-    const delay = test.duration * 60 * 1000;
-    await scheduleAutoSubmit(attempt._id, delay);
+    if (test.isStrictSectionMode && test.sectionDurations?.length > 0) {
+        attemptData.currentSectionIndex = 0;
+        attemptData.currentSectionStatus = 'LOBBY';
+        // We do NOT set sectionExpiresAt yet
+    }
+
+    attempt = await Attempt.create(attemptData);
+
+    // Queue auto-submit for the whole test if not strict mode
+    // (If strict mode, we'll let frontend handle section transitions, and fallback to global expiry)
+    if (!test.isStrictSectionMode) {
+        const delay = test.duration * 60 * 1000;
+        await scheduleAutoSubmit(attempt._id, delay);
+    }
 
     return attempt;
 };
@@ -41,6 +52,10 @@ exports.saveAnswer = async (attemptId, studentId, questionId, selectedOption) =>
 
     if (new Date() > attempt.expiresAt) {
         throw new ErrorResponse("Time expired", 403);
+    }
+    
+    if (attempt.sectionExpiresAt && new Date() > attempt.sectionExpiresAt) {
+        throw new ErrorResponse("Section time expired", 403);
     }
 
     const answerIndex = attempt.answers.findIndex(a => a.questionId.toString() === questionId);
@@ -59,26 +74,73 @@ exports.submitAttempt = async (attemptId, studentId) => {
     const attempt = await Attempt.findOne({ _id: attemptId, studentId, status: "IN_PROGRESS" });
     if (!attempt) throw new ErrorResponse("Attempt not found", 404);
 
+    attempt.status = "SUBMITTED";
+    attempt.submittedAt = new Date();
+
+    const test = await Test.findById(attempt.testId);
     const questions = await Question.find({ testId: attempt.testId });
-    
+
+    // Cancel auto-submit
+    await cancelAutoSubmit(attempt._id);
+
     let score = 0;
+    const sectionScores = {};
+
     attempt.answers.forEach(ans => {
-        const question = questions.find(q => q._id.toString() === ans.questionId.toString());
-        if (question && question.correctAnswer === ans.selectedOption) {
-            score += (question.marks || 1);
+        const q = questions.find(qu => qu._id.toString() === ans.questionId.toString());
+        if (q && q.correctAnswer === ans.selectedOption) {
+            score += q.marks;
+            const sec = q.section || 'General';
+            sectionScores[sec] = (sectionScores[sec] || 0) + q.marks;
         }
     });
 
     attempt.score = score;
-    attempt.status = "SUBMITTED";
-    attempt.submittedAt = new Date();
+    attempt.sectionScores = sectionScores;
     await attempt.save();
+    return attempt;
+};
 
-    // Clear queue
-    await cancelAutoSubmit(attempt._id);
+// Next Section (moves to LOBBY)
+exports.nextSection = async (attemptId, studentId) => {
+    const attempt = await Attempt.findOne({ _id: attemptId, studentId, status: "IN_PROGRESS" });
+    if (!attempt) throw new ErrorResponse("Attempt not found", 404);
+
+    const test = await Test.findById(attempt.testId);
+    if (!test.isStrictSectionMode) throw new ErrorResponse("Not a strict section test", 400);
+
+    const nextIndex = attempt.currentSectionIndex + 1;
+    if (nextIndex >= test.sectionDurations.length) {
+        // Last section finished -> Submit Test
+        return await exports.submitAttempt(attemptId, studentId);
+    }
+
+    attempt.currentSectionIndex = nextIndex;
+    attempt.currentSectionStatus = 'LOBBY';
+    attempt.sectionExpiresAt = null; // Clear timer
+    await attempt.save();
 
     return attempt;
 };
+
+// Start Section (moves from LOBBY to IN_PROGRESS)
+exports.startSection = async (attemptId, studentId) => {
+    const attempt = await Attempt.findOne({ _id: attemptId, studentId, status: "IN_PROGRESS" });
+    if (!attempt) throw new ErrorResponse("Attempt not found", 404);
+
+    if (attempt.currentSectionStatus !== 'LOBBY') {
+        throw new ErrorResponse("Section is already in progress or completed", 400);
+    }
+
+    const test = await Test.findById(attempt.testId);
+    
+    attempt.currentSectionStatus = 'IN_PROGRESS';
+    attempt.sectionExpiresAt = new Date(Date.now() + test.sectionDurations[attempt.currentSectionIndex].duration * 60 * 1000);
+    await attempt.save();
+
+    return attempt;
+};
+
 
 // Reset attempt (Instructor Only)
 exports.resetAttempt = async (attemptId, instructorId) => {

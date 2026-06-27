@@ -5,9 +5,13 @@ const User = require('../models/User');
 let io;
 
 exports.initSocket = (server) => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS 
+        ? process.env.ALLOWED_ORIGINS.split(",").map(o => o.trim()) 
+        : ["http://localhost:5173", "http://localhost:5174"];
+
     io = socketIo(server, {
         cors: {
-            origin: process.env.CLIENT_URL || 'http://localhost:5173',
+            origin: allowedOrigins,
             methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
             credentials: true
         }

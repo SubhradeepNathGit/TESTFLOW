@@ -1,6 +1,7 @@
 const attemptService = require("../services/attempt.service");
 const { statusCodes } = require("../helper/statusCode");
 const { emitToInstitution } = require("../utils/socket");
+const ErrorResponse = require("../utils/errorResponse");
 
 class AttemptController {
     // Start test attempt
@@ -70,6 +71,46 @@ class AttemptController {
                 score: result.score 
             });
             emitToInstitution(req.user.institutionId, "leaderboard:update");
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    // Next Section
+    async nextSection(req, res, next) {
+        try {
+            const { attemptId } = req.body;
+            if (!attemptId) {
+                return next(new ErrorResponse("Please provide attemptId", 400));
+            }
+
+            const result = await attemptService.nextSection(attemptId, req.user.id);
+            res.status(statusCodes.OK).json({
+                status: true,
+                success: true,
+                message: "Moved to next section",
+                data: result
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    // Start Section
+    async startSection(req, res, next) {
+        try {
+            const { attemptId } = req.body;
+            if (!attemptId) {
+                return next(new ErrorResponse("Please provide attemptId", 400));
+            }
+
+            const result = await attemptService.startSection(attemptId, req.user.id);
+            res.status(statusCodes.OK).json({
+                status: true,
+                success: true,
+                message: "Section started",
+                data: result
+            });
         } catch (err) {
             next(err);
         }

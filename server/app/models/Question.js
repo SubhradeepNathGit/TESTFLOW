@@ -7,6 +7,11 @@ const QuestionSchema = new mongoose.Schema(
             ref: "Test",
             required: true,
         },
+        section: {
+            type: String,
+            default: "General",
+            trim: true,
+        },
         questionText: {
             type: String,
             required: [true, "Please add question text"],

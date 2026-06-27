@@ -25,6 +25,18 @@ const AttemptSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
+        currentSectionIndex: {
+            type: Number,
+            default: 0,
+        },
+        currentSectionStatus: {
+            type: String,
+            enum: ['IN_PROGRESS', 'LOBBY', 'COMPLETED'],
+            default: 'IN_PROGRESS',
+        },
+        sectionExpiresAt: {
+            type: Date,
+        },
         submittedAt: {
             type: Date,
         },
@@ -40,6 +52,11 @@ const AttemptSchema = new mongoose.Schema(
         score: {
             type: Number,
             default: 0,
+        },
+        sectionScores: {
+            type: Map,
+            of: Number,
+            default: {},
         },
         status: {
             type: String,

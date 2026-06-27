@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { 
+import {
     getTests, uploadPdfTest, publishTest, getTestStats, createTest, getTest,
-    archiveTest, deleteQuestion 
+    archiveTest, deleteQuestion
 } from '../../api/testApi';
 import { resetAttempt } from '../../api/attemptApi';
 import { useSocket } from '../../hooks/useSocket';
@@ -23,6 +23,8 @@ const InstructorDashboard = () => {
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [selectedTestId, setSelectedTestId] = useState(null);
     const [newTest, setNewTest] = useState({ title: '', description: '', duration: 60, pdfFile: null });
+    const [testType, setTestType] = useState('single'); // 'single' or 'multi'
+    const [uiSections, setUiSections] = useState([{ name: 'General', duration: 60, file: null }]);
     const [creationMode, setCreationMode] = useState('pdf'); // 'pdf' or 'manual'
     const [activeTab, setActiveTab] = useState('stats'); // 'stats' or 'questions'
     const [selectedTestQuestions, setSelectedTestQuestions] = useState([]);
@@ -35,7 +37,7 @@ const InstructorDashboard = () => {
         message: '',
         confirmText: '',
         type: 'warning',
-        onConfirm: () => {}
+        onConfirm: () => { }
     });
 
     // useQuery for tests list
@@ -95,19 +97,33 @@ const InstructorDashboard = () => {
 
     const handleCreateTest = async (e) => {
         e.preventDefault();
-        
+
         if (creationMode === 'pdf') {
-            if (!newTest.pdfFile) return toast.error("Please select a PDF file");
+            if (testType === 'single' && !newTest.pdfFile) return toast.error("Please select a PDF file");
+            if (testType === 'multi' && uiSections.some(s => !s.file)) return toast.error("Please upload a PDF for every section");
+            if (testType === 'multi' && uiSections.some(s => s.duration <= 0)) return toast.error("Section duration must be greater than 0");
+
             setIsUploading(true);
             const formData = new FormData();
             formData.append('title', newTest.title);
             formData.append('description', newTest.description);
             formData.append('duration', newTest.duration);
-            formData.append('pdfFile', newTest.pdfFile);
+            formData.append('testType', testType);
+
+            if (testType === 'single') {
+                formData.append('pdfFiles', newTest.pdfFile);
+            } else {
+                formData.append('sections', JSON.stringify(uiSections.map(s => ({ name: s.name, duration: s.duration }))));
+                uiSections.forEach(sec => {
+                    formData.append('pdfFiles', sec.file);
+                });
+            }
+
             try {
                 const { data } = await uploadPdfTest(formData);
                 toast.success(`Parsed ${data.data.questionCount} questions from PDF!`);
                 setNewTest({ title: '', description: '', duration: 60, pdfFile: null });
+                setUiSections([{ name: 'General', duration: 60, file: null }]);
                 refetchTests();
             } catch (err) {
                 toast.error(err.response?.data?.message || "Upload failed. Check PDF format.");
@@ -116,13 +132,18 @@ const InstructorDashboard = () => {
             // Manual Mode
             setIsUploading(true);
             try {
-                const { data } = await createTest({
+                const payload = {
                     title: newTest.title,
                     description: newTest.description,
-                    duration: newTest.duration
-                });
+                    duration: newTest.duration,
+                    testType: testType
+                };
+                if (testType === 'multi') payload.sections = uiSections;
+
+                const { data } = await createTest(payload);
                 toast.success("Manual test created! Now add some questions.");
                 setNewTest({ title: '', description: '', duration: 60, pdfFile: null });
+                setUiSections([{ name: 'General', duration: 60, file: null }]);
                 refetchTests();
                 // Auto-select the new test and switch to questions tab
                 await fetchFullTestDetails(data.data._id);
@@ -139,7 +160,7 @@ const InstructorDashboard = () => {
         try {
             const { data: statsData } = await getTestStats(testId);
             setStats(statsData.data);
-            
+
             const { data: testData } = await getTest(testId);
             setSelectedTestQuestions(testData.data.questions || []);
             // Removed tab reset to stats to keep user focus
@@ -203,8 +224,8 @@ const InstructorDashboard = () => {
                     await publishTest(testId);
                     toast.success("Assessment is now LIVE!");
                     refetchTests();
-                } catch (err) { 
-                    toast.error(err.response?.data?.message || "Failed to publish"); 
+                } catch (err) {
+                    toast.error(err.response?.data?.message || "Failed to publish");
                 } finally {
                     setPublishingId(null);
                 }
@@ -270,16 +291,16 @@ const InstructorDashboard = () => {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -translate-y-1/2 translate-x-1/4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                                     Create Test 
+                                    Create Test
                                 </h2>
                                 <div className="flex bg-slate-100 dark:bg-white/[0.03] p-1 rounded-xl">
-                                    <button 
+                                    <button
                                         onClick={() => setCreationMode('pdf')}
                                         className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${creationMode === 'pdf' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
                                     >
                                         PDF
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => setCreationMode('manual')}
                                         className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${creationMode === 'manual' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}
                                     >
@@ -287,7 +308,7 @@ const InstructorDashboard = () => {
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <form onSubmit={handleCreateTest} className="space-y-4">
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Test Identity</label>
@@ -298,20 +319,119 @@ const InstructorDashboard = () => {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Duration</label>
-                                        <div className="relative">
-                                            <input type="number" placeholder="60" required
-                                                className="w-full bg-slate-50 dark:bg-white/[0.03] rounded-2xl p-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-100 dark:border-white/5 text-slate-900 dark:text-slate-100"
-                                                value={newTest.duration}
-                                                onChange={e => setNewTest({ ...newTest, duration: e.target.value })}
-                                            />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 uppercase">Min</span>
-                                        </div>
+                                <div className="space-y-4">
+                                    <div className="flex bg-slate-100 dark:bg-white/[0.03] p-1 rounded-xl w-fit">
+                                        <button type="button" onClick={() => setTestType('single')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${testType === 'single' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Single Section</button>
+                                        <button type="button" onClick={() => setTestType('multi')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${testType === 'multi' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>Multi Section</button>
                                     </div>
 
-                                    {creationMode === 'pdf' && (
+                                    {testType === 'single' ? (
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Duration</label>
+                                            <div className="relative">
+                                                <input type="number" placeholder="60" required
+                                                    className="w-full bg-slate-50 dark:bg-white/[0.03] rounded-2xl p-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-100 dark:border-white/5 text-slate-900 dark:text-slate-100"
+                                                    value={newTest.duration}
+                                                    onChange={e => setNewTest({ ...newTest, duration: e.target.value })}
+                                                />
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 uppercase">Min</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sections</label>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[10px] font-bold text-slate-400">
+                                                        Total: <span className="text-indigo-500 font-black">{uiSections.reduce((a, b) => a + b.duration, 0)}m</span>
+                                                    </span>
+                                                    <button type="button" onClick={() => setUiSections([...uiSections, { name: '', duration: 10, file: null }])} className="px-3 py-1.5 rounded-lg text-[10px] font-black text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors flex items-center gap-1"><FiPlus size={12} /> Add</button>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                {uiSections.map((sec, idx) => (
+                                                    <div key={idx} className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-4 group hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all">
+                                                        {/* Header: Section Index + Delete */}
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Section {idx + 1}</span>
+                                                            {uiSections.length > 1 && (
+                                                                <button type="button" onClick={() => {
+                                                                    const filtered = uiSections.filter((_, i) => i !== idx);
+                                                                    setUiSections(filtered);
+                                                                    setNewTest(prev => ({ ...prev, duration: filtered.reduce((a,b) => a + (Number(b.duration) || 0), 0) }));
+                                                                }} className="text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all">
+                                                                    <FiX size={15}/>
+                                                                </button>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Vertical Inputs */}
+                                                        <div className="flex flex-col gap-3">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Section Name (e.g. Aptitude)"
+                                                                value={sec.name}
+                                                                onChange={(e) => {
+                                                                    const newSecs = [...uiSections];
+                                                                    newSecs[idx].name = e.target.value;
+                                                                    setUiSections(newSecs);
+                                                                }}
+                                                                className="w-full h-[42px] bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/[0.06] rounded-xl px-4 text-sm font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 transition-colors placeholder:text-slate-300 dark:placeholder:text-slate-600"
+                                                            />
+                                                            
+                                                            <div className="flex gap-3">
+                                                                <div className="relative flex-1">
+                                                                    <input
+                                                                        type="number"
+                                                                        min="1"
+                                                                        value={sec.duration === 0 ? '' : sec.duration}
+                                                                        placeholder="Duration in minutes"
+                                                                        className="w-full h-[42px] bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/[0.06] rounded-xl pl-4 pr-12 text-sm font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                                        onChange={(e) => {
+                                                                            const newSecs = [...uiSections];
+                                                                            const val = e.target.value;
+                                                                            newSecs[idx].duration = val === '' ? '' : parseInt(val) || 0;
+                                                                            setUiSections(newSecs);
+                                                                            setNewTest(prev => ({ ...prev, duration: newSecs.reduce((a,b) => a + (Number(b.duration) || 0), 0) }));
+                                                                        }}
+                                                                    />
+                                                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase tracking-widest pointer-events-none">min</span>
+                                                                </div>
+
+                                                                {/* PDF Upload */}
+                                                                {creationMode === 'pdf' && (
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <input type="file" accept=".pdf" id={`pdf-upload-${idx}`} className="hidden"
+                                                                            onChange={e => {
+                                                                                const newSecs = [...uiSections];
+                                                                                newSecs[idx].file = e.target.files[0];
+                                                                                setUiSections(newSecs);
+                                                                            }}
+                                                                        />
+                                                                        <label htmlFor={`pdf-upload-${idx}`}
+                                                                            className={`w-full h-[42px] rounded-xl px-3 flex items-center justify-center gap-2 cursor-pointer transition-all text-xs font-bold ${
+                                                                                sec.file 
+                                                                                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400' 
+                                                                                    : 'bg-slate-50/50 dark:bg-white/[0.02] border border-dashed border-slate-200 dark:border-white/[0.08] text-slate-400 dark:text-slate-500 hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:text-indigo-500'
+                                                                            }`}
+                                                                        >
+                                                                            {sec.file ? <FiCheckCircle size={15} className="shrink-0" /> : <FiUploadCloud size={15} className="shrink-0" />}
+                                                                            <span className="truncate">
+                                                                                {sec.file ? sec.file.name : 'Upload PDF'}
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {creationMode === 'pdf' && testType === 'single' && (
                                         <div className="space-y-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Question Source</label>
                                             <div className="relative">
@@ -327,22 +447,22 @@ const InstructorDashboard = () => {
                                     )}
                                 </div>
 
-                                <button type="submit" disabled={isUploading}
-                                    className="w-full bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-black font-black py-4 rounded-2xl transition-all shadow-none dark:shadow-none flex items-center justify-center gap-2 mt-2">
+                                <button type="submit" disabled={isUploading || (testType === 'multi' && uiSections.length <= 1)}
+                                    className="w-full bg-slate-900 dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-black font-black py-4 rounded-2xl transition-all shadow-none dark:shadow-none flex items-center justify-center gap-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-900 dark:disabled:hover:bg-white">
                                     {isUploading ? (
                                         <>
                                             <div className="w-4 h-4 border-2 border-slate-400 dark:border-slate-900 border-t-white dark:border-t-black rounded-full animate-spin" />
                                             Processing
                                         </>
                                     ) : (
-                                        creationMode === 'pdf' ? <><FiUploadCloud size={18} /> GENERATE FROM PDF</> : <><FiUploadCloud size={18}/> INITIALIZE TEST</>
+                                        creationMode === 'pdf' ? <><FiUploadCloud size={18} /> GENERATE FROM PDF</> : <><FiUploadCloud size={18} /> INITIALIZE TEST</>
                                     )}
                                 </button>
                             </form>
                         </div>
 
                         {/* Tests List */}
-                         <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-6 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none relative overflow-hidden group hover:border-slate-200 dark:hover:border-rose-500/30 transition-all duration-500">
+                        <div className="bg-white dark:bg-white/[0.03] dark:backdrop-blur-xl p-6 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none dark:shadow-none relative overflow-hidden group hover:border-slate-200 dark:hover:border-rose-500/30 transition-all duration-500">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 blur-[60px] -translate-y-1/2 translate-x-1/4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                             <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-5">Assessments ({tests.length})</h2>
                             <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -352,24 +472,23 @@ const InstructorDashboard = () => {
                                         <p className="text-xs text-slate-300 mt-1">Upload a PDF or create manually.</p>
                                     </div>
                                 ) : tests.map(test => (
-                                     <div key={test._id}
+                                    <div key={test._id}
                                         className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedTestId === test._id ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800' : 'bg-slate-50/70 dark:bg-black/70 border-transparent hover:bg-slate-100 dark:hover:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700'}`}
                                         onClick={() => fetchStats(test._id)}
                                     >
-                                         <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate leading-snug">{test.title}</p>
                                                 <p className="text-xs font-medium text-slate-400 mt-1">
                                                     {test.duration} min · <span className="font-bold text-slate-500">{test.totalMarks}</span> marks
                                                 </p>
-                                                <span className={`inline-block mt-2 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-full ${
-                                                    test.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
-                                                }`}>
+                                                <span className={`inline-block mt-2 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded-full ${test.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
+                                                    }`}>
                                                     {test.status}
                                                 </span>
                                             </div>
                                             <div className="flex flex-col items-center gap-2 shrink-0">
-                                                 <button 
+                                                <button
                                                     onClick={(e) => { e.stopPropagation(); handleArchiveTest(test._id); }}
                                                     className="p-2 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all rounded-xl border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
                                                     title="Archive Test"
@@ -377,7 +496,7 @@ const InstructorDashboard = () => {
                                                     <Trash2 size={15} />
                                                 </button>
                                                 {test.status !== 'Published' && (
-                                                    <button 
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); handlePublish(test._id); }}
                                                         disabled={publishingId === test._id}
                                                         className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -426,13 +545,13 @@ const InstructorDashboard = () => {
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">{stats?.testTitle || "Test Details"}</h2>                                     <div className="flex bg-slate-100 dark:bg-white/[0.03] dark:backdrop-blur-xl border-white/5 shadow-none">
-                                        <button 
+                                        <button
                                             onClick={() => setActiveTab('stats')}
                                             className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${activeTab === 'stats' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                                         >
                                             <FiTrendingUp className="w-4 h-4" /> Performance
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => setActiveTab('questions')}
                                             className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${activeTab === 'questions' ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                                         >
@@ -520,7 +639,7 @@ const InstructorDashboard = () => {
                                                 <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Manage and refine individual assessment items.</p>
                                             </div>
                                             {tests.find(t => t._id === selectedTestId)?.status !== 'Published' && (
-                                                <button 
+                                                <button
                                                     onClick={() => { setEditingQuestion(null); setIsQuestionModalOpen(true); }}
                                                     className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none"
                                                 >
@@ -538,71 +657,72 @@ const InstructorDashboard = () => {
                                                     <p className="text-xs text-slate-400 max-w-[200px] mx-auto">This assessment doesn't have any items yet. Start by adding a manual question or importing via PDF.</p>
                                                 </div>
                                             ) : selectedTestQuestions.map((q, idx) => {
-                                                const correctIdx = q.options.findIndex((opt, i) => 
-                                                    opt === q.correctAnswer || 
+                                                const correctIdx = q.options.findIndex((opt, i) =>
+                                                    opt === q.correctAnswer ||
                                                     String.fromCharCode(65 + i) === q?.correctAnswer?.trim()?.toUpperCase()
                                                 );
 
                                                 return (
-                                                <div key={idx} className="group bg-white dark:bg-white/[0.03] p-7 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300">
-                                                    {/* Question header row */}
-                                                    <div className="flex gap-4 items-start mb-5">
-                                                        <div className="w-10 h-10 bg-slate-50 dark:bg-black rounded-2xl flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-sm shrink-0 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">
-                                                            {idx + 1}
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <p className="font-bold text-slate-800 dark:text-slate-200 leading-relaxed text-sm">{q.questionText}</p>
-                                                        </div>
-                                                        {/* Actions — always visible unless published */}
-                                                        <div className="flex items-center gap-2 shrink-0 ml-2">
-                                                            <span className="px-3 py-1 bg-slate-50 dark:bg-black text-slate-400 dark:text-slate-500 text-[10px] font-black rounded-full uppercase mr-1">
-                                                                {q.marks} {q.marks === 1 ? 'Mark' : 'Marks'}
-                                                            </span>
-                                                            {tests.find(t => t._id === selectedTestId)?.status !== 'Published' && (
-                                                                    <>
-                                                                    <button 
-                                                                        onClick={() => handleEditQuestionBtn(q)}
-                                                                        className="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-600 dark:hover:bg-indigo-400 hover:text-white dark:hover:text-slate-900 rounded-xl transition-all"
-                                                                        title="Edit Question"
-                                                                    >
-                                                                        <Edit size={14} />
-                                                                    </button>
-                                                                    <button 
-                                                                        onClick={() => handleDeleteQuestion(q._id)}
-                                                                        className="p-2 bg-slate-50 dark:bg-black text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 dark:hover:text-rose-400 rounded-xl transition-all"
-                                                                        title="Delete Question"
-                                                                    >
-                                                                        <Trash size={14} />
-                                                                    </button>
-                                                                    </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Options grid */}
-                                                    <div className="grid grid-cols-2 gap-3 mb-4 pl-14">
-                                                        {q.options.map((opt, i) => {
-                                                            const isCorrectOpt = i === correctIdx;
-                                                            return (
-                                                            <div key={i} className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[11px] font-bold transition-colors ${
-                                                                isCorrectOpt
-                                                                    ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
-                                                                    : 'bg-slate-50 dark:bg-black/50 border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400'
-                                                            }`}>
-                                                                <span className={`w-5 h-5 flex items-center justify-center rounded-lg text-[9px] font-black shrink-0 ${
-                                                                    isCorrectOpt ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500'
-                                                                }`}>
-                                                                    {String.fromCharCode(65 + i)}
-                                                                </span>
-                                                                <span className="truncate">{opt}</span>
-                                                                {isCorrectOpt && <FiCheck className="shrink-0 ml-auto text-emerald-600" size={12} />}
+                                                    <div key={idx} className="group bg-white dark:bg-white/[0.03] p-7 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-none hover:border-indigo-100 dark:hover:border-indigo-500/30 transition-all duration-300">
+                                                        {/* Question header row */}
+                                                        <div className="flex gap-4 items-start mb-5">
+                                                            <div className="w-10 h-10 bg-slate-50 dark:bg-black rounded-2xl flex items-center justify-center font-black text-slate-400 dark:text-slate-500 text-sm shrink-0 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">
+                                                                {idx + 1}
                                                             </div>
-                                                            );
-                                                        })}
+                                                            <div className="flex-1">
+                                                                <p className="font-bold text-slate-800 dark:text-slate-200 leading-relaxed text-sm">{q.questionText}</p>
+                                                            </div>
+                                                            {/* Actions — always visible unless published */}
+                                                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                                <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 text-[10px] font-black rounded-full uppercase mr-1 border border-indigo-100 dark:border-indigo-800">
+                                                                    {q.section || 'General'}
+                                                                </span>
+                                                                <span className="px-3 py-1 bg-slate-50 dark:bg-black text-slate-400 dark:text-slate-500 text-[10px] font-black rounded-full uppercase mr-1">
+                                                                    {q.marks} {q.marks === 1 ? 'Mark' : 'Marks'}
+                                                                </span>
+                                                                {tests.find(t => t._id === selectedTestId)?.status !== 'Published' && (
+                                                                    <>
+                                                                        <button
+                                                                            onClick={() => handleEditQuestionBtn(q)}
+                                                                            className="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-600 dark:hover:bg-indigo-400 hover:text-white dark:hover:text-slate-900 rounded-xl transition-all"
+                                                                            title="Edit Question"
+                                                                        >
+                                                                            <Edit size={14} />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleDeleteQuestion(q._id)}
+                                                                            className="p-2 bg-slate-50 dark:bg-black text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-500 dark:hover:text-rose-400 rounded-xl transition-all"
+                                                                            title="Delete Question"
+                                                                        >
+                                                                            <Trash size={14} />
+                                                                        </button>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Options grid */}
+                                                        <div className="grid grid-cols-2 gap-3 mb-4 pl-14">
+                                                            {q.options.map((opt, i) => {
+                                                                const isCorrectOpt = i === correctIdx;
+                                                                return (
+                                                                    <div key={i} className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[11px] font-bold transition-colors ${isCorrectOpt
+                                                                            ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
+                                                                            : 'bg-slate-50 dark:bg-black/50 border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400'
+                                                                        }`}>
+                                                                        <span className={`w-5 h-5 flex items-center justify-center rounded-lg text-[9px] font-black shrink-0 ${isCorrectOpt ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500'
+                                                                            }`}>
+                                                                            {String.fromCharCode(65 + i)}
+                                                                        </span>
+                                                                        <span className="truncate">{opt}</span>
+                                                                        {isCorrectOpt && <FiCheck className="shrink-0 ml-auto text-emerald-600" size={12} />}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+
+
                                                     </div>
-
-
-                                                </div>
                                                 );
                                             })}
                                         </div>
@@ -610,7 +730,7 @@ const InstructorDashboard = () => {
                                 )}
                             </motion.div>
                         ) : (
-                         <div className="h-full min-h-[500px] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border-2 border-dashed border-slate-200 dark:border-white/10 rounded-[40px] flex flex-col items-center justify-center p-20 text-center group hover:border-indigo-500/30 transition-all duration-700">
+                            <div className="h-full min-h-[500px] bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm border-2 border-dashed border-slate-200 dark:border-white/10 rounded-[40px] flex flex-col items-center justify-center p-20 text-center group hover:border-indigo-500/30 transition-all duration-700">
                                 <div className="w-24 h-24 bg-white dark:bg-white/5 rounded-3xl shadow-none dark:shadow-none flex items-center justify-center text-slate-200 dark:text-slate-700 mb-8 border border-slate-100 dark:border-white/5">
                                     <FiActivity size={48} />
                                 </div>
@@ -621,11 +741,11 @@ const InstructorDashboard = () => {
                     </div>
                 </div>
             </div>
-            
+
             {/* Modal Components */}
-            <QuestionModal 
-                isOpen={isQuestionModalOpen} 
-                onClose={() => setIsQuestionModalOpen(false)} 
+            <QuestionModal
+                isOpen={isQuestionModalOpen}
+                onClose={() => setIsQuestionModalOpen(false)}
                 testId={selectedTestId}
                 initialData={editingQuestion}
                 onSuccess={() => fetchFullTestDetails(selectedTestId)}

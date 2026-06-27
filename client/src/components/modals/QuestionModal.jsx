@@ -10,7 +10,8 @@ const QuestionModal = ({ isOpen, onClose, testId, onSuccess, initialData }) => {
         questionText: '',
         options: ['', '', '', ''],
         correctAnswer: '',
-        marks: 1
+        marks: 1,
+        section: 'General'
     });
 
     useEffect(() => {
@@ -19,14 +20,16 @@ const QuestionModal = ({ isOpen, onClose, testId, onSuccess, initialData }) => {
                 questionText: initialData.questionText || '',
                 options: initialData.options || ['', '', '', ''],
                 correctAnswer: initialData.correctAnswer || '',
-                marks: initialData.marks || 1
+                marks: initialData.marks || 1,
+                section: initialData.section || 'General'
             });
         } else {
             setNewQuestion({
                 questionText: '',
                 options: ['', '', '', ''],
                 correctAnswer: '',
-                marks: 1
+                marks: 1,
+                section: 'General'
             });
         }
     }, [initialData, isOpen]);
@@ -165,37 +168,50 @@ const QuestionModal = ({ isOpen, onClose, testId, onSuccess, initialData }) => {
                             <div className="flex gap-8">
                                 <div className="flex flex-col">
                                     <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
-                                        Assigned Marks
+                                        Marks
                                     </label>
                                     <input
                                         type="number"
                                         min="1"
-                                        className="w-20 bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.08] rounded-xl p-3 text-slate-700 dark:text-slate-200 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-500/50 transition-all"
+                                        className="w-20 h-[42px] bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.08] rounded-xl px-3 text-slate-700 dark:text-slate-200 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-500/50 transition-all"
                                         value={newQuestion.marks}
                                         onChange={e => setNewQuestion({ ...newQuestion, marks: parseInt(e.target.value) || 1 })}
                                     />
                                 </div>
+                                <div className="flex flex-col">
+                                    <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
+                                        Section Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Aptitude"
+                                        className="w-32 h-[42px] bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.08] rounded-xl px-3 text-slate-700 dark:text-slate-200 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-500/50 transition-all"
+                                        value={newQuestion.section}
+                                        onChange={e => setNewQuestion({ ...newQuestion, section: e.target.value })}
+                                        required
+                                    />
+                                </div>
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex gap-3 items-end">
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="px-8 py-4 rounded-2xl text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-white/[0.06] transition-all"
+                                    className="h-[42px] px-6 rounded-xl text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-white/[0.06] transition-all flex items-center justify-center"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSaving}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-xs shadow-xl dark:shadow-none flex items-center gap-2 transition-all disabled:opacity-70 active:scale-95"
+                                    className="h-[42px] bg-indigo-600 hover:bg-indigo-700 text-white px-8 rounded-xl font-black text-xs shadow-xl dark:shadow-none flex items-center justify-center gap-2 transition-all disabled:opacity-70 active:scale-95"
                                 >
                                     {isSaving ? (
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <>
                                             <Save size={16} />
-                                            {initialData ? 'UPDATE QUESTION' : 'SAVE QUESTION'}
+                                            {initialData ? 'UPDATE' : 'SAVE'}
                                         </>
                                     )}
                                 </button>

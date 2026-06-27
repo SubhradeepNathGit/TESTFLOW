@@ -26,7 +26,7 @@ router.get("/", protect, checkPermission("read_test"), getTests);
 router.get("/leaderboard", protect, getLeaderboard);
 router.get("/:id", protect, checkPermission("read_test"), getTest);
 
-router.post("/upload-pdf", protect, checkPermission("create_test"), uploadPdf.single("pdfFile"), uploadPdfTest);
+router.post("/upload-pdf", protect, checkPermission("create_test"), uploadPdf.array("pdfFiles"), uploadPdfTest);
 router.post("/", protect, checkPermission("create_test"), createTest);
 router.post("/:id/questions", protect, checkPermission("update_test"), addQuestion);
 

@@ -26,6 +26,20 @@ const TestSchema = new mongoose.Schema(
             type: Number,
             required: [true, "Please set test duration in minutes"],
         },
+        isStrictSectionMode: {
+            type: Boolean,
+            default: false,
+        },
+        sectionDurations: [{
+            name: {
+                type: String,
+                required: true,
+            },
+            duration: {
+                type: Number, // duration in minutes for this specific section
+                required: true,
+            }
+        }],
         totalMarks: {
             type: Number,
             required: true,

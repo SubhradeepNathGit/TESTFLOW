@@ -199,27 +199,44 @@ const ResultsPage = () => {
                         ))}
                     </div>
 
+                    {/* Section Breakdown */}
+                    {lastAttempt?.sectionScores && Object.keys(lastAttempt.sectionScores).length > 0 && (
+                        <div className="px-4 sm:px-7 mb-7">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Section Breakdown</h3>
+                            <div className="space-y-2">
+                                {Object.entries(lastAttempt.sectionScores).map(([sec, marks]) => (
+                                    <div key={sec} className="bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.06] rounded-xl p-3 px-5 flex items-center justify-between">
+                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{sec}</span>
+                                        <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{marks} <span className="text-[9px] text-slate-400 uppercase tracking-widest ml-1">Pts</span></span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Actions */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.9 }}
-                        className="px-7 pb-8 space-y-3"
+                        className="px-7 pb-8 flex flex-col gap-4"
                     >
-                        <button
-                            onClick={() => navigate('/student-dashboard')}
-                            className="w-full bg-slate-950 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-widest shadow-xl active:scale-95"
-                        >
-                            <FiArrowLeft size={14} />
-                            Back to Dashboard
-                        </button>
-                        <button
-                            onClick={() => navigate('/leaderboard')}
-                            className="w-full bg-indigo-50 dark:bg-white/[0.05] border border-indigo-100 dark:border-white/[0.08] text-indigo-700 dark:text-indigo-400 font-black py-3.5 rounded-2xl hover:bg-indigo-100 dark:hover:bg-white/[0.1] transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-widest active:scale-95"
-                        >
-                            <FiTrendingUp size={14} />
-                            View Leaderboard
-                        </button>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => navigate('/student-dashboard')}
+                                className="flex-1 bg-slate-950 dark:bg-white text-white dark:text-black font-black py-3 rounded-2xl hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest shadow-xl active:scale-95"
+                            >
+                                <FiArrowLeft size={14} />
+                                Dashboard
+                            </button>
+                            <button
+                                onClick={() => navigate('/leaderboard')}
+                                className="flex-1 bg-indigo-50 dark:bg-white/[0.05] border border-indigo-100 dark:border-white/[0.08] text-indigo-700 dark:text-indigo-400 font-black py-3 rounded-2xl hover:bg-indigo-100 dark:hover:bg-white/[0.1] transition-all flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest active:scale-95"
+                            >
+                                <FiTrendingUp size={14} />
+                                Leaderboard
+                            </button>
+                        </div>
                         <p className="text-center text-[11px] font-semibold text-slate-400">
                             Detailed question-by-question analysis coming soon.
                         </p>

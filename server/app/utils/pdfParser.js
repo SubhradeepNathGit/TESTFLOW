@@ -2,7 +2,7 @@ const { PDFParse } = require("pdf-parse");
 const Tesseract = require("tesseract.js");
 
 // PDF MCQ parser
-const parseMCQFromPDF = async (buffer) => {
+const parseMCQFromPDF = async (buffer, uiSections = []) => {
     let parser = null;
     try {
         parser = new PDFParse({ data: buffer });
@@ -24,14 +24,55 @@ const parseMCQFromPDF = async (buffer) => {
 
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let currentMarks = 1;
+        let currentSection = "General";
+        let isStrictSectionMode = false;
+        const sectionDurations = [];
+
+        // Strict Section Header Regex: [Section: Name | Time: Minutes]
+        const strictSectionRegex = /\[Section:\s*(.+?)\s*\|\s*Time:\s*(\d+)\]/i;
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             
-            // Section detection
-            if (/Section\s*A/i.test(line)) currentMarks = 1;
-            else if (/Section\s*B/i.test(line)) currentMarks = 2;
-            else if (/Section\s*C/i.test(line)) currentMarks = 5;
+            // UI-defined section detection
+            let matchedUiSection = false;
+            if (uiSections.length > 0) {
+                const normalizedLine = line.toLowerCase().replace(/\[|\]/g, '').trim();
+                const matchedSec = uiSections.find(s => normalizedLine.includes(s.name.toLowerCase()));
+                if (matchedSec) {
+                    currentSection = matchedSec.name;
+                    matchedUiSection = true;
+                    // We don't skip the line if it might contain a question immediately, but usually section headers are isolated.
+                    if (normalizedLine === matchedSec.name.toLowerCase() || normalizedLine.startsWith('section')) {
+                        continue;
+                    }
+                }
+            }
+
+            // Strict Section Header Regex: [Section: Name | Time: Minutes]
+            const strictMatch = line.match(strictSectionRegex);
+            if (!matchedUiSection && strictMatch) {
+                isStrictSectionMode = true;
+                currentSection = strictMatch[1].trim();
+                const duration = parseInt(strictMatch[2], 10);
+                if (!sectionDurations.find(s => s.name === currentSection)) {
+                    sectionDurations.push({ name: currentSection, duration });
+                }
+                continue; // skip this line for question parsing
+            } else if (!matchedUiSection && /(.+?)\s+Section/i.test(line)) {
+                currentSection = line.match(/(.+?)\s+Section/i)[1].trim();
+            } else if (!matchedUiSection && /Section\s+(.+)/i.test(line)) {
+                currentSection = line.match(/Section\s+(.+)/i)[1].trim();
+            } else if (!matchedUiSection && /Section\s*A/i.test(line)) {
+                currentMarks = 1;
+                currentSection = "Section A";
+            } else if (/Section\s*B/i.test(line)) {
+                currentMarks = 2;
+                currentSection = "Section B";
+            } else if (/Section\s*C/i.test(line)) {
+                currentMarks = 5;
+                currentSection = "Section C";
+            }
 
             const qMatch = line.match(questionRegex);
             const oMatch = line.match(optionRegex);
@@ -50,7 +91,8 @@ const parseMCQFromPDF = async (buffer) => {
                     questionText: qMatch[2],
                     options: [],
                     correctAnswer: "",
-                    marks: currentMarks
+                    marks: currentMarks,
+                    section: currentSection
                 };
             } else if (oMatch && currentQuestion) {
                 currentQuestion.options.push(oMatch[2]);
@@ -73,7 +115,13 @@ const parseMCQFromPDF = async (buffer) => {
         if (currentQuestion) questions.push(currentQuestion);
 
         // Filter valid questions
-        return questions.filter(q => q.options.length >= 2);
+        const validQuestions = questions.filter(q => q.options.length >= 2);
+        
+        return {
+            questions: validQuestions,
+            isStrictSectionMode,
+            sectionDurations
+        };
         
     } catch (error) {
         console.error("PDF Parsing Error:", error);
