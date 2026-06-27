@@ -1,5 +1,55 @@
 # TESTFLOW
 
+<p align="center">
+  <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="client/public/Banner1.png" width="32%" />
+  <img src="client/public/Banner2.png" width="32%" />
+  <img src="client/public/Banner3.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner4.png" width="32%" />
+  <img src="client/public/Banner5.png" width="32%" />
+  <img src="client/public/Banner6.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner7.png" width="32%" />
+  <img src="client/public/Banner8.png" width="32%" />
+  <img src="client/public/Banner9.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner10.png" width="32%" />
+  <img src="client/public/Banner11.png" width="32%" />
+  <img src="client/public/Banner12.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner13.png" width="32%" />
+  <img src="client/public/Banner14.png" width="32%" />
+  <img src="client/public/Banner15.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner16.png" width="32%" />
+  <img src="client/public/Banner17.png" width="32%" />
+  <img src="client/public/Banner18.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner19.png" width="32%" />
+  <img src="client/public/Banner20.png" width="32%" />
+  <img src="client/public/Banner21.png" width="32%" />
+</p>
+<p align="center">
+  <img src="client/public/Banner22.png" width="49%" />
+  <img src="client/public/Banner23.png" width="49%" />
+</p>
+
 **TESTFLOW** is a highly scalable, production-ready Online Test Portal Engine designed to automate and streamline the assessment process. Built on a robust MERN (MongoDB, Express, React, Node.js) stack, it handles large-scale concurrent users, asynchronous jobs via Redis and BullMQ, and features an intelligent PDF Parsing Engine equipped with OCR capabilities.
 
 ## 🚀 Features
@@ -48,6 +98,21 @@ When a student starts an exam, keeping track of the timer natively on the Node s
 - **The Worker**: If the student doesn't submit manually, the worker (`config/worker.js`) triggers exactly when the delay ends, calculates the score independently, marks the attempt as `AUTO_SUBMITTED`, and commits it to the database.
 - **Graceful Cancellation**: If the student submits manually, the system queries BullMQ using the `jobId` (`submit-${attemptId}`) and removes the scheduled auto-submit job.
 
+### 3. Multi-Section Test Engine (Real-World Recruitment Assessment)
+To mirror real-world recruitment and corporate assessments, TESTFLOW incorporates a highly advanced Multi-Section Test capability. This builds upon the traditional single-flow test by grouping questions into distinct logical sections (e.g., Aptitude, Technical, HR) with dedicated time management and navigation constraints.
+
+**How it was built over the existing system:**
+- **Dynamic Data Structure:** The backend schema was upgraded to support a nested `sections` array within the `Test` model, mapping questions to their respective section IDs rather than a flat list.
+- **Section-Level Time Management:** Instead of a single global timer, the test engine now supports isolated timers per section. State management tracks active sections, automatically enforcing time limits and switching to the next section when time expires.
+- **Strict Navigation Control:** Real-world assessments prevent candidates from freely navigating between sections. The updated UI implements lock-downs: once a section is submitted or times out, it is locked permanently. The student must progress linearly, mirroring platforms like HackerRank or SHL.
+- **Sectional Analytics:** The auto-submit BullMQ worker was modified to calculate scores not just globally, but on a per-section basis, giving recruiters detailed insights into a candidate's specific domain strengths.
+
+**Workflow Implementation:**
+1. **Authoring:** Admin defines sections (e.g., "Logical Reasoning - 15 mins", "Coding - 30 mins") and assigns parsed questions to these sections.
+2. **Execution:** Student starts the test. Only the first section is active. The global timer and section timer run concurrently.
+3. **Transition:** When the section timer runs out (or the student submits the section), the frontend dispatches a `SECTION_SUBMIT` event, saving the current state to the backend, locking the section, and seamlessly transitioning to the next.
+4. **Finalization:** Upon completing the final section, the entire test is submitted, and the BullMQ worker finalizes the score analytics.
+
 ---
 
 ## 💻 Full Workflow
@@ -66,6 +131,19 @@ When a student starts an exam, keeping track of the timer natively on the Node s
    - *Manual*: Student clicks submit. Backend calculates score, BullMQ job is canceled.
    - *Auto*: Timer hits zero. BullMQ worker kicks in and finalizes the attempt autonomously.
 5. **Leaderboard**: Socket.io triggers a refetch, dynamically updating the global leaderboard for all connected clients.
+
+---
+
+## 🐳 Docker & Containerization Implementation
+
+TESTFLOW is fully containerized to ensure consistent environments from development to production, leveraging `docker-compose` for orchestration.
+
+**How Docker is Implemented:**
+- **Microservices Architecture:** The application is split into isolated containers for the `client` and `server`.
+- **Backend Container (`testflow-server`):** Built from `server/Dockerfile`, running on Node.js. It mounts a local volume for `server/uploads` to persist uploaded PDFs/media and injects environment variables securely.
+- **Frontend Container (`testflow-client`):** Built from `client/Dockerfile`. In production, it utilizes NGINX within the container to serve the static React build and handles SSL termination (mounting Let's Encrypt certificates directly into the NGINX configuration).
+- **Network Bridge (`testflow-network`):** A custom Docker network bridge allows the frontend and backend containers to communicate securely by resolving container names (e.g., `server:3006`) without exposing unnecessary ports to the host.
+- **Deployment Efficiency:** The entire stack can be spun up with a single command (`docker-compose up -d --build`), drastically reducing environment setup time and configuration drift.
 
 ---
 
