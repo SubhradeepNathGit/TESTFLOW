@@ -9,6 +9,7 @@ import { Database, CheckCircle2, XCircle, Trash2, Search, Building2, Users, Book
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../utils/cn";
 import useDebounce from "../../hooks/useDebounce";
+import useThrottle from "../../hooks/useThrottle";
 import { useConfirm } from "../../hooks/useConfirm.jsx";
 
 const EmptyState = ({ icon: Icon, title, desc }) => (
