@@ -99,7 +99,7 @@ When a student starts an exam, keeping track of the timer natively on the Node s
 - **The Worker**: If the student doesn't submit manually, the worker (`config/worker.js`) triggers exactly when the delay ends, calculates the score independently, marks the attempt as `AUTO_SUBMITTED`, and commits it to the database.
 - **Graceful Cancellation**: If the student submits manually, the system queries BullMQ using the `jobId` (`submit-${attemptId}`) and removes the scheduled auto-submit job.
 
-### 3. Multi-Section Test Engine (Real-World Recruitment Assessment)
+### 3. Multi-Section Test Engine 
 To mirror real-world recruitment and corporate assessments, TESTFLOW incorporates a highly advanced Multi-Section Test capability. This builds upon the traditional single-flow test by grouping questions into distinct logical sections (e.g., Aptitude, Technical, HR) with dedicated time management and navigation constraints.
 
 **How it was built over the existing system:**
@@ -114,24 +114,47 @@ To mirror real-world recruitment and corporate assessments, TESTFLOW incorporate
 3. **Transition:** When the section timer runs out (or the student submits the section), the frontend dispatches a `SECTION_SUBMIT` event, saving the current state to the backend, locking the section, and seamlessly transitioning to the next.
 4. **Finalization:** Upon completing the final section, the entire test is submitted, and the BullMQ worker finalizes the score analytics.
 
+### 4. Pass/Fail Evaluation Engine
+Upon submission, the backend evaluates the student's selected options against the parsed JSON answer key. A predefined threshold (e.g., passing percentage) set by the Instructor determines the final status. The attempt record is immediately updated in the database with the calculated score, grade, and a boolean `passed` flag to denote whether the student cleared the assessment.
+
+### 5. Real-Time Global Leaderboard
+The global leaderboard operates as a live, highly competitive environment. Leveraging Socket.io, the backend emits a broadcast event the moment any student's test is finalized. Connected React clients instantly intercept this, invalidate their React Query caches, and orchestrate a smooth re-render of the ranked list—ordered by highest score and fastest completion time—without requiring a manual page refresh.
+
+### 6. Comprehensive Analytics Hub & Aggregation Pipelines
+To empower Company Admins and Instructors, the platform processes massive amounts of attempt data using advanced **MongoDB Aggregation Pipelines**. By offloading complex calculations to the database layer, the Node.js event loop remains unblocked, ensuring high scalability.
+
+**Key Pipeline Implementations in the Codebase:**
+- **Dynamic Score Distribution (`$bucket`)**: The pipeline joins (`$lookup`) the `Attempt` and `Test` collections, calculates the dynamic percentage per attempt using `$project` and conditional (`$cond`) operators to prevent division-by-zero, and leverages the `$bucket` operator to autonomously group students into performance percentiles (e.g., 0-20%, 81-100%).
+- **Top Institution Leaderboards (`$group` & `$sort`)**: Aggregates average scores across entire institutions by computing percentages on the fly, joining the Institution collection to map IDs to names, and returning the optimized top 5 results using `$sort` and `$limit`.
+- **Pass/Fail Analytics**: Projects a calculated `passed` status (`$cond` evaluating if the percentage is `>= 50%`) and groups them (`$sum: 1`) to instantly retrieve the global success ratio.
+- **Global Leaderboard Filtering**: When constructing the live student leaderboard, the pipeline joins the test metadata and strictly filters out (`$match`) attempts associated with `isDeleted` or archived tests, guaranteeing real-time data integrity.
+
+On the frontend, **Recharts** translates these dense, pre-processed JSON data arrays into stunning, interactive visual dashboards.
+
 ---
 
 ## 💻 Full Workflow
 
-### 1. Admin Workflow
-1. **Creation**: Admin uploads a Question Paper PDF.
-2. **Parsing**: The backend parses the PDF via the Parser Engine and returns structured JSON (Questions, Options, Answers).
-3. **Review**: The Admin reviews the parsed output on the frontend and creates the Test object.
-4. **Publish**: The Test goes live. Socket.io broadcasts the availability.
+### 1. Registration & Onboarding Workflow
+1. **Platform Admin**: Manages the overall platform and governs system-wide configurations.
+2. **Company Admin (Owner)**: Registers the company/institution on the portal. They act as the primary owner for that company's ecosystem.
+3. **Instructor Onboarding**: Under the Company ID, Instructors register or are added to manage and supervise the assessments.
+4. **Student/Employee Onboarding**: The Company Admin adds Students/Employees to the platform. Their secure login credentials are automatically generated and dispatched to their registered email addresses.
 
-### 2. Student Workflow
-1. **Enrollment**: Student joins the portal, sees live tests.
+### 2. Assessment Creation Workflow
+1. **Creation**: The Instructor or Company Admin uploads a Question Paper PDF.
+2. **Parsing**: The backend parses the PDF via the Parser Engine and returns structured JSON (Questions, Options, Answers).
+3. **Review**: The Instructor reviews the parsed output on the frontend and finalizes the Test object.
+4. **Publish**: The Test goes live. Socket.io broadcasts the availability to the targeted employees/students.
+
+### 3. Student / Employee Workflow
+1. **Login**: Employees check their email for auto-generated credentials, log into the portal, and find their assigned tests on their dashboard.
 2. **Attempt**: Student starts the test. The backend registers an `IN_PROGRESS` attempt and schedules a BullMQ job.
-3. **Execution**: The React frontend locks down, showing the countdown. Answers are synced via React Query.
+3. **Execution**: The React frontend locks down, showing the countdown. Answers are synced securely via React Query.
 4. **Submission**:
    - *Manual*: Student clicks submit. Backend calculates score, BullMQ job is canceled.
    - *Auto*: Timer hits zero. BullMQ worker kicks in and finalizes the attempt autonomously.
-5. **Leaderboard**: Socket.io triggers a refetch, dynamically updating the global leaderboard for all connected clients.
+5. **Leaderboard & Analytics**: Socket.io triggers a refetch, dynamically updating leaderboards, while detailed sectional analytics are generated for the Company Admin.
 
 ---
 
@@ -294,4 +317,8 @@ Restart NGINX:
 sudo systemctl restart nginx
 ```
 
-Your TESTFLOW instance is now live, scalable, and fully operational!
+---
+
+Developed by Subhradeep Nath
+Copyright (c) 2026 Subhradeep Nath. All rights reserved.
+LinkedIn: https://www.linkedin.com/in/subhradeep-nath/
