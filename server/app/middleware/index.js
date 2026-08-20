@@ -32,7 +32,7 @@ module.exports = (app) => {
     // CORS Configuration
     const allowedOrigins = process.env.ALLOWED_ORIGINS 
         ? process.env.ALLOWED_ORIGINS.split(",").map(o => o.trim()) 
-        : ["http://localhost:5173"];
+        : ["http://localhost:5173", "http://localhost:5174", "https://testflow-portal.vercel.app"];
     
     console.log("CORS Allowed Origins:", allowedOrigins);
         
@@ -41,7 +41,11 @@ module.exports = (app) => {
             // Allow requests with no origin (like mobile apps or curl)
             if (!origin) return callback(null, true);
             
-            if (allowedOrigins.indexOf(origin) !== -1) {
+            const isAllowed = allowedOrigins.indexOf(origin) !== -1 || 
+                             origin.endsWith('.vercel.app') ||
+                             process.env.NODE_ENV !== 'production';
+
+            if (isAllowed) {
                 callback(null, true);
             } else {
                 console.log("CORS Blocked Origin:", origin);
